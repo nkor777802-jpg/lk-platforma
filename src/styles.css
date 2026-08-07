@@ -5,6 +5,16 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
+ * ФИРМЕННЫЙ СТИЛЬ «ЛЮДИНОВОКАБЕЛЬ»
+ * Источник: брендбук + логотип PANTONE.
+ * Основной: оранжевый Pantone 166C #E3661D
+ * Дополнительный: синий Pantone 654C #112866
+ * Парные: #EF7F1A (1585C), #0A4B81 (541C)
+ * Доп.: #323232, #4D4D4D, #1A7E8C (3145C), #399EAD (3135C)
+ * Не изобретать новые цвета — использовать только эти токены.
+ */
+
+/*
  * Design system definition.
  *
  * The @theme inline block maps CSS custom properties to Tailwind utility

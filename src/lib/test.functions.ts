@@ -256,7 +256,7 @@ export const getProtocolHtml = createServerFn({ method: "POST" })
     const { data: profession } = await supabaseAdmin
       .from("professions")
       .select("name")
-      .eq("id", attempt.profession_id)
+      .eq("id", attempt.profession_id ?? "")
       .single();
     const { data: answers } = await supabaseAdmin
       .from("test_answers")

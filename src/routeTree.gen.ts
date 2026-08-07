@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticated/company'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
@@ -20,6 +21,8 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as AuthenticatedProfessionsIndexRouteImport } from './routes/_authenticated/professions.index'
 import { Route as AuthenticatedProfessionsSlugRouteImport } from './routes/_authenticated/professions.$slug'
+import { Route as AuthenticatedResultsAttemptIdRouteImport } from './routes/_authenticated/results.$attemptId'
+import { Route as AuthenticatedTestProfessionIdRouteImport } from './routes/_authenticated/test.$professionId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,6 +37,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCompanyRoute = AuthenticatedCompanyRouteImport.update({
   id: '/company',
@@ -77,10 +85,23 @@ const AuthenticatedProfessionsSlugRoute =
     path: '/professions/$slug',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedResultsAttemptIdRoute =
+  AuthenticatedResultsAttemptIdRouteImport.update({
+    id: '/results/$attemptId',
+    path: '/results/$attemptId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTestProfessionIdRoute =
+  AuthenticatedTestProfessionIdRouteImport.update({
+    id: '/test/$professionId',
+    path: '/test/$professionId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/library': typeof AuthenticatedLibraryRoute
@@ -88,11 +109,14 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
+  '/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
+  '/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
   '/professions/': typeof AuthenticatedProfessionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/library': typeof AuthenticatedLibraryRoute
@@ -100,6 +124,8 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
+  '/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
+  '/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
   '/professions': typeof AuthenticatedProfessionsIndexRoute
 }
 export interface FileRoutesById {
@@ -107,6 +133,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
@@ -114,6 +141,8 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_authenticated/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
+  '/_authenticated/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
+  '/_authenticated/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
   '/_authenticated/professions/': typeof AuthenticatedProfessionsIndexRoute
 }
 export interface FileRouteTypes {
@@ -121,6 +150,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/admin'
     | '/company'
     | '/dashboard'
     | '/library'
@@ -128,11 +158,14 @@ export interface FileRouteTypes {
     | '/profile'
     | '/videos'
     | '/professions/$slug'
+    | '/results/$attemptId'
+    | '/test/$professionId'
     | '/professions/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/admin'
     | '/company'
     | '/dashboard'
     | '/library'
@@ -140,12 +173,15 @@ export interface FileRouteTypes {
     | '/profile'
     | '/videos'
     | '/professions/$slug'
+    | '/results/$attemptId'
+    | '/test/$professionId'
     | '/professions'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/admin'
     | '/_authenticated/company'
     | '/_authenticated/dashboard'
     | '/_authenticated/library'
@@ -153,6 +189,8 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/videos'
     | '/_authenticated/professions/$slug'
+    | '/_authenticated/results/$attemptId'
+    | '/_authenticated/test/$professionId'
     | '/_authenticated/professions/'
   fileRoutesById: FileRoutesById
 }
@@ -184,6 +222,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/company': {
       id: '/_authenticated/company'
@@ -241,10 +286,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfessionsSlugRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/results/$attemptId': {
+      id: '/_authenticated/results/$attemptId'
+      path: '/results/$attemptId'
+      fullPath: '/results/$attemptId'
+      preLoaderRoute: typeof AuthenticatedResultsAttemptIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/test/$professionId': {
+      id: '/_authenticated/test/$professionId'
+      path: '/test/$professionId'
+      fullPath: '/test/$professionId'
+      preLoaderRoute: typeof AuthenticatedTestProfessionIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedCompanyRoute: typeof AuthenticatedCompanyRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
@@ -252,10 +312,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedProfessionsSlugRoute: typeof AuthenticatedProfessionsSlugRoute
+  AuthenticatedResultsAttemptIdRoute: typeof AuthenticatedResultsAttemptIdRoute
+  AuthenticatedTestProfessionIdRoute: typeof AuthenticatedTestProfessionIdRoute
   AuthenticatedProfessionsIndexRoute: typeof AuthenticatedProfessionsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedCompanyRoute: AuthenticatedCompanyRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
@@ -263,6 +326,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedProfessionsSlugRoute: AuthenticatedProfessionsSlugRoute,
+  AuthenticatedResultsAttemptIdRoute: AuthenticatedResultsAttemptIdRoute,
+  AuthenticatedTestProfessionIdRoute: AuthenticatedTestProfessionIdRoute,
   AuthenticatedProfessionsIndexRoute: AuthenticatedProfessionsIndexRoute,
 }
 

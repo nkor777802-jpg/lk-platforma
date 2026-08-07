@@ -119,7 +119,7 @@ function ProfilePage() {
   );
 }
 
-function Field({ label, value }: { label: string; value?: string | null }) {
+function Field({ label, value }: { label: string; value: string | null | undefined }) {
   return (
     <div>
       <p className="text-muted-foreground">{label}</p>

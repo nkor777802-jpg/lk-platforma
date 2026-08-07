@@ -15,6 +15,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticated/company'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
+import { Route as AuthenticatedProfessionsIndexRouteImport } from './routes/_authenticated/professions.index'
+import { Route as AuthenticatedProfessionsSlugRouteImport } from './routes/_authenticated/professions.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -45,6 +47,18 @@ const AuthenticatedProductsRoute = AuthenticatedProductsRouteImport.update({
   path: '/products',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProfessionsIndexRoute =
+  AuthenticatedProfessionsIndexRouteImport.update({
+    id: '/professions/',
+    path: '/professions/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProfessionsSlugRoute =
+  AuthenticatedProfessionsSlugRouteImport.update({
+    id: '/professions/$slug',
+    path: '/professions/$slug',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -52,6 +66,8 @@ export interface FileRoutesByFullPath {
   '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/products': typeof AuthenticatedProductsRoute
+  '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
+  '/professions/': typeof AuthenticatedProfessionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -59,6 +75,8 @@ export interface FileRoutesByTo {
   '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/products': typeof AuthenticatedProductsRoute
+  '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
+  '/professions': typeof AuthenticatedProfessionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,12 +86,28 @@ export interface FileRoutesById {
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
+  '/_authenticated/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
+  '/_authenticated/professions/': typeof AuthenticatedProfessionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/company' | '/dashboard' | '/products'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/company'
+    | '/dashboard'
+    | '/products'
+    | '/professions/$slug'
+    | '/professions/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/company' | '/dashboard' | '/products'
+  to:
+    | '/'
+    | '/auth'
+    | '/company'
+    | '/dashboard'
+    | '/products'
+    | '/professions/$slug'
+    | '/professions'
   id:
     | '__root__'
     | '/'
@@ -82,6 +116,8 @@ export interface FileRouteTypes {
     | '/_authenticated/company'
     | '/_authenticated/dashboard'
     | '/_authenticated/products'
+    | '/_authenticated/professions/$slug'
+    | '/_authenticated/professions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -134,6 +170,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProductsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/professions/': {
+      id: '/_authenticated/professions/'
+      path: '/professions'
+      fullPath: '/professions/'
+      preLoaderRoute: typeof AuthenticatedProfessionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/professions/$slug': {
+      id: '/_authenticated/professions/$slug'
+      path: '/professions/$slug'
+      fullPath: '/professions/$slug'
+      preLoaderRoute: typeof AuthenticatedProfessionsSlugRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -141,12 +191,16 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCompanyRoute: typeof AuthenticatedCompanyRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
+  AuthenticatedProfessionsSlugRoute: typeof AuthenticatedProfessionsSlugRoute
+  AuthenticatedProfessionsIndexRoute: typeof AuthenticatedProfessionsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCompanyRoute: AuthenticatedCompanyRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
+  AuthenticatedProfessionsSlugRoute: AuthenticatedProfessionsSlugRoute,
+  AuthenticatedProfessionsIndexRoute: AuthenticatedProfessionsIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

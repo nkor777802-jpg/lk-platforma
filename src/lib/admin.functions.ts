@@ -511,3 +511,35 @@ export const exportCsv = createServerFn({ method: "POST" })
     await logAction({ actorId: context.userId, action: "export", entity: data.kind });
     return { csv: toCsv(rows), count: rows.length };
   });
+
+export const bootstrapFirstAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: existing, error: checkError } = await supabaseAdmin
+      .from("user_roles")
+      .select("id")
+      .eq("role", "admin")
+      .limit(1);
+    if (checkError) throw new Error("Не удалось проверить наличие администраторов");
+    if ((existing ?? []).length > 0) {
+      throw new Error("Администратор уже существует. Обратитесь к нему для получения прав.");
+    }
+
+    const { error } = await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: context.userId, role: "admin" });
+    if (error) throw new Error("Не удалось назначить роль администратора");
+
+    const { logAction } = await import("./admin.server");
+    await logAction({
+      actorId: context.userId,
+      action: "bootstrap.admin",
+      entity: "user_roles",
+      entityId: context.userId,
+      details: { role: "admin" },
+    });
+
+    return { success: true };
+  });

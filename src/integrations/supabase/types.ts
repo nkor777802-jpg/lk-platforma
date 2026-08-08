@@ -1227,7 +1227,10 @@ export type Database = {
           id: string
           is_active: boolean
           is_common: boolean
+          points: number
           profession_id: string | null
+          question_type: string
+          reference_answer: string | null
           source_material_id: string | null
           text: string
           topic: string | null
@@ -1241,7 +1244,10 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_common?: boolean
+          points?: number
           profession_id?: string | null
+          question_type?: string
+          reference_answer?: string | null
           source_material_id?: string | null
           text: string
           topic?: string | null
@@ -1255,7 +1261,10 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_common?: boolean
+          points?: number
           profession_id?: string | null
+          question_type?: string
+          reference_answer?: string | null
           source_material_id?: string | null
           text?: string
           topic?: string | null
@@ -1312,11 +1321,19 @@ export type Database = {
           correct_text: string | null
           id: string
           is_correct: boolean | null
+          points: number
           question_id: string | null
           question_text: string
+          review_comment: string | null
+          review_score: number | null
+          review_status: string
+          reviewed_at: string | null
+          reviewer_id: string | null
           selected_option_id: string | null
+          selected_option_ids: string[]
           selected_text: string | null
           sort_order: number
+          text_answer: string | null
           time_spent_seconds: number | null
         }
         Insert: {
@@ -1325,11 +1342,19 @@ export type Database = {
           correct_text?: string | null
           id?: string
           is_correct?: boolean | null
+          points?: number
           question_id?: string | null
           question_text?: string
+          review_comment?: string | null
+          review_score?: number | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
           selected_option_id?: string | null
+          selected_option_ids?: string[]
           selected_text?: string | null
           sort_order?: number
+          text_answer?: string | null
           time_spent_seconds?: number | null
         }
         Update: {
@@ -1338,11 +1363,19 @@ export type Database = {
           correct_text?: string | null
           id?: string
           is_correct?: boolean | null
+          points?: number
           question_id?: string | null
           question_text?: string
+          review_comment?: string | null
+          review_score?: number | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
           selected_option_id?: string | null
+          selected_option_ids?: string[]
           selected_text?: string | null
           sort_order?: number
+          text_answer?: string | null
           time_spent_seconds?: number | null
         }
         Relationships: [
@@ -1367,6 +1400,7 @@ export type Database = {
           attempt_number: number
           correct_answers: number
           finished_at: string | null
+          grade_result: string | null
           id: string
           passed: boolean | null
           profession_id: string | null
@@ -1381,6 +1415,7 @@ export type Database = {
           attempt_number?: number
           correct_answers?: number
           finished_at?: string | null
+          grade_result?: string | null
           id?: string
           passed?: boolean | null
           profession_id?: string | null
@@ -1395,6 +1430,7 @@ export type Database = {
           attempt_number?: number
           correct_answers?: number
           finished_at?: string | null
+          grade_result?: string | null
           id?: string
           passed?: boolean | null
           profession_id?: string | null
@@ -1458,15 +1494,19 @@ export type Database = {
           is_default: boolean
           lock_answer: boolean
           max_attempts: number
+          mode: string
           pass_percent: number
           profession_id: string | null
           professional_questions: number
+          result_rule: string
+          retry_interval_hours: number
           show_correct_answer: boolean
           shuffle_options: boolean
           shuffle_questions: boolean
           time_limit_minutes: number | null
           total_questions: number
           updated_at: string
+          warn_before_minutes: number
         }
         Insert: {
           allow_retry?: boolean
@@ -1477,15 +1517,19 @@ export type Database = {
           is_default?: boolean
           lock_answer?: boolean
           max_attempts?: number
+          mode?: string
           pass_percent?: number
           profession_id?: string | null
           professional_questions?: number
+          result_rule?: string
+          retry_interval_hours?: number
           show_correct_answer?: boolean
           shuffle_options?: boolean
           shuffle_questions?: boolean
           time_limit_minutes?: number | null
           total_questions?: number
           updated_at?: string
+          warn_before_minutes?: number
         }
         Update: {
           allow_retry?: boolean
@@ -1496,15 +1540,19 @@ export type Database = {
           is_default?: boolean
           lock_answer?: boolean
           max_attempts?: number
+          mode?: string
           pass_percent?: number
           profession_id?: string | null
           professional_questions?: number
+          result_rule?: string
+          retry_interval_hours?: number
           show_correct_answer?: boolean
           shuffle_options?: boolean
           shuffle_questions?: boolean
           time_limit_minutes?: number | null
           total_questions?: number
           updated_at?: string
+          warn_before_minutes?: number
         }
         Relationships: [
           {

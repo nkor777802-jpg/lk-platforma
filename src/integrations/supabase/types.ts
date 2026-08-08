@@ -207,6 +207,57 @@ export type Database = {
         }
         Relationships: []
       }
+      cable_constructions: {
+        Row: {
+          asset_code: string | null
+          created_at: string
+          element_code: string
+          element_name: string
+          id: string
+          is_active: boolean
+          layer_description: string | null
+          layer_number: number
+          material_code: string | null
+          process: string | null
+          product_code: string
+          show_in_learning: boolean
+          updated_at: string
+          visual_type: string | null
+        }
+        Insert: {
+          asset_code?: string | null
+          created_at?: string
+          element_code: string
+          element_name: string
+          id?: string
+          is_active?: boolean
+          layer_description?: string | null
+          layer_number: number
+          material_code?: string | null
+          process?: string | null
+          product_code: string
+          show_in_learning?: boolean
+          updated_at?: string
+          visual_type?: string | null
+        }
+        Update: {
+          asset_code?: string | null
+          created_at?: string
+          element_code?: string
+          element_name?: string
+          id?: string
+          is_active?: boolean
+          layer_description?: string | null
+          layer_number?: number
+          material_code?: string | null
+          process?: string | null
+          product_code?: string
+          show_in_learning?: boolean
+          updated_at?: string
+          visual_type?: string | null
+        }
+        Relationships: []
+      }
       certificates: {
         Row: {
           attempt_id: string | null
@@ -410,8 +461,68 @@ export type Database = {
         }
         Relationships: []
       }
+      course_lessons: {
+        Row: {
+          code: string | null
+          content: string | null
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          file_url: string | null
+          id: string
+          is_active: boolean
+          is_required: boolean
+          material_type: string
+          module_id: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          code?: string | null
+          content?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          file_url?: string | null
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          material_type?: string
+          module_id: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string | null
+          content?: string | null
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          file_url?: string | null
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          material_type?: string
+          module_id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_lessons_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "course_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_modules: {
         Row: {
+          code: string | null
           course_id: string
           created_at: string
           description: string | null
@@ -423,6 +534,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          code?: string | null
           course_id: string
           created_at?: string
           description?: string | null
@@ -434,6 +546,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          code?: string | null
           course_id?: string
           created_at?: string
           description?: string | null
@@ -489,6 +602,7 @@ export type Database = {
       }
       courses: {
         Row: {
+          code: string | null
           created_at: string
           description: string | null
           id: string
@@ -500,6 +614,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          code?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -511,6 +626,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          code?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -530,6 +646,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      defects: {
+        Row: {
+          code: string
+          corrective_action: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          possible_cause: string | null
+          process: string | null
+          product_category: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          corrective_action?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          possible_cause?: string | null
+          process?: string | null
+          product_category?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          corrective_action?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          possible_cause?: string | null
+          process?: string | null
+          product_category?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       departments: {
         Row: {
@@ -906,6 +1067,54 @@ export type Database = {
           },
         ]
       }
+      import_runs: {
+        Row: {
+          actor_id: string | null
+          actor_name: string | null
+          created_at: string
+          created_rows: number
+          error_rows: number
+          file_name: string | null
+          id: string
+          kind: string
+          report: Json
+          skipped_rows: number
+          status: string
+          total_rows: number
+          updated_rows: number
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          created_rows?: number
+          error_rows?: number
+          file_name?: string | null
+          id?: string
+          kind: string
+          report?: Json
+          skipped_rows?: number
+          status?: string
+          total_rows?: number
+          updated_rows?: number
+        }
+        Update: {
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          created_rows?: number
+          error_rows?: number
+          file_name?: string | null
+          id?: string
+          kind?: string
+          report?: Json
+          skipped_rows?: number
+          status?: string
+          total_rows?: number
+          updated_rows?: number
+        }
+        Relationships: []
+      }
       learning_categories: {
         Row: {
           code: string | null
@@ -1075,7 +1284,11 @@ export type Database = {
       }
       materials: {
         Row: {
+          actualized_at: string | null
+          author: string | null
           category_id: string | null
+          code: string | null
+          course_id: string | null
           created_at: string
           department_id: string | null
           description: string | null
@@ -1086,6 +1299,7 @@ export type Database = {
           id: string
           is_active: boolean
           is_mandatory_for_all: boolean
+          lesson_id: string | null
           material_type: string
           mime_type: string | null
           module_id: string | null
@@ -1094,9 +1308,14 @@ export type Database = {
           tags: string[] | null
           title: string
           updated_at: string
+          version: string | null
         }
         Insert: {
+          actualized_at?: string | null
+          author?: string | null
           category_id?: string | null
+          code?: string | null
+          course_id?: string | null
           created_at?: string
           department_id?: string | null
           description?: string | null
@@ -1107,6 +1326,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_mandatory_for_all?: boolean
+          lesson_id?: string | null
           material_type?: string
           mime_type?: string | null
           module_id?: string | null
@@ -1115,9 +1335,14 @@ export type Database = {
           tags?: string[] | null
           title: string
           updated_at?: string
+          version?: string | null
         }
         Update: {
+          actualized_at?: string | null
+          author?: string | null
           category_id?: string | null
+          code?: string | null
+          course_id?: string | null
           created_at?: string
           department_id?: string | null
           description?: string | null
@@ -1128,6 +1353,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_mandatory_for_all?: boolean
+          lesson_id?: string | null
           material_type?: string
           mime_type?: string | null
           module_id?: string | null
@@ -1136,6 +1362,7 @@ export type Database = {
           tags?: string[] | null
           title?: string
           updated_at?: string
+          version?: string | null
         }
         Relationships: [
           {
@@ -1146,10 +1373,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "materials_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "materials_department_id_fkey"
             columns: ["department_id"]
             isOneToOne: false
             referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "materials_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "course_lessons"
             referencedColumns: ["id"]
           },
           {
@@ -1167,6 +1408,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      model_assets: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          file_url: string | null
+          format: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+          version: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          file_url?: string | null
+          format?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+          version?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          file_url?: string | null
+          format?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+          version?: string | null
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -1414,6 +1694,150 @@ export type Database = {
           },
         ]
       }
+      product_categories: {
+        Row: {
+          code: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      production_materials: {
+        Row: {
+          category: string | null
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      production_products: {
+        Row: {
+          brand: string | null
+          category: string | null
+          code: string
+          created_at: string
+          default_area: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          brand?: string | null
+          category?: string | null
+          code: string
+          created_at?: string
+          default_area?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          brand?: string | null
+          category?: string | null
+          code?: string
+          created_at?: string
+          default_area?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      production_routes: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          is_allowed: boolean
+          is_required_step: boolean
+          process: string
+          product_code: string
+          step_number: number
+          trainer_comment: string | null
+          updated_at: string
+          work_center_code: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_allowed?: boolean
+          is_required_step?: boolean
+          process: string
+          product_code: string
+          step_number: number
+          trainer_comment?: string | null
+          updated_at?: string
+          work_center_code: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_allowed?: boolean
+          is_required_step?: boolean
+          process?: string
+          product_code?: string
+          step_number?: number
+          trainer_comment?: string | null
+          updated_at?: string
+          work_center_code?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           applications: string[] | null
@@ -1542,6 +1966,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          code: string | null
           created_at: string
           department_id: string | null
           email: string | null
@@ -1560,6 +1985,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          code?: string | null
           created_at?: string
           department_id?: string | null
           email?: string | null
@@ -1578,6 +2004,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          code?: string | null
           created_at?: string
           department_id?: string | null
           email?: string | null
@@ -1786,6 +2213,7 @@ export type Database = {
       questions: {
         Row: {
           category: string | null
+          code: string | null
           created_at: string
           difficulty: string
           explanation: string | null
@@ -1803,6 +2231,7 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          code?: string | null
           created_at?: string
           difficulty?: string
           explanation?: string | null
@@ -1820,6 +2249,7 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          code?: string | null
           created_at?: string
           difficulty?: string
           explanation?: string | null
@@ -2052,7 +2482,9 @@ export type Database = {
       test_settings: {
         Row: {
           allow_retry: boolean
+          code: string | null
           common_questions: number
+          course_id: string | null
           created_at: string
           grading_rules: Json
           id: string
@@ -2068,14 +2500,18 @@ export type Database = {
           show_correct_answer: boolean
           shuffle_options: boolean
           shuffle_questions: boolean
+          status: string
           time_limit_minutes: number | null
+          title: string | null
           total_questions: number
           updated_at: string
           warn_before_minutes: number
         }
         Insert: {
           allow_retry?: boolean
+          code?: string | null
           common_questions?: number
+          course_id?: string | null
           created_at?: string
           grading_rules?: Json
           id?: string
@@ -2091,14 +2527,18 @@ export type Database = {
           show_correct_answer?: boolean
           shuffle_options?: boolean
           shuffle_questions?: boolean
+          status?: string
           time_limit_minutes?: number | null
+          title?: string | null
           total_questions?: number
           updated_at?: string
           warn_before_minutes?: number
         }
         Update: {
           allow_retry?: boolean
+          code?: string | null
           common_questions?: number
+          course_id?: string | null
           created_at?: string
           grading_rules?: Json
           id?: string
@@ -2114,12 +2554,21 @@ export type Database = {
           show_correct_answer?: boolean
           shuffle_options?: boolean
           shuffle_questions?: boolean
+          status?: string
           time_limit_minutes?: number | null
+          title?: string | null
           total_questions?: number
           updated_at?: string
           warn_before_minutes?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "test_settings_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "test_settings_profession_id_fkey"
             columns: ["profession_id"]
@@ -2218,6 +2667,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      work_centers: {
+        Row: {
+          area: string | null
+          code: string
+          created_at: string
+          description: string | null
+          equipment_type: string | null
+          id: string
+          is_active: boolean
+          name: string
+          process: string | null
+          site: string | null
+          updated_at: string
+        }
+        Insert: {
+          area?: string | null
+          code: string
+          created_at?: string
+          description?: string | null
+          equipment_type?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          process?: string | null
+          site?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area?: string | null
+          code?: string
+          created_at?: string
+          description?: string | null
+          equipment_type?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          process?: string | null
+          site?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {

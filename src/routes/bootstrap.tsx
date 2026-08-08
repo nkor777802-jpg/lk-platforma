@@ -51,7 +51,8 @@ function BootstrapPage() {
     try {
       await bootstrap({ data: undefined });
       toast.success("Вы назначены первым администратором");
-      void router.navigate({ to: "/admin", replace: true });
+      // Перезагружаем страницу, чтобы контекст авторизации перечитал роли из БД.
+      window.location.href = "/admin";
     } catch (e) {
       toast.error("Не удалось назначить администратора", {
         description: e instanceof Error ? e.message : "Неизвестная ошибка",

@@ -23,9 +23,9 @@ export function PublicHeader() {
           <img
             src={brandLogos.fullCompactColor}
             alt={brandLogos.alt}
-            className="h-11 w-auto object-contain sm:hidden"
-            width={43}
-            height={44}
+            className="h-12 w-auto object-contain sm:hidden"
+            width={47}
+            height={48}
           />
           <img
             src={brandLogos.fullColor}

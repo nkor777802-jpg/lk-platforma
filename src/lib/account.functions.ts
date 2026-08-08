@@ -15,13 +15,13 @@ export const updateMyProfile = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     // Белый список полей: кадровые данные сотрудник менять не может
-    const patch: Record<string, string | null> = {};
-    if (data.phone !== undefined) patch["phone"] = data.phone;
-    if (data.email !== undefined) patch["email"] = data.email;
-    if (data.avatar_url !== undefined) patch["avatar_url"] = data.avatar_url;
+    const patch: { phone?: string | null; email?: string | null; avatar_url?: string | null } = {};
+    if (data.phone !== undefined) patch.phone = data.phone;
+    if (data.email !== undefined) patch.email = data.email;
+    if (data.avatar_url !== undefined) patch.avatar_url = data.avatar_url;
     const { error } = await context.supabase
       .from("profiles")
-      .update(patch)
+      .update(patch as never)
       .eq("id", context.userId);
     if (error) throw new Error(error.message);
     return { success: true };

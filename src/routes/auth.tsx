@@ -38,6 +38,11 @@ function AuthPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
@@ -110,6 +115,8 @@ function AuthPage() {
     if (result.redirected) return;
     void router.navigate({ to: "/dashboard", replace: true });
   };
+
+  if (!mounted) return null;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted px-4 py-12">

@@ -45,7 +45,7 @@ export const Route = createFileRoute("/_public/faq")({
 function FaqPage() {
   return (
     <>
-      <div className="bg-secondary text-secondary-foreground">
+      <div className="brand-pattern-blue text-secondary-foreground">
         <div className="mx-auto max-w-7xl px-4 py-16">
           <h1 className="text-4xl font-bold sm:text-5xl">Частые вопросы</h1>
         </div>

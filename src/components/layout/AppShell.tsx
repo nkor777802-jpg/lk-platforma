@@ -163,7 +163,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </main>
       </div>
 
-      <footer className="border-t border-border bg-secondary py-8 text-secondary-foreground">
+      <footer className="brand-pattern-blue border-t border-border py-8 text-secondary-foreground">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between">
           <img
             src={brandLogos.fullCompactWhite}

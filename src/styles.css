@@ -219,3 +219,15 @@
   background-size: 320px 320px;
   background-position: center top;
 }
+
+/*
+ * Фирменный синий паттерн из брендбука: пучок «кабельных трасс» —
+ * параллельные линии, идущие под прямым углом со скруглением,
+ * светлые на глубоком синем фоне. Замена сплошным синим плоскостям.
+ */
+@utility brand-pattern-blue {
+  background-color: var(--brand-blue);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cg fill='none' stroke='%236E9BD6' stroke-opacity='0.28' stroke-width='4' stroke-linecap='square'%3E%3Cpath d='M0 80 H140 A20 20 0 0 0 160 60 V0'/%3E%3Cpath d='M0 102 H140 A42 42 0 0 0 182 60 V0'/%3E%3Cpath d='M0 124 H140 A64 64 0 0 0 204 60 V0'/%3E%3Cpath d='M0 146 H140 A86 86 0 0 0 226 60 V0'/%3E%3Cpath d='M0 168 H140 A108 108 0 0 0 248 60 V0'/%3E%3Cpath d='M0 190 H140 A130 130 0 0 0 270 60 V0'/%3E%3Cpath d='M320 240 H180 A20 20 0 0 1 160 260 V320'/%3E%3Cpath d='M320 262 H180 A42 42 0 0 1 138 304 V320'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 320px 320px;
+  color: var(--secondary-foreground);
+}

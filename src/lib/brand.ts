@@ -10,6 +10,7 @@ import logoFullColor from "@/assets/logo-full-color.png.asset.json";
 import logoFullWhite from "@/assets/logo-full-white.png.asset.json";
 import logoMarkColor from "@/assets/logo-mark-color.png.asset.json";
 import logoMarkWhite from "@/assets/logo-mark-white.png.asset.json";
+import logoMarkBlue from "@/assets/logo-mark-blue.png.asset.json";
 
 export const brandColors = {
   /** Основной фирменный цвет — Pantone 166C */
@@ -66,6 +67,8 @@ export const brandLogos = {
   /** Знак (фигура) — иконка, favicon, мелкие носители */
   markColor: logoMarkColor.url,
   markWhite: logoMarkWhite.url,
+  /** Знак в дополнительном фирменном цвете (синий #112866) — для светлых фонов */
+  markBlue: logoMarkBlue.url,
   alt: "Людиновокабель — кабельный завод",
 } as const;
 

@@ -40,6 +40,8 @@ import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminTestsRouteImport } from './routes/_authenticated/admin/tests'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
+import { Route as AuthenticatedLearningIndexRouteImport } from './routes/_authenticated/learning.index'
+import { Route as AuthenticatedLearningCourseIdRouteImport } from './routes/_authenticated/learning.$courseId'
 import { Route as AuthenticatedProfessionsIndexRouteImport } from './routes/_authenticated/professions.index'
 import { Route as AuthenticatedProfessionsSlugRouteImport } from './routes/_authenticated/professions.$slug'
 import { Route as AuthenticatedResultsAttemptIdRouteImport } from './routes/_authenticated/results.$attemptId'
@@ -208,6 +210,18 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedLearningIndexRoute =
+  AuthenticatedLearningIndexRouteImport.update({
+    id: '/learning/',
+    path: '/learning/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLearningCourseIdRoute =
+  AuthenticatedLearningCourseIdRouteImport.update({
+    id: '/learning/$courseId',
+    path: '/learning/$courseId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProfessionsIndexRoute =
   AuthenticatedProfessionsIndexRouteImport.update({
     id: '/professions/',
@@ -273,11 +287,13 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/learning/$courseId': typeof AuthenticatedLearningCourseIdRoute
   '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
   '/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
   '/training/professions': typeof PublicTrainingProfessionsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/learning/': typeof AuthenticatedLearningIndexRoute
   '/professions/': typeof AuthenticatedProfessionsIndexRoute
   '/training/': typeof PublicTrainingIndexRoute
 }
@@ -309,11 +325,13 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/learning/$courseId': typeof AuthenticatedLearningCourseIdRoute
   '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
   '/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
   '/training/professions': typeof PublicTrainingProfessionsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/learning': typeof AuthenticatedLearningIndexRoute
   '/professions': typeof AuthenticatedProfessionsIndexRoute
   '/training': typeof PublicTrainingIndexRoute
 }
@@ -349,11 +367,13 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/learning/$courseId': typeof AuthenticatedLearningCourseIdRoute
   '/_authenticated/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/_authenticated/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
   '/_authenticated/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
   '/_public/training/professions': typeof PublicTrainingProfessionsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/learning/': typeof AuthenticatedLearningIndexRoute
   '/_authenticated/professions/': typeof AuthenticatedProfessionsIndexRoute
   '/_public/training/': typeof PublicTrainingIndexRoute
 }
@@ -388,11 +408,13 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tests'
     | '/admin/users'
+    | '/learning/$courseId'
     | '/professions/$slug'
     | '/results/$attemptId'
     | '/test/$professionId'
     | '/training/professions'
     | '/admin/'
+    | '/learning/'
     | '/professions/'
     | '/training/'
   fileRoutesByTo: FileRoutesByTo
@@ -424,11 +446,13 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tests'
     | '/admin/users'
+    | '/learning/$courseId'
     | '/professions/$slug'
     | '/results/$attemptId'
     | '/test/$professionId'
     | '/training/professions'
     | '/admin'
+    | '/learning'
     | '/professions'
     | '/training'
   id:
@@ -463,11 +487,13 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/tests'
     | '/_authenticated/admin/users'
+    | '/_authenticated/learning/$courseId'
     | '/_authenticated/professions/$slug'
     | '/_authenticated/results/$attemptId'
     | '/_authenticated/test/$professionId'
     | '/_public/training/professions'
     | '/_authenticated/admin/'
+    | '/_authenticated/learning/'
     | '/_authenticated/professions/'
     | '/_public/training/'
   fileRoutesById: FileRoutesById
@@ -699,6 +725,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/learning/': {
+      id: '/_authenticated/learning/'
+      path: '/learning'
+      fullPath: '/learning/'
+      preLoaderRoute: typeof AuthenticatedLearningIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/learning/$courseId': {
+      id: '/_authenticated/learning/$courseId'
+      path: '/learning/$courseId'
+      fullPath: '/learning/$courseId'
+      preLoaderRoute: typeof AuthenticatedLearningCourseIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/professions/': {
       id: '/_authenticated/professions/'
       path: '/professions'
@@ -790,9 +830,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
+  AuthenticatedLearningCourseIdRoute: typeof AuthenticatedLearningCourseIdRoute
   AuthenticatedProfessionsSlugRoute: typeof AuthenticatedProfessionsSlugRoute
   AuthenticatedResultsAttemptIdRoute: typeof AuthenticatedResultsAttemptIdRoute
   AuthenticatedTestProfessionIdRoute: typeof AuthenticatedTestProfessionIdRoute
+  AuthenticatedLearningIndexRoute: typeof AuthenticatedLearningIndexRoute
   AuthenticatedProfessionsIndexRoute: typeof AuthenticatedProfessionsIndexRoute
 }
 
@@ -804,9 +846,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
+  AuthenticatedLearningCourseIdRoute: AuthenticatedLearningCourseIdRoute,
   AuthenticatedProfessionsSlugRoute: AuthenticatedProfessionsSlugRoute,
   AuthenticatedResultsAttemptIdRoute: AuthenticatedResultsAttemptIdRoute,
   AuthenticatedTestProfessionIdRoute: AuthenticatedTestProfessionIdRoute,
+  AuthenticatedLearningIndexRoute: AuthenticatedLearningIndexRoute,
   AuthenticatedProfessionsIndexRoute: AuthenticatedProfessionsIndexRoute,
 }
 
@@ -849,13 +893,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

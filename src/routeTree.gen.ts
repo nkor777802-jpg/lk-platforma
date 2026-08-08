@@ -20,6 +20,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedTestsRouteImport } from './routes/_authenticated/tests'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicAboutRouteImport } from './routes/_public/about'
@@ -44,6 +45,7 @@ import { Route as AuthenticatedLearningIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedLearningCourseIdRouteImport } from './routes/_authenticated/learning.$courseId'
 import { Route as AuthenticatedProfessionsIndexRouteImport } from './routes/_authenticated/professions.index'
 import { Route as AuthenticatedProfessionsSlugRouteImport } from './routes/_authenticated/professions.$slug'
+import { Route as AuthenticatedResultsIndexRouteImport } from './routes/_authenticated/results.index'
 import { Route as AuthenticatedResultsAttemptIdRouteImport } from './routes/_authenticated/results.$attemptId'
 import { Route as AuthenticatedTestProfessionIdRouteImport } from './routes/_authenticated/test.$professionId'
 import { Route as PublicTrainingIndexRouteImport } from './routes/_public/training.index'
@@ -100,6 +102,11 @@ const AuthenticatedProductsRoute = AuthenticatedProductsRouteImport.update({
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTestsRoute = AuthenticatedTestsRouteImport.update({
+  id: '/tests',
+  path: '/tests',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedVideosRoute = AuthenticatedVideosRouteImport.update({
@@ -234,6 +241,12 @@ const AuthenticatedProfessionsSlugRoute =
     path: '/professions/$slug',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedResultsIndexRoute =
+  AuthenticatedResultsIndexRouteImport.update({
+    id: '/results/',
+    path: '/results/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedResultsAttemptIdRoute =
   AuthenticatedResultsAttemptIdRouteImport.update({
     id: '/results/$attemptId',
@@ -269,6 +282,7 @@ export interface FileRoutesByFullPath {
   '/library': typeof AuthenticatedLibraryRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/tests': typeof AuthenticatedTestsRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/about': typeof PublicAboutRoute
   '/consent': typeof PublicConsentRoute
@@ -295,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/learning/': typeof AuthenticatedLearningIndexRoute
   '/professions/': typeof AuthenticatedProfessionsIndexRoute
+  '/results/': typeof AuthenticatedResultsIndexRoute
   '/training/': typeof PublicTrainingIndexRoute
 }
 export interface FileRoutesByTo {
@@ -307,6 +322,7 @@ export interface FileRoutesByTo {
   '/library': typeof AuthenticatedLibraryRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/tests': typeof AuthenticatedTestsRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/about': typeof PublicAboutRoute
   '/consent': typeof PublicConsentRoute
@@ -333,6 +349,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/learning': typeof AuthenticatedLearningIndexRoute
   '/professions': typeof AuthenticatedProfessionsIndexRoute
+  '/results': typeof AuthenticatedResultsIndexRoute
   '/training': typeof PublicTrainingIndexRoute
 }
 export interface FileRoutesById {
@@ -348,6 +365,7 @@ export interface FileRoutesById {
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/tests': typeof AuthenticatedTestsRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_public/about': typeof PublicAboutRoute
   '/_public/consent': typeof PublicConsentRoute
@@ -375,6 +393,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/learning/': typeof AuthenticatedLearningIndexRoute
   '/_authenticated/professions/': typeof AuthenticatedProfessionsIndexRoute
+  '/_authenticated/results/': typeof AuthenticatedResultsIndexRoute
   '/_public/training/': typeof PublicTrainingIndexRoute
 }
 export interface FileRouteTypes {
@@ -390,6 +409,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/products'
     | '/profile'
+    | '/tests'
     | '/videos'
     | '/about'
     | '/consent'
@@ -416,6 +436,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/learning/'
     | '/professions/'
+    | '/results/'
     | '/training/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -428,6 +449,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/products'
     | '/profile'
+    | '/tests'
     | '/videos'
     | '/about'
     | '/consent'
@@ -454,6 +476,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/learning'
     | '/professions'
+    | '/results'
     | '/training'
   id:
     | '__root__'
@@ -468,6 +491,7 @@ export interface FileRouteTypes {
     | '/_authenticated/library'
     | '/_authenticated/products'
     | '/_authenticated/profile'
+    | '/_authenticated/tests'
     | '/_authenticated/videos'
     | '/_public/about'
     | '/_public/consent'
@@ -495,6 +519,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/learning/'
     | '/_authenticated/professions/'
+    | '/_authenticated/results/'
     | '/_public/training/'
   fileRoutesById: FileRoutesById
 }
@@ -583,6 +608,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tests': {
+      id: '/_authenticated/tests'
+      path: '/tests'
+      fullPath: '/tests'
+      preLoaderRoute: typeof AuthenticatedTestsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/videos': {
@@ -753,6 +785,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfessionsSlugRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/results/': {
+      id: '/_authenticated/results/'
+      path: '/results'
+      fullPath: '/results/'
+      preLoaderRoute: typeof AuthenticatedResultsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/results/$attemptId': {
       id: '/_authenticated/results/$attemptId'
       path: '/results/$attemptId'
@@ -829,6 +868,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedTestsRoute: typeof AuthenticatedTestsRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedLearningCourseIdRoute: typeof AuthenticatedLearningCourseIdRoute
   AuthenticatedProfessionsSlugRoute: typeof AuthenticatedProfessionsSlugRoute
@@ -836,6 +876,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTestProfessionIdRoute: typeof AuthenticatedTestProfessionIdRoute
   AuthenticatedLearningIndexRoute: typeof AuthenticatedLearningIndexRoute
   AuthenticatedProfessionsIndexRoute: typeof AuthenticatedProfessionsIndexRoute
+  AuthenticatedResultsIndexRoute: typeof AuthenticatedResultsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -845,6 +886,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedTestsRoute: AuthenticatedTestsRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedLearningCourseIdRoute: AuthenticatedLearningCourseIdRoute,
   AuthenticatedProfessionsSlugRoute: AuthenticatedProfessionsSlugRoute,
@@ -852,6 +894,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTestProfessionIdRoute: AuthenticatedTestProfessionIdRoute,
   AuthenticatedLearningIndexRoute: AuthenticatedLearningIndexRoute,
   AuthenticatedProfessionsIndexRoute: AuthenticatedProfessionsIndexRoute,
+  AuthenticatedResultsIndexRoute: AuthenticatedResultsIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

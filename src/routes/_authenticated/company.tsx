@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { departmentsQuery, historyQuery, managementQuery, siteContentQuery } from "@/lib/lms-queries";
+import { signedUrl } from "@/lib/storage";
 import { EmptyState, InlineLoading } from "@/components/states";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -83,13 +84,7 @@ function CompanyPage() {
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {(management.data ?? []).map((m) => (
-                <Card key={m.id}>
-                  <CardContent className="pt-6">
-                    <p className="text-lg font-semibold text-foreground">{m.full_name}</p>
-                    <p className="text-sm font-medium text-primary">{m.position}</p>
-                    <p className="mt-2 text-sm text-muted-foreground">{m.bio}</p>
-                  </CardContent>
-                </Card>
+                <ManagementCard key={m.id} member={m} />
               ))}
             </div>
           )}

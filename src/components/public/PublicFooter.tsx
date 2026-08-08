@@ -4,7 +4,7 @@ import { company } from "@/content/site";
 
 export function PublicFooter() {
   return (
-    <footer className="mt-auto bg-secondary text-secondary-foreground">
+    <footer className="brand-pattern-blue mt-auto text-secondary-foreground">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-3">
         <div>
           <img

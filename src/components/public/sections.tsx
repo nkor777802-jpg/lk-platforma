@@ -14,7 +14,7 @@ export function Section({
   tone?: "default" | "muted" | "dark";
 }) {
   const toneClass =
-    tone === "muted" ? "bg-muted" : tone === "dark" ? "bg-secondary text-secondary-foreground" : "bg-background";
+    tone === "muted" ? "bg-muted" : tone === "dark" ? "brand-pattern-blue text-secondary-foreground" : "bg-background";
   return (
     <section id={id} className={toneClass}>
       <div className="mx-auto max-w-7xl px-4 py-16 sm:py-20">

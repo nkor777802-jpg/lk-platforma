@@ -421,7 +421,7 @@ export const getProtocolHtml = createServerFn({ method: "POST" })
       .single();
     const { data: answers } = await supabaseAdmin
       .from("test_answers")
-      .select("question_text, selected_text, correct_text, is_correct, sort_order")
+      .select("question_text, selected_text, correct_text, is_correct, sort_order, review_status")
       .eq("attempt_id", data.attemptId)
       .order("sort_order");
     const { data: practical } = await supabaseAdmin
@@ -439,6 +439,9 @@ export const getProtocolHtml = createServerFn({ method: "POST" })
       date: new Date(attempt.finished_at ?? attempt.started_at ?? Date.now()).toLocaleString("ru-RU"),
       attemptNumber: attempt.attempt_number ?? 1,
       logoUrl: (logo.default ?? logo).url,
+      mode: ((attempt.settings_snapshot ?? {}) as { mode?: "learning" | "exam" }).mode ?? "exam",
+      gradeResult: (attempt.grade_result ?? null) as "confirmed" | "lowered" | "failed" | null,
+      awaitingReview: attempt.status === "awaiting_review",
       answers: answers ?? [],
       practical: (practical ?? []).map((p) => ({
         title: (p as { practical_tasks?: { title?: string } }).practical_tasks?.title ?? "Задание",

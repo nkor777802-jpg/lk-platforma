@@ -6,6 +6,7 @@ import { CheckCircle2, Lightbulb, Trophy } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { allAchievementsQuery, myAchievementsQuery } from "@/lib/lms-queries";
 import { myDevelopmentQuery } from "@/lib/development-queries";
+import { myAnalyticsQuery } from "@/lib/analytics-queries";
 import { setPlanItemStatus } from "@/lib/development.functions";
 import { EmptyState, InlineLoading } from "@/components/states";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,6 +55,7 @@ function DevelopmentPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const dev = useQuery(myDevelopmentQuery);
+  const stats = useQuery(myAnalyticsQuery);
   const earned = useQuery(myAchievementsQuery(user?.id));
   const all = useQuery(allAchievementsQuery);
   const setStatus = useServerFn(setPlanItemStatus);
@@ -115,6 +117,59 @@ function DevelopmentPage() {
             <p className="text-muted-foreground">Подразделение</p>
             <p className="font-medium">{profile?.departments?.name ?? "—"}</p>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Моя статистика</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {stats.isPending ? (
+            <InlineLoading />
+          ) : !stats.data ? (
+            <p className="text-sm text-muted-foreground">Статистика пока недоступна.</p>
+          ) : (
+            <>
+              <div className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  { label: "Пройдено аттестаций", value: stats.data.attempts },
+                  { label: "Средний балл", value: `${stats.data.avgScore}%` },
+                  { label: "Доля успешных", value: `${stats.data.passRate}%` },
+                  {
+                    label: "Последний результат",
+                    value: stats.data.lastScore === null ? "—" : `${stats.data.lastScore}%`,
+                  },
+                  { label: "Завершено этапов обучения", value: stats.data.completedStages },
+                  {
+                    label: "Выполнено назначений",
+                    value: `${stats.data.completedAssignments} из ${stats.data.assignments}`,
+                  },
+                  { label: "Выполнение назначений", value: `${stats.data.assignmentRate}%` },
+                  { label: "Просрочено", value: stats.data.overdue },
+                ].map((c) => (
+                  <div key={c.label} className="rounded-lg border border-border p-3">
+                    <p className="text-muted-foreground">{c.label}</p>
+                    <p className="mt-1 text-2xl font-semibold text-secondary">{c.value}</p>
+                  </div>
+                ))}
+              </div>
+              {stats.data.trend.length > 1 ? (
+                <div className="space-y-2">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    Динамика среднего балла по месяцам
+                  </p>
+                  {stats.data.trend.map((t) => (
+                    <div key={t.period} className="flex items-center gap-3 text-xs">
+                      <span className="w-20 text-muted-foreground">{t.period}</span>
+                      <Progress value={t.avgScore} className="h-2 flex-1" />
+                      <span className="w-10 text-right font-medium">{t.avgScore}%</span>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </>
+          )}
         </CardContent>
       </Card>
 

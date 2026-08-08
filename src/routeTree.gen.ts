@@ -32,6 +32,7 @@ import { Route as PublicContactsRouteImport } from './routes/_public/contacts'
 import { Route as PublicFaqRouteImport } from './routes/_public/faq'
 import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedAdminAssignmentsRouteImport } from './routes/_authenticated/admin/assignments'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminCoursesRouteImport } from './routes/_authenticated/admin/courses'
@@ -172,6 +173,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminAnalyticsRoute =
+  AuthenticatedAdminAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminAssignmentsRoute =
   AuthenticatedAdminAssignmentsRouteImport.update({
     id: '/assignments',
@@ -327,6 +334,7 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof PublicContactsRoute
   '/faq': typeof PublicFaqRoute
   '/privacy': typeof PublicPrivacyRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/courses': typeof AuthenticatedAdminCoursesRoute
@@ -372,6 +380,7 @@ export interface FileRoutesByTo {
   '/contacts': typeof PublicContactsRoute
   '/faq': typeof PublicFaqRoute
   '/privacy': typeof PublicPrivacyRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/courses': typeof AuthenticatedAdminCoursesRoute
@@ -421,6 +430,7 @@ export interface FileRoutesById {
   '/_public/faq': typeof PublicFaqRoute
   '/_public/privacy': typeof PublicPrivacyRoute
   '/_public/': typeof PublicIndexRoute
+  '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/courses': typeof AuthenticatedAdminCoursesRoute
@@ -469,6 +479,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/faq'
     | '/privacy'
+    | '/admin/analytics'
     | '/admin/assignments'
     | '/admin/audit'
     | '/admin/courses'
@@ -514,6 +525,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/faq'
     | '/privacy'
+    | '/admin/analytics'
     | '/admin/assignments'
     | '/admin/audit'
     | '/admin/courses'
@@ -562,6 +574,7 @@ export interface FileRouteTypes {
     | '/_public/faq'
     | '/_public/privacy'
     | '/_public/'
+    | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/assignments'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/courses'
@@ -759,6 +772,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/analytics': {
+      id: '/_authenticated/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/assignments': {
       id: '/_authenticated/admin/assignments'
       path: '/assignments'
@@ -924,6 +944,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminAssignmentsRoute: typeof AuthenticatedAdminAssignmentsRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminCoursesRoute: typeof AuthenticatedAdminCoursesRoute
@@ -943,6 +964,7 @@ interface AuthenticatedAdminRouteRouteChildren {
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminAssignmentsRoute: AuthenticatedAdminAssignmentsRoute,
     AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
     AuthenticatedAdminCoursesRoute: AuthenticatedAdminCoursesRoute,
@@ -1046,13 +1068,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

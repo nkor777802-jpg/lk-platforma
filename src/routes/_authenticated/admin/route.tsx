@@ -35,6 +35,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 export const ADMIN_NAV = [
   { to: "/admin", label: "Обзор", icon: BarChart3, exact: true },
+  { to: "/admin/analytics", label: "Аналитика", icon: BarChart3 },
   { to: "/admin/users", label: "Пользователи", icon: Users },
   { to: "/admin/org", label: "Оргструктура", icon: FolderTree },
   { to: "/admin/courses", label: "Курсы", icon: BookOpen },

@@ -260,6 +260,9 @@ export const finishAttempt = createServerFn({ method: "POST" })
       full?.passed ?? null,
     );
 
+    const { recalcGamification } = await import("./gamification.server");
+    await recalcGamification(supabaseAdmin, context.userId);
+
     return result;
   });
 

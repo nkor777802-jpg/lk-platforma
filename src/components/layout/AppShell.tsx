@@ -147,7 +147,11 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <footer className="border-t border-border bg-secondary py-8 text-secondary-foreground">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between">
-          <img src={brandLogos.fullWhite} alt={brandLogos.alt} className="h-8 w-auto" />
+          <img
+            src={brandLogos.fullWhite}
+            alt={brandLogos.alt}
+            className="h-7 w-auto max-w-[180px] object-contain sm:h-8 sm:max-w-none"
+          />
           <p className="break-words text-sm opacity-80">
             Корпоративная платформа обучения и аттестации · {user?.email}
           </p>

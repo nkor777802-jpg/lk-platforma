@@ -164,21 +164,21 @@ export function EntityManager({
 
   return (
     <section className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-semibold text-secondary">{title}</h2>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h2 className="text-lg font-semibold text-secondary sm:text-xl">{title}</h2>
           {description ? (
             <p className="text-sm text-muted-foreground">{description}</p>
           ) : null}
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => openForm(null)}>
+            <Button onClick={() => openForm(null)} className="w-full sm:w-auto">
               <Plus className="mr-1.5 h-4 w-4" />
               Добавить
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-h-[85vh] overflow-y-auto">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>{editing ? "Редактирование" : "Новая запись"}</DialogTitle>
             </DialogHeader>
@@ -234,11 +234,15 @@ export function EntityManager({
                 </div>
               ))}
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setOpen(false)}>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" className="w-full sm:w-auto" onClick={() => setOpen(false)}>
                 Отмена
               </Button>
-              <Button onClick={submit} disabled={saveMutation.isPending}>
+              <Button
+                onClick={submit}
+                disabled={saveMutation.isPending}
+                className="w-full sm:w-auto"
+              >
                 Сохранить
               </Button>
             </DialogFooter>

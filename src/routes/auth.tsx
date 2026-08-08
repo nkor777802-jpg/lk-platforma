@@ -114,7 +114,13 @@ function AuthPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted px-4 py-12">
       <div className="w-full max-w-md">
-        <img src={brandLogos.fullColor} alt={brandLogos.alt} className="mx-auto mb-8 h-12 w-auto" />
+        <img
+          src={brandLogos.fullColor}
+          alt={brandLogos.alt}
+          className="mx-auto mb-8 h-12 w-auto max-w-[220px] object-contain"
+          width={134}
+          height={48}
+        />
         <Card>
           <CardHeader>
             <CardTitle>Академия «Людиновокабель»</CardTitle>

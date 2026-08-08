@@ -447,7 +447,7 @@ export const getProtocolHtml = createServerFn({ method: "POST" })
       .select("score, max_score, passed, practical_tasks(title)")
       .eq("attempt_id", data.attemptId);
 
-    const logo = await import("@/assets/logo-full-color.png.asset.json");
+    const logo = await import("@/assets/logo-full-color-v2.png.asset.json");
     const html = renderProtocolHtml({
       fullName: profile?.full_name ?? "—",
       personnelNumber: profile?.personnel_number ?? null,

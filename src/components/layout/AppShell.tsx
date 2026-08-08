@@ -41,14 +41,18 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-3 px-3 sm:gap-6 sm:px-4">
           <Link to="/dashboard" className="shrink-0">
             <img
-              src={brandLogos.markColor}
+              src={brandLogos.fullCompactColor}
               alt={brandLogos.alt}
-              className="h-8 w-auto sm:hidden"
+              className="h-12 w-auto object-contain sm:hidden"
+              width={47}
+              height={48}
             />
             <img
               src={brandLogos.fullColor}
               alt={brandLogos.alt}
-              className="hidden h-9 w-auto sm:block"
+              className="hidden h-9 w-auto max-w-[200px] object-contain sm:block lg:h-10"
+              width={112}
+              height={40}
             />
           </Link>
           <nav className="hidden flex-1 items-center gap-1 lg:flex">
@@ -162,9 +166,18 @@ export function AppShell({ children }: { children: ReactNode }) {
       <footer className="border-t border-border bg-secondary py-8 text-secondary-foreground">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between">
           <img
+            src={brandLogos.fullCompactWhite}
+            alt={brandLogos.alt}
+            className="h-14 w-auto object-contain sm:hidden"
+            width={54}
+            height={56}
+          />
+          <img
             src={brandLogos.fullWhite}
             alt={brandLogos.alt}
-            className="h-7 w-auto max-w-[180px] object-contain sm:h-8 sm:max-w-none"
+            className="hidden h-10 w-auto max-w-[200px] object-contain sm:block"
+            width={112}
+            height={40}
           />
           <p className="break-words text-sm opacity-80">
             Корпоративная платформа обучения и аттестации · {user?.email}

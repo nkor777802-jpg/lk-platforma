@@ -7,7 +7,20 @@ export function PublicFooter() {
     <footer className="mt-auto bg-secondary text-secondary-foreground">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-3">
         <div>
-          <img src={brandLogos.fullWhite} alt={brandLogos.alt} className="h-9 w-auto" width={180} height={36} />
+          <img
+            src={brandLogos.fullCompactWhite}
+            alt={brandLogos.alt}
+            className="h-14 w-auto object-contain sm:hidden"
+            width={54}
+            height={56}
+          />
+          <img
+            src={brandLogos.fullWhite}
+            alt={brandLogos.alt}
+            className="hidden h-10 w-auto max-w-[200px] object-contain sm:block"
+            width={112}
+            height={40}
+          />
           <p className="mt-4 text-sm opacity-80">{company.legalName}</p>
           <p className="mt-1 text-sm opacity-80">{company.tagline}</p>
         </div>

@@ -6,8 +6,10 @@
  * (bg-primary, text-secondary, bg-brand-orange и т.д.), а не хардкод hex.
  */
 
-import logoFullColor from "@/assets/logo-full-color.png.asset.json";
-import logoFullWhite from "@/assets/logo-full-white.png.asset.json";
+import logoFullColor from "@/assets/logo-full-color-v2.png.asset.json";
+import logoFullWhite from "@/assets/logo-full-white-v2.png.asset.json";
+import logoCompactColor from "@/assets/logo-compact-color.png.asset.json";
+import logoCompactWhite from "@/assets/logo-compact-white.png.asset.json";
 import logoMarkColor from "@/assets/logo-mark-color.png.asset.json";
 import logoMarkWhite from "@/assets/logo-mark-white.png.asset.json";
 import logoMarkBlue from "@/assets/logo-mark-blue.png.asset.json";
@@ -64,6 +66,10 @@ export const brandLogos = {
   fullColor: logoFullColor.url,
   /** Белый логотип — для оранжевого, синего, тёмного фона и паттерна */
   fullWhite: logoFullWhite.url,
+  /** Компактная (двухстрочная) цветная версия — узкие экраны */
+  fullCompactColor: logoCompactColor.url,
+  /** Компактная (двухстрочная) белая версия — узкие экраны на тёмном фоне */
+  fullCompactWhite: logoCompactWhite.url,
   /** Знак (фигура) — иконка, favicon, мелкие носители */
   markColor: logoMarkColor.url,
   markWhite: logoMarkWhite.url,

@@ -38,6 +38,7 @@ import { Route as AuthenticatedAdminCoursesRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminDevelopmentRouteImport } from './routes/_authenticated/admin/development'
 import { Route as AuthenticatedAdminDictionariesRouteImport } from './routes/_authenticated/admin/dictionaries'
 import { Route as AuthenticatedAdminExportRouteImport } from './routes/_authenticated/admin/export'
+import { Route as AuthenticatedAdminGamificationRouteImport } from './routes/_authenticated/admin/gamification'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin/import'
 import { Route as AuthenticatedAdminMaterialsRouteImport } from './routes/_authenticated/admin/materials'
 import { Route as AuthenticatedAdminOrgRouteImport } from './routes/_authenticated/admin/org'
@@ -206,6 +207,12 @@ const AuthenticatedAdminExportRoute =
     path: '/export',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminGamificationRoute =
+  AuthenticatedAdminGamificationRouteImport.update({
+    id: '/gamification',
+    path: '/gamification',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminImportRoute =
   AuthenticatedAdminImportRouteImport.update({
     id: '/import',
@@ -326,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/admin/development': typeof AuthenticatedAdminDevelopmentRoute
   '/admin/dictionaries': typeof AuthenticatedAdminDictionariesRoute
   '/admin/export': typeof AuthenticatedAdminExportRoute
+  '/admin/gamification': typeof AuthenticatedAdminGamificationRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/materials': typeof AuthenticatedAdminMaterialsRoute
   '/admin/org': typeof AuthenticatedAdminOrgRoute
@@ -370,6 +378,7 @@ export interface FileRoutesByTo {
   '/admin/development': typeof AuthenticatedAdminDevelopmentRoute
   '/admin/dictionaries': typeof AuthenticatedAdminDictionariesRoute
   '/admin/export': typeof AuthenticatedAdminExportRoute
+  '/admin/gamification': typeof AuthenticatedAdminGamificationRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/materials': typeof AuthenticatedAdminMaterialsRoute
   '/admin/org': typeof AuthenticatedAdminOrgRoute
@@ -418,6 +427,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/development': typeof AuthenticatedAdminDevelopmentRoute
   '/_authenticated/admin/dictionaries': typeof AuthenticatedAdminDictionariesRoute
   '/_authenticated/admin/export': typeof AuthenticatedAdminExportRoute
+  '/_authenticated/admin/gamification': typeof AuthenticatedAdminGamificationRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/materials': typeof AuthenticatedAdminMaterialsRoute
   '/_authenticated/admin/org': typeof AuthenticatedAdminOrgRoute
@@ -465,6 +475,7 @@ export interface FileRouteTypes {
     | '/admin/development'
     | '/admin/dictionaries'
     | '/admin/export'
+    | '/admin/gamification'
     | '/admin/import'
     | '/admin/materials'
     | '/admin/org'
@@ -509,6 +520,7 @@ export interface FileRouteTypes {
     | '/admin/development'
     | '/admin/dictionaries'
     | '/admin/export'
+    | '/admin/gamification'
     | '/admin/import'
     | '/admin/materials'
     | '/admin/org'
@@ -556,6 +568,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/development'
     | '/_authenticated/admin/dictionaries'
     | '/_authenticated/admin/export'
+    | '/_authenticated/admin/gamification'
     | '/_authenticated/admin/import'
     | '/_authenticated/admin/materials'
     | '/_authenticated/admin/org'
@@ -788,6 +801,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminExportRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/gamification': {
+      id: '/_authenticated/admin/gamification'
+      path: '/gamification'
+      fullPath: '/admin/gamification'
+      preLoaderRoute: typeof AuthenticatedAdminGamificationRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/import': {
       id: '/_authenticated/admin/import'
       path: '/import'
@@ -910,6 +930,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminDevelopmentRoute: typeof AuthenticatedAdminDevelopmentRoute
   AuthenticatedAdminDictionariesRoute: typeof AuthenticatedAdminDictionariesRoute
   AuthenticatedAdminExportRoute: typeof AuthenticatedAdminExportRoute
+  AuthenticatedAdminGamificationRoute: typeof AuthenticatedAdminGamificationRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminMaterialsRoute: typeof AuthenticatedAdminMaterialsRoute
   AuthenticatedAdminOrgRoute: typeof AuthenticatedAdminOrgRoute
@@ -928,6 +949,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminDevelopmentRoute: AuthenticatedAdminDevelopmentRoute,
     AuthenticatedAdminDictionariesRoute: AuthenticatedAdminDictionariesRoute,
     AuthenticatedAdminExportRoute: AuthenticatedAdminExportRoute,
+    AuthenticatedAdminGamificationRoute: AuthenticatedAdminGamificationRoute,
     AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
     AuthenticatedAdminMaterialsRoute: AuthenticatedAdminMaterialsRoute,
     AuthenticatedAdminOrgRoute: AuthenticatedAdminOrgRoute,

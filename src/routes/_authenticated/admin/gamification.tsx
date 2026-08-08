@@ -86,9 +86,9 @@ function AdminGamificationPage() {
               { name: "is_active", label: "Активно", type: "boolean" },
             ]}
             columns={[
-              { key: "title", header: "Название" },
-              { key: "task_type", header: "Тип" },
-              { key: "max_score", header: "Балл" },
+              { key: "title", label: "Название" },
+              { key: "task_type", label: "Тип" },
+              { key: "max_score", label: "Балл" },
             ]}
           />
         </TabsContent>
@@ -111,9 +111,9 @@ function AdminGamificationPage() {
               { name: "sort_order", label: "Порядок", type: "number" },
             ]}
             columns={[
-              { key: "content", header: "Содержание" },
-              { key: "match_target", header: "Соответствие" },
-              { key: "correct_position", header: "Позиция" },
+              { key: "content", label: "Содержание" },
+              { key: "match_target", label: "Соответствие" },
+              { key: "correct_position", label: "Позиция" },
             ]}
           />
         </TabsContent>
@@ -141,9 +141,9 @@ function AdminGamificationPage() {
               { name: "is_active", label: "Активно", type: "boolean" },
             ]}
             columns={[
-              { key: "title", header: "Название" },
-              { key: "condition_type", header: "Условие" },
-              { key: "condition_value", header: "Значение" },
+              { key: "title", label: "Название" },
+              { key: "condition_type", label: "Условие" },
+              { key: "condition_value", label: "Значение" },
             ]}
           />
         </TabsContent>
@@ -172,9 +172,9 @@ function AdminGamificationPage() {
               { name: "is_active", label: "Активно", type: "boolean" },
             ]}
             columns={[
-              { key: "name", header: "Участок" },
-              { key: "unlock_condition", header: "Условие" },
-              { key: "unlock_value", header: "Значение" },
+              { key: "name", label: "Участок" },
+              { key: "unlock_condition", label: "Условие" },
+              { key: "unlock_value", label: "Значение" },
             ]}
           />
         </TabsContent>

@@ -307,6 +307,70 @@ export type Database = {
         }
         Relationships: []
       }
+      competencies: {
+        Row: {
+          competency_type: string
+          course_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_required: boolean
+          level_id: string
+          profession_test_id: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          competency_type?: string
+          course_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_required?: boolean
+          level_id: string
+          profession_test_id?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          competency_type?: string
+          course_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_required?: boolean
+          level_id?: string
+          profession_test_id?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competencies_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competencies_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "qualification_levels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competencies_profession_test_id_fkey"
+            columns: ["profession_test_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_requests: {
         Row: {
           consent: boolean
@@ -507,6 +571,159 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      development_plan_items: {
+        Row: {
+          comment: string | null
+          completed_at: string | null
+          course_id: string | null
+          created_at: string
+          due_date: string | null
+          id: string
+          is_mandatory: boolean
+          item_type: string
+          material_id: string | null
+          plan_id: string
+          practical_task_id: string | null
+          responsible_id: string | null
+          sort_order: number
+          status: string
+          test_profession_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          comment?: string | null
+          completed_at?: string | null
+          course_id?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          is_mandatory?: boolean
+          item_type?: string
+          material_id?: string | null
+          plan_id: string
+          practical_task_id?: string | null
+          responsible_id?: string | null
+          sort_order?: number
+          status?: string
+          test_profession_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          comment?: string | null
+          completed_at?: string | null
+          course_id?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          is_mandatory?: boolean
+          item_type?: string
+          material_id?: string | null
+          plan_id?: string
+          practical_task_id?: string | null
+          responsible_id?: string | null
+          sort_order?: number
+          status?: string
+          test_profession_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "development_plan_items_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "development_plan_items_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "development_plan_items_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "development_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "development_plan_items_practical_task_id_fkey"
+            columns: ["practical_task_id"]
+            isOneToOne: false
+            referencedRelation: "practical_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "development_plan_items_test_profession_id_fkey"
+            columns: ["test_profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      development_plans: {
+        Row: {
+          comment: string | null
+          created_at: string
+          due_date: string | null
+          goal: string
+          id: string
+          profession_id: string | null
+          responsible_id: string | null
+          status: string
+          target_level_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          due_date?: string | null
+          goal: string
+          id?: string
+          profession_id?: string | null
+          responsible_id?: string | null
+          status?: string
+          target_level_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          due_date?: string | null
+          goal?: string
+          id?: string
+          profession_id?: string | null
+          responsible_id?: string | null
+          status?: string
+          target_level_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "development_plans_profession_id_fkey"
+            columns: ["profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "development_plans_target_level_id_fkey"
+            columns: ["target_level_id"]
+            isOneToOne: false
+            referencedRelation: "qualification_levels"
             referencedColumns: ["id"]
           },
         ]
@@ -1326,6 +1543,131 @@ export type Database = {
           version?: number
         }
         Relationships: []
+      }
+      qualification_history: {
+        Row: {
+          approved_by: string | null
+          approved_by_name: string | null
+          attempt_id: string | null
+          basis: string | null
+          created_at: string
+          from_level_id: string | null
+          id: string
+          profession_id: string | null
+          to_level_id: string | null
+          user_id: string
+        }
+        Insert: {
+          approved_by?: string | null
+          approved_by_name?: string | null
+          attempt_id?: string | null
+          basis?: string | null
+          created_at?: string
+          from_level_id?: string | null
+          id?: string
+          profession_id?: string | null
+          to_level_id?: string | null
+          user_id: string
+        }
+        Update: {
+          approved_by?: string | null
+          approved_by_name?: string | null
+          attempt_id?: string | null
+          basis?: string | null
+          created_at?: string
+          from_level_id?: string | null
+          id?: string
+          profession_id?: string | null
+          to_level_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qualification_history_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "test_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qualification_history_from_level_id_fkey"
+            columns: ["from_level_id"]
+            isOneToOne: false
+            referencedRelation: "qualification_levels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qualification_history_profession_id_fkey"
+            columns: ["profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qualification_history_to_level_id_fkey"
+            columns: ["to_level_id"]
+            isOneToOne: false
+            referencedRelation: "qualification_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qualification_levels: {
+        Row: {
+          code: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          is_leadership: boolean
+          name: string
+          next_level_id: string | null
+          profession_id: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_leadership?: boolean
+          name: string
+          next_level_id?: string | null
+          profession_id?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_leadership?: boolean
+          name?: string
+          next_level_id?: string | null
+          profession_id?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qualification_levels_next_level_id_fkey"
+            columns: ["next_level_id"]
+            isOneToOne: false
+            referencedRelation: "qualification_levels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qualification_levels_profession_id_fkey"
+            columns: ["profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       questions: {
         Row: {

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { X } from "lucide-react";
 import { brandLogos } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
 
@@ -57,12 +57,23 @@ export function PublicHeader() {
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden"
+            className="h-10 w-10 lg:hidden"
             aria-label={open ? "Закрыть меню" : "Открыть меню"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {open ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <img
+                src={brandLogos.markBlue}
+                alt=""
+                aria-hidden="true"
+                className="h-6 w-auto"
+                width={24}
+                height={24}
+              />
+            )}
           </Button>
         </div>
       </div>

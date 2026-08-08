@@ -185,6 +185,9 @@ export const setUserRoles = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+type JsonRow = { [key: string]: JsonValue };
+
 export const listRows = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
@@ -200,7 +203,7 @@ export const listRows = createServerFn({ method: "POST" })
       ? query.order(data.orderBy, { ascending: true })
       : query);
     if (error) throw new Error(error.message);
-    return JSON.parse(JSON.stringify(rows ?? [])) as unknown[];
+    return JSON.parse(JSON.stringify(rows ?? [])) as JsonRow[];
   });
 
 export const saveRow = createServerFn({ method: "POST" })

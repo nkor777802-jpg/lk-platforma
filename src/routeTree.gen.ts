@@ -19,6 +19,7 @@ import { Route as AuthenticatedCertificatesRouteImport } from './routes/_authent
 import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticated/company'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDevelopmentRouteImport } from './routes/_authenticated/development'
+import { Route as AuthenticatedGamificationRouteImport } from './routes/_authenticated/gamification'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -37,6 +38,7 @@ import { Route as AuthenticatedAdminCoursesRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminDevelopmentRouteImport } from './routes/_authenticated/admin/development'
 import { Route as AuthenticatedAdminDictionariesRouteImport } from './routes/_authenticated/admin/dictionaries'
 import { Route as AuthenticatedAdminExportRouteImport } from './routes/_authenticated/admin/export'
+import { Route as AuthenticatedAdminGamificationRouteImport } from './routes/_authenticated/admin/gamification'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin/import'
 import { Route as AuthenticatedAdminMaterialsRouteImport } from './routes/_authenticated/admin/materials'
 import { Route as AuthenticatedAdminOrgRouteImport } from './routes/_authenticated/admin/org'
@@ -102,6 +104,12 @@ const AuthenticatedDevelopmentRoute =
   AuthenticatedDevelopmentRouteImport.update({
     id: '/development',
     path: '/development',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedGamificationRoute =
+  AuthenticatedGamificationRouteImport.update({
+    id: '/gamification',
+    path: '/gamification',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
@@ -197,6 +205,12 @@ const AuthenticatedAdminExportRoute =
   AuthenticatedAdminExportRouteImport.update({
     id: '/export',
     path: '/export',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminGamificationRoute =
+  AuthenticatedAdminGamificationRouteImport.update({
+    id: '/gamification',
+    path: '/gamification',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminImportRoute =
@@ -302,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/development': typeof AuthenticatedDevelopmentRoute
+  '/gamification': typeof AuthenticatedGamificationRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -318,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/admin/development': typeof AuthenticatedAdminDevelopmentRoute
   '/admin/dictionaries': typeof AuthenticatedAdminDictionariesRoute
   '/admin/export': typeof AuthenticatedAdminExportRoute
+  '/admin/gamification': typeof AuthenticatedAdminGamificationRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/materials': typeof AuthenticatedAdminMaterialsRoute
   '/admin/org': typeof AuthenticatedAdminOrgRoute
@@ -345,6 +361,7 @@ export interface FileRoutesByTo {
   '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/development': typeof AuthenticatedDevelopmentRoute
+  '/gamification': typeof AuthenticatedGamificationRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -361,6 +378,7 @@ export interface FileRoutesByTo {
   '/admin/development': typeof AuthenticatedAdminDevelopmentRoute
   '/admin/dictionaries': typeof AuthenticatedAdminDictionariesRoute
   '/admin/export': typeof AuthenticatedAdminExportRoute
+  '/admin/gamification': typeof AuthenticatedAdminGamificationRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/materials': typeof AuthenticatedAdminMaterialsRoute
   '/admin/org': typeof AuthenticatedAdminOrgRoute
@@ -391,6 +409,7 @@ export interface FileRoutesById {
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/development': typeof AuthenticatedDevelopmentRoute
+  '/_authenticated/gamification': typeof AuthenticatedGamificationRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -408,6 +427,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/development': typeof AuthenticatedAdminDevelopmentRoute
   '/_authenticated/admin/dictionaries': typeof AuthenticatedAdminDictionariesRoute
   '/_authenticated/admin/export': typeof AuthenticatedAdminExportRoute
+  '/_authenticated/admin/gamification': typeof AuthenticatedAdminGamificationRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/materials': typeof AuthenticatedAdminMaterialsRoute
   '/_authenticated/admin/org': typeof AuthenticatedAdminOrgRoute
@@ -438,6 +458,7 @@ export interface FileRouteTypes {
     | '/company'
     | '/dashboard'
     | '/development'
+    | '/gamification'
     | '/library'
     | '/products'
     | '/profile'
@@ -454,6 +475,7 @@ export interface FileRouteTypes {
     | '/admin/development'
     | '/admin/dictionaries'
     | '/admin/export'
+    | '/admin/gamification'
     | '/admin/import'
     | '/admin/materials'
     | '/admin/org'
@@ -481,6 +503,7 @@ export interface FileRouteTypes {
     | '/company'
     | '/dashboard'
     | '/development'
+    | '/gamification'
     | '/library'
     | '/products'
     | '/profile'
@@ -497,6 +520,7 @@ export interface FileRouteTypes {
     | '/admin/development'
     | '/admin/dictionaries'
     | '/admin/export'
+    | '/admin/gamification'
     | '/admin/import'
     | '/admin/materials'
     | '/admin/org'
@@ -526,6 +550,7 @@ export interface FileRouteTypes {
     | '/_authenticated/company'
     | '/_authenticated/dashboard'
     | '/_authenticated/development'
+    | '/_authenticated/gamification'
     | '/_authenticated/library'
     | '/_authenticated/products'
     | '/_authenticated/profile'
@@ -543,6 +568,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/development'
     | '/_authenticated/admin/dictionaries'
     | '/_authenticated/admin/export'
+    | '/_authenticated/admin/gamification'
     | '/_authenticated/admin/import'
     | '/_authenticated/admin/materials'
     | '/_authenticated/admin/org'
@@ -640,6 +666,13 @@ declare module '@tanstack/react-router' {
       path: '/development'
       fullPath: '/development'
       preLoaderRoute: typeof AuthenticatedDevelopmentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/gamification': {
+      id: '/_authenticated/gamification'
+      path: '/gamification'
+      fullPath: '/gamification'
+      preLoaderRoute: typeof AuthenticatedGamificationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/library': {
@@ -768,6 +801,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminExportRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/gamification': {
+      id: '/_authenticated/admin/gamification'
+      path: '/gamification'
+      fullPath: '/admin/gamification'
+      preLoaderRoute: typeof AuthenticatedAdminGamificationRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/import': {
       id: '/_authenticated/admin/import'
       path: '/import'
@@ -890,6 +930,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminDevelopmentRoute: typeof AuthenticatedAdminDevelopmentRoute
   AuthenticatedAdminDictionariesRoute: typeof AuthenticatedAdminDictionariesRoute
   AuthenticatedAdminExportRoute: typeof AuthenticatedAdminExportRoute
+  AuthenticatedAdminGamificationRoute: typeof AuthenticatedAdminGamificationRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminMaterialsRoute: typeof AuthenticatedAdminMaterialsRoute
   AuthenticatedAdminOrgRoute: typeof AuthenticatedAdminOrgRoute
@@ -908,6 +949,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminDevelopmentRoute: AuthenticatedAdminDevelopmentRoute,
     AuthenticatedAdminDictionariesRoute: AuthenticatedAdminDictionariesRoute,
     AuthenticatedAdminExportRoute: AuthenticatedAdminExportRoute,
+    AuthenticatedAdminGamificationRoute: AuthenticatedAdminGamificationRoute,
     AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
     AuthenticatedAdminMaterialsRoute: AuthenticatedAdminMaterialsRoute,
     AuthenticatedAdminOrgRoute: AuthenticatedAdminOrgRoute,
@@ -929,6 +971,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCompanyRoute: typeof AuthenticatedCompanyRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDevelopmentRoute: typeof AuthenticatedDevelopmentRoute
+  AuthenticatedGamificationRoute: typeof AuthenticatedGamificationRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -949,6 +992,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCompanyRoute: AuthenticatedCompanyRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDevelopmentRoute: AuthenticatedDevelopmentRoute,
+  AuthenticatedGamificationRoute: AuthenticatedGamificationRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
@@ -1002,13 +1046,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

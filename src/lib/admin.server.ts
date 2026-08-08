@@ -72,6 +72,8 @@ export const MANAGED_TABLES = {
   competencies: { soft: "none" },
   development_plans: { soft: "none" },
   development_plan_items: { soft: "none" },
+  achievements: { soft: "is_active" },
+  factory_zones: { soft: "is_active" },
 } as const;
 
 export type ManagedTable = keyof typeof MANAGED_TABLES;

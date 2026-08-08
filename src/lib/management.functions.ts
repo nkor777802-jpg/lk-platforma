@@ -24,7 +24,7 @@ export const uploadManagementPhoto = createServerFn({ method: "POST" })
 
     const { error: uploadError } = await context.supabase.storage
       .from("management")
-      .upload(path, bytes, { upsert: false, contentType: undefined });
+      .upload(path, bytes, { upsert: false });
     if (uploadError) throw new Error(uploadError.message);
 
     const { error: updateError } = await context.supabase

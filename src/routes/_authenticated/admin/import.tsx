@@ -195,16 +195,16 @@ function ImportCenterPage() {
               <table className="w-full text-left text-sm">
                 <thead className="text-xs uppercase text-muted-foreground">
                   <tr>
-                    <th className="px-3 py-2">Дата</th>
-                    <th className="px-3 py-2">Тип</th>
-                    <th className="px-3 py-2">Файл</th>
-                    <th className="px-3 py-2">Пользователь</th>
-                    <th className="px-3 py-2">Строк</th>
-                    <th className="px-3 py-2">Создано</th>
-                    <th className="px-3 py-2">Обновлено</th>
-                    <th className="px-3 py-2">Пропущено</th>
-                    <th className="px-3 py-2">Ошибки</th>
-                    <th className="px-3 py-2">Статус</th>
+                    <th className="whitespace-nowrap px-3 py-2">Дата</th>
+                    <th className="whitespace-nowrap px-3 py-2">Тип</th>
+                    <th className="whitespace-nowrap px-3 py-2">Файл</th>
+                    <th className="whitespace-nowrap px-3 py-2">Пользователь</th>
+                    <th className="whitespace-nowrap px-3 py-2">Строк</th>
+                    <th className="whitespace-nowrap px-3 py-2">Создано</th>
+                    <th className="whitespace-nowrap px-3 py-2">Обновлено</th>
+                    <th className="whitespace-nowrap px-3 py-2">Пропущено</th>
+                    <th className="whitespace-nowrap px-3 py-2">Ошибки</th>
+                    <th className="whitespace-nowrap px-3 py-2">Статус</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -260,7 +260,7 @@ function ImportCenterPage() {
                 </div>
               ))}
 
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 [&>button]:flex-1 sm:[&>button]:flex-none">
                 <input
                   ref={inputRef}
                   type="file"
@@ -271,7 +271,7 @@ function ImportCenterPage() {
                 <Button variant="outline" onClick={() => inputRef.current?.click()}>
                   Выбрать файл
                 </Button>
-                <span className="text-xs text-muted-foreground">
+                <span className="w-full break-all text-xs text-muted-foreground sm:w-auto">
                   {file ? file.name : "Файл не выбран"}
                 </span>
                 <Button
@@ -294,7 +294,7 @@ function ImportCenterPage() {
                   <p className="font-medium text-foreground">
                     {report.committed ? "Импорт выполнен" : "Предварительная проверка"}
                   </p>
-                  <pre className="whitespace-pre-wrap rounded bg-muted p-3 text-xs">
+                  <pre className="whitespace-pre-wrap break-words rounded bg-muted p-3 text-xs">
 {`Файл: ${report.fileName}
 
 Строк найдено: ${report.totalRows}

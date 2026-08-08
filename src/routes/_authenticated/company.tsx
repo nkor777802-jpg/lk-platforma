@@ -132,3 +132,39 @@ function CompanyPage() {
     </div>
   );
 }
+
+function ManagementCard({ member }: { member: { id: string; full_name: string; position: string; bio?: string | null; photo_url?: string | null } }) {
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!member.photo_url) {
+      setPhotoUrl(null);
+      return;
+    }
+    signedUrl(member.photo_url, "management").then((url) => {
+      if (mounted) setPhotoUrl(url);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, [member.photo_url]);
+
+  return (
+    <Card>
+      <CardContent className="pt-6">
+        {photoUrl ? (
+          <img
+            src={photoUrl}
+            alt={`Фото ${member.full_name}`}
+            className="mb-4 aspect-square w-full max-w-[160px] rounded-md object-cover"
+            loading="lazy"
+          />
+        ) : null}
+        <p className="text-lg font-semibold text-foreground">{member.full_name}</p>
+        <p className="text-sm font-medium text-primary">{member.position}</p>
+        {member.bio ? <p className="mt-2 text-sm text-muted-foreground">{member.bio}</p> : null}
+      </CardContent>
+    </Card>
+  );
+}

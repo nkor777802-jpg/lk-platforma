@@ -15,6 +15,11 @@ export interface TestSettings {
   shuffle_options: boolean;
   show_correct_answer: boolean;
   lock_answer: boolean;
+  retry_interval_hours: number;
+  result_rule: "best" | "last";
+  warn_before_minutes: number;
+  mode: "learning" | "exam";
+  grading_rules?: Record<string, unknown> | null;
 }
 
 export const DEFAULT_SETTINGS: TestSettings = {
@@ -29,7 +34,99 @@ export const DEFAULT_SETTINGS: TestSettings = {
   shuffle_options: true,
   show_correct_answer: false,
   lock_answer: true,
+  retry_interval_hours: 0,
+  result_rule: "best",
+  warn_before_minutes: 5,
+  mode: "exam",
 };
+
+export type GradeResult = "confirmed" | "lowered" | "failed";
+
+/** Итог по разряду: соответствует заявленному / подтверждён более низкий / не пройден. */
+export function computeGrade(
+  percent: number,
+  passPercent: number,
+  rules?: Record<string, unknown> | null,
+): GradeResult {
+  const lower = Number((rules as { lower_percent?: number } | null)?.lower_percent);
+  const lowerThreshold = Number.isFinite(lower) ? lower : Math.max(passPercent - 15, 0);
+  if (percent >= passPercent) return "confirmed";
+  if (percent >= lowerThreshold) return "lowered";
+  return "failed";
+}
+
+export const GRADE_LABELS: Record<GradeResult, string> = {
+  confirmed: "Соответствует заявленному разряду",
+  lowered: "Подтверждён более низкий разряд",
+  failed: "Разряд не подтверждён",
+};
+
+/**
+ * Пересчёт итога попытки по сохранённым ответам.
+ * Используется при завершении теста и после ручной проверки развернутых ответов.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function finalizeAttempt(supabase: any, attemptId: string) {
+  const { data: attempt } = await supabase
+    .from("test_attempts")
+    .select("id, total_questions, settings_snapshot")
+    .eq("id", attemptId)
+    .single();
+  if (!attempt) throw new Error("Попытка не найдена");
+
+  const { data: answers } = await supabase
+    .from("test_answers")
+    .select("is_correct, review_status, review_score, points")
+    .eq("attempt_id", attemptId);
+
+  const rows = (answers ?? []) as {
+    is_correct: boolean | null;
+    review_status: string | null;
+    review_score: number | null;
+    points: number | null;
+  }[];
+
+  const snapshot = (attempt.settings_snapshot ?? {}) as Partial<TestSettings> & {
+    question_ids?: string[];
+  };
+  const passPercent = snapshot.pass_percent ?? DEFAULT_SETTINGS.pass_percent;
+  const pending = rows.filter((r) => r.review_status === "pending").length;
+
+  const maxPoints =
+    rows.reduce((sum, r) => sum + (r.points ?? 1), 0) || attempt.total_questions || 1;
+  const earned = rows.reduce((sum, r) => {
+    if (r.review_status === "graded") return sum + (r.review_score ?? 0);
+    if (r.review_status === "pending") return sum;
+    return sum + (r.is_correct ? (r.points ?? 1) : 0);
+  }, 0);
+
+  const correct = rows.filter((r) => r.is_correct).length;
+  const percent = Math.round((earned / maxPoints) * 1000) / 10;
+  const passed = pending === 0 ? percent >= passPercent : null;
+  const gradeResult = pending === 0 ? computeGrade(percent, passPercent, snapshot.grading_rules) : null;
+
+  await supabase
+    .from("test_attempts")
+    .update({
+      status: pending > 0 ? "awaiting_review" : "finished",
+      correct_answers: correct,
+      score_percent: percent,
+      passed,
+      grade_result: gradeResult,
+      finished_at: new Date().toISOString(),
+    })
+    .eq("id", attemptId);
+
+  return {
+    correct,
+    total: attempt.total_questions ?? rows.length,
+    percent,
+    passed,
+    passPercent,
+    pending,
+    gradeResult,
+  };
+}
 
 export function shuffle<T>(items: T[]): T[] {
   const copy = [...items];
@@ -59,11 +156,15 @@ export interface ProtocolInput {
   date: string;
   attemptNumber: number;
   logoUrl: string;
+  mode?: "learning" | "exam";
+  gradeResult?: GradeResult | null;
+  awaitingReview?: boolean;
   answers: {
     question_text: string;
     selected_text: string | null;
     correct_text: string | null;
     is_correct: boolean | null;
+    review_status?: string | null;
   }[];
   practical: { title: string; score: number; maxScore: number; passed: boolean }[];
   correct: number;
@@ -80,7 +181,9 @@ export function renderProtocolHtml(p: ProtocolInput): string {
       <td>${escapeHtml(a.question_text)}</td>
       <td>${escapeHtml(a.selected_text ?? "—")}</td>
       <td>${escapeHtml(a.correct_text ?? "—")}</td>
-      <td class="${a.is_correct ? "ok" : "bad"}">${a.is_correct ? "Верно" : "Ошибка"}</td>
+      <td class="${a.review_status === "pending" ? "muted" : a.is_correct ? "ok" : "bad"}">${
+        a.review_status === "pending" ? "На проверке" : a.is_correct ? "Верно" : "Ошибка"
+      }</td>
     </tr>`,
     )
     .join("");
@@ -128,6 +231,7 @@ export function renderProtocolHtml(p: ProtocolInput): string {
   <div><span>Разряд:</span> <b>${escapeHtml(p.grade ?? "—")}</b></div>
   <div><span>Дата и время:</span> <b>${escapeHtml(p.date)}</b></div>
   <div><span>Попытка:</span> <b>№${p.attemptNumber}</b></div>
+  <div><span>Режим:</span> <b>${p.mode === "learning" ? "Учебный" : "Аттестационный"}</b></div>
 </div>
 <table><thead><tr><th>№</th><th>Вопрос</th><th>Ответ сотрудника</th><th>Правильный ответ</th><th>Результат</th></tr></thead>
 <tbody>${rows}</tbody></table>
@@ -138,6 +242,8 @@ export function renderProtocolHtml(p: ProtocolInput): string {
   <div>Правильных ответов: <b>${p.correct}</b></div>
   <div>Ошибок: <b>${p.total - p.correct}</b></div>
   <div>Результат: <b>${p.percent.toFixed(1)}%</b></div>
+  ${p.gradeResult ? `<div>Итог по разряду: <b>${escapeHtml(GRADE_LABELS[p.gradeResult])}</b></div>` : ""}
+  ${p.awaitingReview ? `<div class="muted">Часть развернутых ответов ожидает проверки преподавателем.</div>` : ""}
   <div class="verdict">${p.passed ? "АТТЕСТОВАН" : "НЕ АТТЕСТОВАН"}</div>
 </div>
 <footer>Документ сформирован автоматически корпоративной платформой обучения «Людиновокабель».</footer>

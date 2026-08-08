@@ -46,6 +46,18 @@ function TestsPage() {
             searchKeys={["text", "topic"]}
             fields={[
               { name: "text", label: "Формулировка вопроса", type: "textarea", required: true },
+              {
+                name: "question_type",
+                label: "Тип вопроса",
+                type: "select",
+                options: [
+                  { value: "single", label: "Один правильный ответ" },
+                  { value: "multi", label: "Несколько правильных ответов" },
+                  { value: "situational", label: "Ситуационный" },
+                  { value: "open", label: "Развернутый ответ" },
+                ],
+              },
+              { name: "points", label: "Баллов за вопрос", type: "number" },
               { name: "topic", label: "Тема" },
               { name: "category", label: "Категория" },
               { name: "profession_id", label: "Профессия", type: "select", options: profOptions },
@@ -61,9 +73,15 @@ function TestsPage() {
                 ],
               },
               { name: "explanation", label: "Пояснение", type: "textarea" },
+              {
+                name: "reference_answer",
+                label: "Эталонный ответ (для развернутых)",
+                type: "textarea",
+              },
             ]}
             columns={[
               { key: "text", label: "Вопрос" },
+              { key: "question_type", label: "Тип" },
               { key: "topic", label: "Тема" },
               { key: "difficulty", label: "Сложность" },
             ]}
@@ -144,6 +162,26 @@ function TestsPage() {
               { name: "shuffle_questions", label: "Случайная выборка вопросов", type: "boolean" },
               { name: "shuffle_options", label: "Перемешивать ответы", type: "boolean" },
               { name: "show_correct_answer", label: "Показывать верный ответ", type: "boolean" },
+              {
+                name: "mode",
+                label: "Режим",
+                type: "select",
+                options: [
+                  { value: "exam", label: "Аттестационный" },
+                  { value: "learning", label: "Учебный" },
+                ],
+              },
+              {
+                name: "result_rule",
+                label: "Правило зачёта",
+                type: "select",
+                options: [
+                  { value: "best", label: "Лучший результат" },
+                  { value: "last", label: "Последний результат" },
+                ],
+              },
+              { name: "retry_interval_hours", label: "Интервал между попытками, ч", type: "number" },
+              { name: "warn_before_minutes", label: "Предупреждение за N минут", type: "number" },
             ]}
             columns={[
               {

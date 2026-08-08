@@ -84,6 +84,8 @@ export function ManagementEditor() {
     },
     onSuccess: (res) => {
       toast.success("Фото загружено");
+      if (photoPreview) URL.revokeObjectURL(photoPreview);
+      setPhotoPreview(null);
       setPhotoPath(res.path);
       void invalidate();
     },

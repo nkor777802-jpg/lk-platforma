@@ -2282,6 +2282,116 @@ export type Database = {
           },
         ]
       }
+      simulator_runs: {
+        Row: {
+          correct_steps: number
+          created_at: string
+          current_step: number
+          duration_seconds: number
+          errors: number
+          finished_at: string | null
+          id: string
+          max_score: number
+          product_code: string
+          product_name: string
+          score: number
+          started_at: string
+          status: string
+          total_steps: number
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          correct_steps?: number
+          created_at?: string
+          current_step?: number
+          duration_seconds?: number
+          errors?: number
+          finished_at?: string | null
+          id?: string
+          max_score?: number
+          product_code: string
+          product_name: string
+          score?: number
+          started_at?: string
+          status?: string
+          total_steps?: number
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          correct_steps?: number
+          created_at?: string
+          current_step?: number
+          duration_seconds?: number
+          errors?: number
+          finished_at?: string | null
+          id?: string
+          max_score?: number
+          product_code?: string
+          product_name?: string
+          score?: number
+          started_at?: string
+          status?: string
+          total_steps?: number
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
+      simulator_steps: {
+        Row: {
+          attempts: number
+          created_at: string
+          duration_seconds: number
+          expected_work_centers: string[]
+          id: string
+          is_correct: boolean
+          process: string
+          run_id: string
+          selected_work_center: string | null
+          step_number: number
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          duration_seconds?: number
+          expected_work_centers?: string[]
+          id?: string
+          is_correct?: boolean
+          process: string
+          run_id: string
+          selected_work_center?: string | null
+          step_number: number
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          duration_seconds?: number
+          expected_work_centers?: string[]
+          id?: string
+          is_correct?: boolean
+          process?: string
+          run_id?: string
+          selected_work_center?: string | null
+          step_number?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulator_steps_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "simulator_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_content: {
         Row: {
           body: string | null

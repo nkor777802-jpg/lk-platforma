@@ -5,9 +5,10 @@ import {
   gamificationSettingsQuery,
   leaderboardsQuery,
   myGamificationQuery,
-  trainersQuery,
 } from "@/lib/gamification-queries";
-import { TrainerCard, type Trainer } from "@/components/gamification/TrainerCard";
+import { simulatorHistoryQuery } from "@/lib/simulator-queries";
+import { ProductionSimulator } from "@/components/gamification/ProductionSimulator";
+import { QualityLab } from "@/components/gamification/QualityLab";
 import { EmptyState, InlineLoading } from "@/components/states";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,16 +18,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export const Route = createFileRoute("/_authenticated/gamification")({
   head: () => ({
     meta: [
-      { title: "Развитие навыков — Академия «Людиновокабель»" },
+      { title: "Производственный тренажёр — Академия «Людиновокабель»" },
       {
         name: "description",
         content:
-          "Производственные тренажёры, квесты, достижения, виртуальный завод и рейтинги сотрудников кабельного производства.",
+          "Интерактивный 3D-тренажёр кабельного производства: маршруты, рабочие центры, конструкция кабеля, контроль качества и рейтинги.",
       },
-      { property: "og:title", content: "Развитие навыков и производственные тренажёры" },
+      { property: "og:title", content: "Производственный 3D-тренажёр" },
       {
         property: "og:description",
-        content: "Практика на производственных сценариях, достижения и рейтинги.",
+        content: "Сборка кабеля по реальным технологическим маршрутам предприятия.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -35,110 +36,115 @@ export const Route = createFileRoute("/_authenticated/gamification")({
   component: GamificationPage,
 });
 
-const QUEST_TYPES = new Set(["quest", "tech_error"]);
-
 function GamificationPage() {
   const settings = useQuery(gamificationSettingsQuery);
   const data = useQuery(myGamificationQuery);
-  const trainers = useQuery(trainersQuery);
   const boards = useQuery(leaderboardsQuery);
+  const history = useQuery(simulatorHistoryQuery);
 
   if (settings.isLoading || data.isLoading) return <InlineLoading />;
   if (!settings.data?.gamificationEnabled)
     return (
       <EmptyState
         title="Модуль отключён"
-        description="Геймификация отключена администратором платформы."
+        description="Производственный тренажёр отключён администратором платформы."
       />
     );
 
-  const all = (trainers.data ?? []) as Trainer[];
-  const simulators = all.filter((t) => !QUEST_TYPES.has(t.taskType));
-  const quests = all.filter((t) => QUEST_TYPES.has(t.taskType));
   const stats = data.data?.stats;
+  const xp = data.data?.xp;
   const showBoards = settings.data.leaderboardsEnabled && boards.data?.enabled;
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Развитие навыков</h1>
+        <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Производственный тренажёр</h1>
         <p className="mt-2 text-muted-foreground">
-          Производственные тренажёры и квесты закрепляют технологию, а достижения и участки завода
-          открываются по мере обучения. Карьерный прогресс — в разделе{" "}
-          <Link to="/development" className="text-primary hover:underline">
-            «Развитие»
+          Сборка кабеля по реальным маршрутам производственного паспорта. Тренажёр повышает
+          вовлечённость, но не заменяет аттестацию — она проходит в разделе{" "}
+          <Link to="/tests" className="text-primary hover:underline">
+            «Тесты»
           </Link>
           .
         </p>
       </div>
 
+      {xp ? (
+        <Card>
+          <CardContent className="flex flex-col gap-3 pt-6 sm:flex-row sm:items-center">
+            <div>
+              <p className="text-3xl font-bold text-primary">Уровень {xp.level}</p>
+              <p className="text-sm text-muted-foreground">{xp.xp} опыта</p>
+            </div>
+            <div className="flex-1 space-y-1">
+              <Progress value={Math.max(0, Math.min(xp.progress, 100))} />
+              <p className="text-xs text-muted-foreground">
+                До следующего уровня: {Math.max(xp.nextFloor - xp.xp, 0)} XP
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
       {stats ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard label="Тренажёров пройдено" value={stats.trainers_passed} />
+          <StatCard label="Кабелей собрано" value={stats.runs_completed} />
+          <StatCard label="Верных операций" value={stats.steps_correct} />
+          <StatCard label="Дефектов найдено" value={stats.defects_found} />
           <StatCard label="Аттестаций сдано" value={stats.tests_passed} />
-          <StatCard label="Тестов на 100%" value={stats.perfect_test} />
-          <StatCard label="Серия без ошибок" value={stats.perfect_streak} />
         </div>
       ) : null}
 
-      <Tabs defaultValue="trainers">
+      <Tabs defaultValue="simulator">
         <TabsList className="flex w-full flex-wrap justify-start">
-          <TabsTrigger value="trainers">Тренажёры</TabsTrigger>
-          <TabsTrigger value="quests">Квесты</TabsTrigger>
+          <TabsTrigger value="simulator">Тренажёр</TabsTrigger>
+          <TabsTrigger value="quality">Контроль качества</TabsTrigger>
           <TabsTrigger value="achievements">Достижения</TabsTrigger>
           <TabsTrigger value="factory">Виртуальный завод</TabsTrigger>
           <TabsTrigger value="collection">Коллекция профессий</TabsTrigger>
+          <TabsTrigger value="history">История</TabsTrigger>
           {showBoards ? <TabsTrigger value="rating">Рейтинг</TabsTrigger> : null}
         </TabsList>
 
-        <TabsContent value="trainers" className="space-y-4 pt-4">
-          {trainers.isLoading ? (
-            <InlineLoading />
-          ) : simulators.length === 0 ? (
-            <EmptyState
-              title="Тренажёры не настроены"
-              description="Администратор ещё не добавил производственные тренажёры."
-            />
-          ) : (
-            simulators.map((t) => <TrainerCard key={t.id} trainer={t} />)
-          )}
+        <TabsContent value="simulator" className="space-y-4 pt-4">
+          <ProductionSimulator />
         </TabsContent>
 
-        <TabsContent value="quests" className="space-y-4 pt-4">
-          {quests.length === 0 ? (
-            <EmptyState
-              title="Квестов пока нет"
-              description="Производственные ситуационные задания появятся здесь."
-            />
-          ) : (
-            quests.map((t) => <TrainerCard key={t.id} trainer={t} />)
-          )}
+        <TabsContent value="quality" className="pt-4">
+          <QualityLab />
         </TabsContent>
 
         <TabsContent value="achievements" className="pt-4">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {(data.data?.achievements ?? []).map((a) => (
-              <Card key={a.id} className={a.earnedAt ? "border-primary/40" : "opacity-80"}>
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <CardTitle className="text-base">{a.title}</CardTitle>
-                    {a.earnedAt ? (
-                      <Badge>Получено</Badge>
-                    ) : (
-                      <Lock className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <p className="text-sm text-muted-foreground">{a.description}</p>
-                  <Progress value={(a.progress / a.conditionValue) * 100} />
-                  <p className="text-xs text-muted-foreground">
-                    {a.progress} из {a.conditionValue}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {(data.data?.achievements ?? []).length === 0 ? (
+            <EmptyState
+              title="Достижения не настроены"
+              description="Администратор ещё не добавил производственные значки."
+            />
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {(data.data?.achievements ?? []).map((a) => (
+                <Card key={a.id} className={a.earnedAt ? "border-primary/40" : "opacity-80"}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <CardTitle className="text-base">{a.title}</CardTitle>
+                      {a.earnedAt ? (
+                        <Badge>Получено</Badge>
+                      ) : (
+                        <Lock className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <p className="text-sm text-muted-foreground">{a.description}</p>
+                    <Progress value={(a.progress / Math.max(a.conditionValue, 1)) * 100} />
+                    <p className="text-xs text-muted-foreground">
+                      {a.progress} из {a.conditionValue}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="factory" className="pt-4">
@@ -159,7 +165,7 @@ function GamificationPage() {
                   <p className="text-sm text-muted-foreground">{z.description}</p>
                   <Progress value={(z.progress / Math.max(z.conditionValue, 1)) * 100} />
                   <p className="text-xs text-muted-foreground">
-                    {z.progress} из {z.conditionValue}
+                    Операций по процессу «{z.process}»: {z.progress} из {z.conditionValue}
                   </p>
                 </CardContent>
               </Card>
@@ -200,12 +206,40 @@ function GamificationPage() {
           )}
         </TabsContent>
 
+        <TabsContent value="history" className="pt-4">
+          {(history.data ?? []).length === 0 ? (
+            <EmptyState
+              title="Прохождений пока нет"
+              description="Запустите тренажёр — результаты появятся здесь и в аналитике."
+            />
+          ) : (
+            <div className="space-y-2">
+              {(history.data ?? []).map((r) => (
+                <Card key={r.id}>
+                  <CardContent className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-6 text-sm">
+                    <span className="font-medium">{r.productName}</span>
+                    <Badge variant={r.status === "completed" ? "default" : "outline"}>
+                      {r.status === "completed" ? "Собран" : "Не завершён"}
+                    </Badge>
+                    <span className="text-muted-foreground">
+                      {r.score} из {r.maxScore} баллов · ошибок {r.errors} · {r.xp} XP
+                    </span>
+                    <span className="text-muted-foreground">
+                      {new Date(r.startedAt).toLocaleString("ru-RU")}
+                    </span>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
         {showBoards ? (
           <TabsContent value="rating" className="pt-4">
             <div className="grid gap-4 lg:grid-cols-3">
-              <Board title="По подразделениям" rows={boards.data?.byDepartment ?? []} />
-              <Board title="По профессиям" rows={boards.data?.byProfession ?? []} />
-              <Board title="По активности" rows={boards.data?.byActivity ?? []} />
+              <Board title="Сотрудники" rows={boards.data?.byActivity ?? []} />
+              <Board title="Подразделения" rows={boards.data?.byDepartment ?? []} />
+              <Board title="Профессии" rows={boards.data?.byProfession ?? []} />
             </div>
           </TabsContent>
         ) : null}

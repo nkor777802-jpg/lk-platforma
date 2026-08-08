@@ -1,10 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import {
-  gamificationSettings,
-  listLeaderboards,
-  listTrainers,
-  myGamification,
-} from "./gamification.functions";
+import { gamificationSettings, listLeaderboards, myGamification } from "./gamification.functions";
 
 export const gamificationSettingsQuery = queryOptions({
   queryKey: ["gamification", "settings"],
@@ -14,11 +9,6 @@ export const gamificationSettingsQuery = queryOptions({
 export const myGamificationQuery = queryOptions({
   queryKey: ["gamification", "me"],
   queryFn: () => myGamification(),
-});
-
-export const trainersQuery = queryOptions({
-  queryKey: ["gamification", "trainers"],
-  queryFn: () => listTrainers(),
 });
 
 export const leaderboardsQuery = queryOptions({

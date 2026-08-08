@@ -136,7 +136,7 @@ export const setPlanItemStatus = createServerFn({ method: "POST" })
       .from("development_plan_items")
       .update({
         status: data.status,
-        comment: data.comment ?? undefined,
+        comment: data.comment ?? null,
         completed_at: data.status === "completed" ? new Date().toISOString() : null,
       })
       .eq("id", data.itemId);

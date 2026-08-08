@@ -20,7 +20,20 @@ export function PublicHeader() {
     <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4">
         <Link to="/" className="shrink-0" aria-label="На главную">
-          <img src={brandLogos.fullColor} alt={brandLogos.alt} className="h-9 w-auto" width={180} height={36} />
+          <img
+            src={brandLogos.fullCompactColor}
+            alt={brandLogos.alt}
+            className="h-11 w-auto object-contain sm:hidden"
+            width={43}
+            height={44}
+          />
+          <img
+            src={brandLogos.fullColor}
+            alt={brandLogos.alt}
+            className="hidden h-9 w-auto max-w-[200px] object-contain sm:block lg:h-10"
+            width={112}
+            height={40}
+          />
         </Link>
 
         <nav aria-label="Основная навигация" className="hidden flex-1 items-center gap-1 lg:flex">

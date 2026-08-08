@@ -68,6 +68,10 @@ export const MANAGED_TABLES = {
   assignments: { soft: "none" },
   group_members: { soft: "none" },
   test_settings: { soft: "none" },
+  qualification_levels: { soft: "is_active" },
+  competencies: { soft: "none" },
+  development_plans: { soft: "none" },
+  development_plan_items: { soft: "none" },
 } as const;
 
 export type ManagedTable = keyof typeof MANAGED_TABLES;

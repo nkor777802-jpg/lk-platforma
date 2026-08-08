@@ -245,7 +245,22 @@ export const finishAttempt = createServerFn({ method: "POST" })
       .single();
     if (!attempt || attempt.user_id !== context.userId) throw new Error("Попытка не найдена");
 
-    return finalizeAttempt(supabaseAdmin, data.attemptId);
+    const result = await finalizeAttempt(supabaseAdmin, data.attemptId);
+
+    const { data: full } = await supabaseAdmin
+      .from("test_attempts")
+      .select("profession_id, passed")
+      .eq("id", data.attemptId)
+      .maybeSingle();
+    const { syncTestPlanItems } = await import("./development.server");
+    await syncTestPlanItems(
+      supabaseAdmin,
+      context.userId,
+      full?.profession_id ?? null,
+      full?.passed ?? null,
+    );
+
+    return result;
   });
 
 /** Очередь развернутых ответов на ручную проверку (преподаватель, HR, администратор). */

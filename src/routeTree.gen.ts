@@ -34,6 +34,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminAssignmentsRouteImport } from './routes/_authenticated/admin/assignments'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminCoursesRouteImport } from './routes/_authenticated/admin/courses'
+import { Route as AuthenticatedAdminDevelopmentRouteImport } from './routes/_authenticated/admin/development'
 import { Route as AuthenticatedAdminDictionariesRouteImport } from './routes/_authenticated/admin/dictionaries'
 import { Route as AuthenticatedAdminExportRouteImport } from './routes/_authenticated/admin/export'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin/import'
@@ -180,6 +181,12 @@ const AuthenticatedAdminCoursesRoute =
     path: '/courses',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminDevelopmentRoute =
+  AuthenticatedAdminDevelopmentRouteImport.update({
+    id: '/development',
+    path: '/development',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminDictionariesRoute =
   AuthenticatedAdminDictionariesRouteImport.update({
     id: '/dictionaries',
@@ -308,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/courses': typeof AuthenticatedAdminCoursesRoute
+  '/admin/development': typeof AuthenticatedAdminDevelopmentRoute
   '/admin/dictionaries': typeof AuthenticatedAdminDictionariesRoute
   '/admin/export': typeof AuthenticatedAdminExportRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
@@ -350,6 +358,7 @@ export interface FileRoutesByTo {
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/courses': typeof AuthenticatedAdminCoursesRoute
+  '/admin/development': typeof AuthenticatedAdminDevelopmentRoute
   '/admin/dictionaries': typeof AuthenticatedAdminDictionariesRoute
   '/admin/export': typeof AuthenticatedAdminExportRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
@@ -396,6 +405,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/courses': typeof AuthenticatedAdminCoursesRoute
+  '/_authenticated/admin/development': typeof AuthenticatedAdminDevelopmentRoute
   '/_authenticated/admin/dictionaries': typeof AuthenticatedAdminDictionariesRoute
   '/_authenticated/admin/export': typeof AuthenticatedAdminExportRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
@@ -441,6 +451,7 @@ export interface FileRouteTypes {
     | '/admin/assignments'
     | '/admin/audit'
     | '/admin/courses'
+    | '/admin/development'
     | '/admin/dictionaries'
     | '/admin/export'
     | '/admin/import'
@@ -483,6 +494,7 @@ export interface FileRouteTypes {
     | '/admin/assignments'
     | '/admin/audit'
     | '/admin/courses'
+    | '/admin/development'
     | '/admin/dictionaries'
     | '/admin/export'
     | '/admin/import'
@@ -528,6 +540,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/assignments'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/courses'
+    | '/_authenticated/admin/development'
     | '/_authenticated/admin/dictionaries'
     | '/_authenticated/admin/export'
     | '/_authenticated/admin/import'
@@ -734,6 +747,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCoursesRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/development': {
+      id: '/_authenticated/admin/development'
+      path: '/development'
+      fullPath: '/admin/development'
+      preLoaderRoute: typeof AuthenticatedAdminDevelopmentRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/dictionaries': {
       id: '/_authenticated/admin/dictionaries'
       path: '/dictionaries'
@@ -867,6 +887,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAssignmentsRoute: typeof AuthenticatedAdminAssignmentsRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminCoursesRoute: typeof AuthenticatedAdminCoursesRoute
+  AuthenticatedAdminDevelopmentRoute: typeof AuthenticatedAdminDevelopmentRoute
   AuthenticatedAdminDictionariesRoute: typeof AuthenticatedAdminDictionariesRoute
   AuthenticatedAdminExportRoute: typeof AuthenticatedAdminExportRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
@@ -884,6 +905,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAssignmentsRoute: AuthenticatedAdminAssignmentsRoute,
     AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
     AuthenticatedAdminCoursesRoute: AuthenticatedAdminCoursesRoute,
+    AuthenticatedAdminDevelopmentRoute: AuthenticatedAdminDevelopmentRoute,
     AuthenticatedAdminDictionariesRoute: AuthenticatedAdminDictionariesRoute,
     AuthenticatedAdminExportRoute: AuthenticatedAdminExportRoute,
     AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
@@ -980,13 +1002,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

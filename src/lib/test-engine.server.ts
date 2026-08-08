@@ -61,6 +61,73 @@ export const GRADE_LABELS: Record<GradeResult, string> = {
   failed: "Разряд не подтверждён",
 };
 
+/**
+ * Пересчёт итога попытки по сохранённым ответам.
+ * Используется при завершении теста и после ручной проверки развернутых ответов.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function finalizeAttempt(supabase: any, attemptId: string) {
+  const { data: attempt } = await supabase
+    .from("test_attempts")
+    .select("id, total_questions, settings_snapshot")
+    .eq("id", attemptId)
+    .single();
+  if (!attempt) throw new Error("Попытка не найдена");
+
+  const { data: answers } = await supabase
+    .from("test_answers")
+    .select("is_correct, review_status, review_score, points")
+    .eq("attempt_id", attemptId);
+
+  const rows = (answers ?? []) as {
+    is_correct: boolean | null;
+    review_status: string | null;
+    review_score: number | null;
+    points: number | null;
+  }[];
+
+  const snapshot = (attempt.settings_snapshot ?? {}) as Partial<TestSettings> & {
+    question_ids?: string[];
+  };
+  const passPercent = snapshot.pass_percent ?? DEFAULT_SETTINGS.pass_percent;
+  const pending = rows.filter((r) => r.review_status === "pending").length;
+
+  const maxPoints =
+    rows.reduce((sum, r) => sum + (r.points ?? 1), 0) || attempt.total_questions || 1;
+  const earned = rows.reduce((sum, r) => {
+    if (r.review_status === "graded") return sum + (r.review_score ?? 0);
+    if (r.review_status === "pending") return sum;
+    return sum + (r.is_correct ? (r.points ?? 1) : 0);
+  }, 0);
+
+  const correct = rows.filter((r) => r.is_correct).length;
+  const percent = Math.round((earned / maxPoints) * 1000) / 10;
+  const passed = pending === 0 ? percent >= passPercent : null;
+  const gradeResult = pending === 0 ? computeGrade(percent, passPercent, snapshot.grading_rules) : null;
+
+  await supabase
+    .from("test_attempts")
+    .update({
+      status: pending > 0 ? "awaiting_review" : "finished",
+      correct_answers: correct,
+      score_percent: percent,
+      passed,
+      grade_result: gradeResult,
+      finished_at: new Date().toISOString(),
+    })
+    .eq("id", attemptId);
+
+  return {
+    correct,
+    total: attempt.total_questions ?? rows.length,
+    percent,
+    passed,
+    passPercent,
+    pending,
+    gradeResult,
+  };
+}
+
 export function shuffle<T>(items: T[]): T[] {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i--) {

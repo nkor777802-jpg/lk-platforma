@@ -10,6 +10,7 @@ import {
   PenLine,
   ScrollText,
   Settings,
+  TrendingUp,
   Upload,
   Users,
 } from "lucide-react";
@@ -38,6 +39,7 @@ export const ADMIN_NAV = [
   { to: "/admin/courses", label: "Курсы", icon: BookOpen },
   { to: "/admin/materials", label: "Материалы", icon: FileText },
   { to: "/admin/assignments", label: "Назначения", icon: ClipboardList },
+  { to: "/admin/development", label: "Развитие", icon: TrendingUp },
   { to: "/admin/tests", label: "Тесты", icon: ListChecks },
   { to: "/admin/reviews", label: "Проверка ответов", icon: PenLine },
   { to: "/admin/dictionaries", label: "Справочники", icon: FolderTree },

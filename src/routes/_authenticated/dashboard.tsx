@@ -77,7 +77,7 @@ function DashboardPage() {
           </p>
           {myProfession ? (
             <Button asChild>
-              <Link to="/professions/$slug" params={{ slug: myProfession.slug }}>
+              <Link to="/professions/$slug" params={{ slug: myProfession.slug ?? myProfession.id }}>
                 Продолжить обучение
               </Link>
             </Button>

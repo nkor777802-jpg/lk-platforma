@@ -40,7 +40,7 @@ function ProfessionsPage() {
                 <h2 className="text-lg font-semibold text-foreground">{p.name}</h2>
                 <p className="mt-2 flex-1 text-sm text-muted-foreground">{p.short_description}</p>
                 <Button asChild className="mt-5 w-full">
-                  <Link to="/professions/$slug" params={{ slug: p.slug }}>
+                  <Link to="/professions/$slug" params={{ slug: p.slug ?? p.id }}>
                     Открыть программу
                   </Link>
                 </Button>

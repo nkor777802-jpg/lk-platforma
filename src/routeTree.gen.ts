@@ -15,11 +15,14 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BootstrapRouteImport } from './routes/bootstrap'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedCertificatesRouteImport } from './routes/_authenticated/certificates'
 import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticated/company'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDevelopmentRouteImport } from './routes/_authenticated/development'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedTestsRouteImport } from './routes/_authenticated/tests'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicAboutRouteImport } from './routes/_public/about'
@@ -40,8 +43,11 @@ import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminTestsRouteImport } from './routes/_authenticated/admin/tests'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
+import { Route as AuthenticatedLearningIndexRouteImport } from './routes/_authenticated/learning.index'
+import { Route as AuthenticatedLearningCourseIdRouteImport } from './routes/_authenticated/learning.$courseId'
 import { Route as AuthenticatedProfessionsIndexRouteImport } from './routes/_authenticated/professions.index'
 import { Route as AuthenticatedProfessionsSlugRouteImport } from './routes/_authenticated/professions.$slug'
+import { Route as AuthenticatedResultsIndexRouteImport } from './routes/_authenticated/results.index'
 import { Route as AuthenticatedResultsAttemptIdRouteImport } from './routes/_authenticated/results.$attemptId'
 import { Route as AuthenticatedTestProfessionIdRouteImport } from './routes/_authenticated/test.$professionId'
 import { Route as PublicTrainingIndexRouteImport } from './routes/_public/training.index'
@@ -75,6 +81,12 @@ const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCertificatesRoute =
+  AuthenticatedCertificatesRouteImport.update({
+    id: '/certificates',
+    path: '/certificates',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCompanyRoute = AuthenticatedCompanyRouteImport.update({
   id: '/company',
   path: '/company',
@@ -85,6 +97,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDevelopmentRoute =
+  AuthenticatedDevelopmentRouteImport.update({
+    id: '/development',
+    path: '/development',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   id: '/library',
   path: '/library',
@@ -98,6 +116,11 @@ const AuthenticatedProductsRoute = AuthenticatedProductsRouteImport.update({
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTestsRoute = AuthenticatedTestsRouteImport.update({
+  id: '/tests',
+  path: '/tests',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedVideosRoute = AuthenticatedVideosRouteImport.update({
@@ -208,6 +231,18 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedLearningIndexRoute =
+  AuthenticatedLearningIndexRouteImport.update({
+    id: '/learning/',
+    path: '/learning/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLearningCourseIdRoute =
+  AuthenticatedLearningCourseIdRouteImport.update({
+    id: '/learning/$courseId',
+    path: '/learning/$courseId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProfessionsIndexRoute =
   AuthenticatedProfessionsIndexRouteImport.update({
     id: '/professions/',
@@ -218,6 +253,12 @@ const AuthenticatedProfessionsSlugRoute =
   AuthenticatedProfessionsSlugRouteImport.update({
     id: '/professions/$slug',
     path: '/professions/$slug',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedResultsIndexRoute =
+  AuthenticatedResultsIndexRouteImport.update({
+    id: '/results/',
+    path: '/results/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedResultsAttemptIdRoute =
@@ -250,11 +291,14 @@ export interface FileRoutesByFullPath {
   '/bootstrap': typeof BootstrapRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/certificates': typeof AuthenticatedCertificatesRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/development': typeof AuthenticatedDevelopmentRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/tests': typeof AuthenticatedTestsRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/about': typeof PublicAboutRoute
   '/consent': typeof PublicConsentRoute
@@ -273,12 +317,15 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/learning/$courseId': typeof AuthenticatedLearningCourseIdRoute
   '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
   '/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
   '/training/professions': typeof PublicTrainingProfessionsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/learning/': typeof AuthenticatedLearningIndexRoute
   '/professions/': typeof AuthenticatedProfessionsIndexRoute
+  '/results/': typeof AuthenticatedResultsIndexRoute
   '/training/': typeof PublicTrainingIndexRoute
 }
 export interface FileRoutesByTo {
@@ -286,11 +333,14 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/bootstrap': typeof BootstrapRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/certificates': typeof AuthenticatedCertificatesRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/development': typeof AuthenticatedDevelopmentRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/tests': typeof AuthenticatedTestsRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/about': typeof PublicAboutRoute
   '/consent': typeof PublicConsentRoute
@@ -309,12 +359,15 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/learning/$courseId': typeof AuthenticatedLearningCourseIdRoute
   '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
   '/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
   '/training/professions': typeof PublicTrainingProfessionsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/learning': typeof AuthenticatedLearningIndexRoute
   '/professions': typeof AuthenticatedProfessionsIndexRoute
+  '/results': typeof AuthenticatedResultsIndexRoute
   '/training': typeof PublicTrainingIndexRoute
 }
 export interface FileRoutesById {
@@ -325,11 +378,14 @@ export interface FileRoutesById {
   '/bootstrap': typeof BootstrapRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/certificates': typeof AuthenticatedCertificatesRoute
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/development': typeof AuthenticatedDevelopmentRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/tests': typeof AuthenticatedTestsRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_public/about': typeof PublicAboutRoute
   '/_public/consent': typeof PublicConsentRoute
@@ -349,12 +405,15 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/learning/$courseId': typeof AuthenticatedLearningCourseIdRoute
   '/_authenticated/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/_authenticated/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
   '/_authenticated/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
   '/_public/training/professions': typeof PublicTrainingProfessionsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/learning/': typeof AuthenticatedLearningIndexRoute
   '/_authenticated/professions/': typeof AuthenticatedProfessionsIndexRoute
+  '/_authenticated/results/': typeof AuthenticatedResultsIndexRoute
   '/_public/training/': typeof PublicTrainingIndexRoute
 }
 export interface FileRouteTypes {
@@ -365,11 +424,14 @@ export interface FileRouteTypes {
     | '/bootstrap'
     | '/sitemap.xml'
     | '/admin'
+    | '/certificates'
     | '/company'
     | '/dashboard'
+    | '/development'
     | '/library'
     | '/products'
     | '/profile'
+    | '/tests'
     | '/videos'
     | '/about'
     | '/consent'
@@ -388,12 +450,15 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tests'
     | '/admin/users'
+    | '/learning/$courseId'
     | '/professions/$slug'
     | '/results/$attemptId'
     | '/test/$professionId'
     | '/training/professions'
     | '/admin/'
+    | '/learning/'
     | '/professions/'
+    | '/results/'
     | '/training/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -401,11 +466,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/bootstrap'
     | '/sitemap.xml'
+    | '/certificates'
     | '/company'
     | '/dashboard'
+    | '/development'
     | '/library'
     | '/products'
     | '/profile'
+    | '/tests'
     | '/videos'
     | '/about'
     | '/consent'
@@ -424,12 +492,15 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tests'
     | '/admin/users'
+    | '/learning/$courseId'
     | '/professions/$slug'
     | '/results/$attemptId'
     | '/test/$professionId'
     | '/training/professions'
     | '/admin'
+    | '/learning'
     | '/professions'
+    | '/results'
     | '/training'
   id:
     | '__root__'
@@ -439,11 +510,14 @@ export interface FileRouteTypes {
     | '/bootstrap'
     | '/sitemap.xml'
     | '/_authenticated/admin'
+    | '/_authenticated/certificates'
     | '/_authenticated/company'
     | '/_authenticated/dashboard'
+    | '/_authenticated/development'
     | '/_authenticated/library'
     | '/_authenticated/products'
     | '/_authenticated/profile'
+    | '/_authenticated/tests'
     | '/_authenticated/videos'
     | '/_public/about'
     | '/_public/consent'
@@ -463,12 +537,15 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/tests'
     | '/_authenticated/admin/users'
+    | '/_authenticated/learning/$courseId'
     | '/_authenticated/professions/$slug'
     | '/_authenticated/results/$attemptId'
     | '/_authenticated/test/$professionId'
     | '/_public/training/professions'
     | '/_authenticated/admin/'
+    | '/_authenticated/learning/'
     | '/_authenticated/professions/'
+    | '/_authenticated/results/'
     | '/_public/training/'
   fileRoutesById: FileRoutesById
 }
@@ -524,6 +601,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/certificates': {
+      id: '/_authenticated/certificates'
+      path: '/certificates'
+      fullPath: '/certificates'
+      preLoaderRoute: typeof AuthenticatedCertificatesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/company': {
       id: '/_authenticated/company'
       path: '/company'
@@ -536,6 +620,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/development': {
+      id: '/_authenticated/development'
+      path: '/development'
+      fullPath: '/development'
+      preLoaderRoute: typeof AuthenticatedDevelopmentRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/library': {
@@ -557,6 +648,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tests': {
+      id: '/_authenticated/tests'
+      path: '/tests'
+      fullPath: '/tests'
+      preLoaderRoute: typeof AuthenticatedTestsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/videos': {
@@ -699,6 +797,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/learning/': {
+      id: '/_authenticated/learning/'
+      path: '/learning'
+      fullPath: '/learning/'
+      preLoaderRoute: typeof AuthenticatedLearningIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/learning/$courseId': {
+      id: '/_authenticated/learning/$courseId'
+      path: '/learning/$courseId'
+      fullPath: '/learning/$courseId'
+      preLoaderRoute: typeof AuthenticatedLearningCourseIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/professions/': {
       id: '/_authenticated/professions/'
       path: '/professions'
@@ -711,6 +823,13 @@ declare module '@tanstack/react-router' {
       path: '/professions/$slug'
       fullPath: '/professions/$slug'
       preLoaderRoute: typeof AuthenticatedProfessionsSlugRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/results/': {
+      id: '/_authenticated/results/'
+      path: '/results'
+      fullPath: '/results/'
+      preLoaderRoute: typeof AuthenticatedResultsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/results/$attemptId': {
@@ -784,30 +903,42 @@ const AuthenticatedAdminRouteRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedCertificatesRoute: typeof AuthenticatedCertificatesRoute
   AuthenticatedCompanyRoute: typeof AuthenticatedCompanyRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDevelopmentRoute: typeof AuthenticatedDevelopmentRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedTestsRoute: typeof AuthenticatedTestsRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
+  AuthenticatedLearningCourseIdRoute: typeof AuthenticatedLearningCourseIdRoute
   AuthenticatedProfessionsSlugRoute: typeof AuthenticatedProfessionsSlugRoute
   AuthenticatedResultsAttemptIdRoute: typeof AuthenticatedResultsAttemptIdRoute
   AuthenticatedTestProfessionIdRoute: typeof AuthenticatedTestProfessionIdRoute
+  AuthenticatedLearningIndexRoute: typeof AuthenticatedLearningIndexRoute
   AuthenticatedProfessionsIndexRoute: typeof AuthenticatedProfessionsIndexRoute
+  AuthenticatedResultsIndexRoute: typeof AuthenticatedResultsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedCertificatesRoute: AuthenticatedCertificatesRoute,
   AuthenticatedCompanyRoute: AuthenticatedCompanyRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDevelopmentRoute: AuthenticatedDevelopmentRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedTestsRoute: AuthenticatedTestsRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
+  AuthenticatedLearningCourseIdRoute: AuthenticatedLearningCourseIdRoute,
   AuthenticatedProfessionsSlugRoute: AuthenticatedProfessionsSlugRoute,
   AuthenticatedResultsAttemptIdRoute: AuthenticatedResultsAttemptIdRoute,
   AuthenticatedTestProfessionIdRoute: AuthenticatedTestProfessionIdRoute,
+  AuthenticatedLearningIndexRoute: AuthenticatedLearningIndexRoute,
   AuthenticatedProfessionsIndexRoute: AuthenticatedProfessionsIndexRoute,
+  AuthenticatedResultsIndexRoute: AuthenticatedResultsIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -849,13 +980,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

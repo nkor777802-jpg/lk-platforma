@@ -9,6 +9,7 @@ import {
   myProgressQuery,
   professionsQuery,
 } from "@/lib/lms-queries";
+import { myAssignmentsQuery, myNotificationsQuery } from "@/lib/account-queries";
 import { EmptyState, InlineLoading } from "@/components/states";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,8 @@ function DashboardPage() {
   const progress = useQuery(myProgressQuery(user?.id));
   const achievements = useQuery(myAchievementsQuery(user?.id));
   const professions = useQuery(professionsQuery);
+  const assignments = useQuery(myAssignmentsQuery(user?.id));
+  const notifications = useQuery(myNotificationsQuery(user?.id));
 
   if (profile.isLoading) return <InlineLoading />;
 
@@ -42,6 +45,13 @@ function DashboardPage() {
   const totalProgress = progress.data?.length ?? 0;
   const percent = totalProgress ? Math.round((completed / totalProgress) * 100) : 0;
   const lastAttempt = attempts.data?.[0];
+  const today = new Date(new Date().toDateString());
+  const active = (assignments.data ?? []).filter((a) => a.status !== "completed");
+  const upcoming = active
+    .filter((a) => a.due_date)
+    .sort((a, b) => (a.due_date! < b.due_date! ? -1 : 1))
+    .slice(0, 5);
+  const unread = (notifications.data ?? []).filter((n) => !n.is_read).slice(0, 5);
 
   return (
     <div className="space-y-8">
@@ -86,6 +96,79 @@ function DashboardPage() {
               <Link to="/professions">Выбрать профессию</Link>
             </Button>
           )}
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Текущие назначения</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {active.length === 0 ? (
+              <p className="text-muted-foreground">Активных назначений нет.</p>
+            ) : (
+              active.slice(0, 5).map((a) => (
+                <div key={a.id} className="flex flex-wrap items-center gap-2">
+                  <span className="font-medium">
+                    {a.courses?.title ?? a.professions?.name ?? "Программа обучения"}
+                  </span>
+                  {a.due_date ? (
+                    <Badge
+                      variant={new Date(a.due_date) < today ? "destructive" : "secondary"}
+                    >
+                      до {new Date(a.due_date).toLocaleDateString("ru-RU")}
+                    </Badge>
+                  ) : null}
+                </div>
+              ))
+            )}
+            <Button asChild variant="outline" size="sm">
+              <Link to="/learning">Все программы</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Ближайшие сроки и уведомления</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {upcoming.length === 0 && unread.length === 0 ? (
+              <p className="text-muted-foreground">Новых событий нет.</p>
+            ) : null}
+            {upcoming.map((a) => (
+              <p key={a.id} className="text-muted-foreground">
+                {a.courses?.title ?? a.professions?.name ?? "Программа"} —{" "}
+                {new Date(a.due_date!).toLocaleDateString("ru-RU")}
+              </p>
+            ))}
+            {unread.map((n) => (
+              <p key={n.id} className="font-medium">
+                {n.title}
+              </p>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Быстрые действия</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Button asChild size="sm">
+            <Link to="/learning">Мое обучение</Link>
+          </Button>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/tests">Пройти тест</Link>
+          </Button>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/results">Результаты</Link>
+          </Button>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/certificates">Сертификаты</Link>
+          </Button>
         </CardContent>
       </Card>
 

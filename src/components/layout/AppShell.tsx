@@ -4,15 +4,24 @@ import { LogOut, Menu, Shield, User as UserIcon, X } from "lucide-react";
 import { brandLogos } from "@/lib/brand";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 
 const NAV = [
   { to: "/dashboard", label: "Главная" },
+  { to: "/learning", label: "Мое обучение" },
+  { to: "/tests", label: "Тесты" },
+  { to: "/results", label: "Результаты" },
+  { to: "/development", label: "Развитие" },
+  { to: "/certificates", label: "Сертификаты" },
+  { to: "/profile", label: "Профиль" },
+] as const;
+
+const SECONDARY_NAV = [
   { to: "/company", label: "О компании" },
   { to: "/products", label: "Продукция" },
   { to: "/professions", label: "Профессии" },
   { to: "/library", label: "Библиотека" },
   { to: "/videos", label: "Видео" },
-  { to: "/profile", label: "Кабинет" },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -45,6 +54,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2">
+            <NotificationBell />
             {isStaff ? (
               <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
                 <Link to="/admin">
@@ -74,7 +84,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
         {open ? (
           <nav className="border-t border-border bg-card px-4 py-2 lg:hidden">
-            {NAV.map((item) => (
+            {[...NAV, ...SECONDARY_NAV].map((item) => (
               <Link
                 key={item.to}
                 to={item.to}

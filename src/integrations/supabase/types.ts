@@ -207,6 +207,73 @@ export type Database = {
         }
         Relationships: []
       }
+      certificates: {
+        Row: {
+          attempt_id: string | null
+          course_id: string | null
+          created_at: string
+          expires_at: string | null
+          file_url: string | null
+          id: string
+          issued_at: string
+          number: string | null
+          profession_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attempt_id?: string | null
+          course_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+          file_url?: string | null
+          id?: string
+          issued_at?: string
+          number?: string | null
+          profession_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attempt_id?: string | null
+          course_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+          file_url?: string | null
+          id?: string
+          issued_at?: string
+          number?: string | null
+          profession_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "test_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_profession_id_fkey"
+            columns: ["profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_history: {
         Row: {
           created_at: string
@@ -802,6 +869,42 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          link: string | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          title: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           description: string | null
@@ -1117,9 +1220,11 @@ export type Database = {
           is_active: boolean
           manager_id: string | null
           personnel_number: string | null
+          phone: string | null
           position: string | null
           position_id: string | null
           profession_id: string | null
+          status: string
           updated_at: string
         }
         Insert: {
@@ -1133,9 +1238,11 @@ export type Database = {
           is_active?: boolean
           manager_id?: string | null
           personnel_number?: string | null
+          phone?: string | null
           position?: string | null
           position_id?: string | null
           profession_id?: string | null
+          status?: string
           updated_at?: string
         }
         Update: {
@@ -1149,9 +1256,11 @@ export type Database = {
           is_active?: boolean
           manager_id?: string | null
           personnel_number?: string | null
+          phone?: string | null
           position?: string | null
           position_id?: string | null
           profession_id?: string | null
+          status?: string
           updated_at?: string
         }
         Relationships: [

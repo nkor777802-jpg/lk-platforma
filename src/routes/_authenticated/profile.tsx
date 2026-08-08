@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import {
   allAchievementsQuery,
@@ -11,6 +14,9 @@ import { EmptyState, InlineLoading } from "@/components/states";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { updateMyProfile } from "@/lib/account.functions";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
@@ -26,10 +32,36 @@ export const Route = createFileRoute("/_authenticated/profile")({
 
 function ProfilePage() {
   const { user } = useAuth();
+  const qc = useQueryClient();
   const profile = useQuery(myProfileQuery(user?.id));
   const attempts = useQuery(myAttemptsQuery(user?.id));
   const earned = useQuery(myAchievementsQuery(user?.id));
   const all = useQuery(allAchievementsQuery);
+  const save = useServerFn(updateMyProfile);
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const loaded = profile.data as { phone?: string | null; email?: string | null } | null | undefined;
+  useEffect(() => {
+    if (loaded) {
+      setPhone(loaded.phone ?? "");
+      setEmail(loaded.email ?? "");
+    }
+  }, [loaded]);
+
+  const submit = async () => {
+    setSaving(true);
+    try {
+      await save({ data: { phone: phone || null, email: email || null } });
+      toast.success("Контактные данные сохранены");
+      void qc.invalidateQueries({ queryKey: ["profile"] });
+    } catch (e) {
+      toast.error("Не удалось сохранить", { description: (e as Error).message });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (profile.isLoading) return <InlineLoading />;
   const p = profile.data;
@@ -57,6 +89,41 @@ function ProfilePage() {
             value={(p as { professions?: { name?: string } } | null)?.professions?.name}
           />
           <Field label="Разряд" value={p?.grade} />
+          <Field label="Статус" value={(p as { status?: string } | null)?.status === "active" ? "Активен" : ((p as { status?: string } | null)?.status ?? "—")} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Контактные данные</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Кадровые данные (подразделение, должность, профессия, разряд) изменяет отдел кадров.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="phone">Телефон</Label>
+              <Input
+                id="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+7 ..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail для связи</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+          </div>
+          <Button onClick={submit} disabled={saving}>
+            Сохранить
+          </Button>
         </CardContent>
       </Card>
 

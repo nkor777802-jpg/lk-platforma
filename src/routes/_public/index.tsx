@@ -55,7 +55,7 @@ function HomePage() {
 
   return (
     <>
-      <section className="brand-pattern-blue text-secondary-foreground">
+      <section className="bg-secondary text-secondary-foreground">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:py-24 lg:grid-cols-2 lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-widest text-primary">

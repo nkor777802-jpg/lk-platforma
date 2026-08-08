@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { adminTableQuery } from "@/lib/admin-queries";
 import { EntityManager } from "@/components/admin/EntityManager";
+import { ManagementEditor } from "@/components/admin/ManagementEditor";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/_authenticated/admin/org")({
@@ -25,10 +26,11 @@ function OrgPage() {
       </div>
 
       <Tabs defaultValue="departments">
-        <TabsList>
+        <TabsList className="flex flex-wrap">
           <TabsTrigger value="departments">Подразделения</TabsTrigger>
           <TabsTrigger value="positions">Должности</TabsTrigger>
           <TabsTrigger value="groups">Группы</TabsTrigger>
+          <TabsTrigger value="management">Руководство</TabsTrigger>
         </TabsList>
 
         <TabsContent value="departments" className="pt-6">
@@ -83,8 +85,12 @@ function OrgPage() {
             columns={[
               { key: "name", label: "Наименование" },
               { key: "description", label: "Описание" },
-            ]}
+          ]}
           />
+        </TabsContent>
+
+        <TabsContent value="management" className="pt-6">
+          <ManagementEditor />
         </TabsContent>
       </Tabs>
     </div>

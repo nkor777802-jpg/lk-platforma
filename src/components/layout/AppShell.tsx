@@ -1,6 +1,6 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { LogOut, Menu, Shield, User as UserIcon, X } from "lucide-react";
+import { LogOut, Shield, User as UserIcon, X } from "lucide-react";
 import { brandLogos } from "@/lib/brand";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -97,10 +97,22 @@ export function AppShell({ children }: { children: ReactNode }) {
               variant="ghost"
               size="icon"
               className="lg:hidden"
-              aria-label="Меню"
+              aria-label={open ? "Закрыть меню" : "Открыть меню"}
+              aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
             >
-              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {open ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <img
+                  src={brandLogos.markBlue}
+                  alt=""
+                  aria-hidden="true"
+                  className="h-6 w-auto"
+                  width={24}
+                  height={24}
+                />
+              )}
             </Button>
           </div>
         </div>
@@ -141,9 +153,11 @@ export function AppShell({ children }: { children: ReactNode }) {
         ) : null}
       </header>
 
-      <main className="mx-auto w-full min-w-0 max-w-7xl flex-1 px-3 py-6 sm:px-4 sm:py-8">
-        {children}
-      </main>
+      <div className="brand-pattern flex-1">
+        <main className="mx-auto w-full min-w-0 max-w-7xl px-3 py-6 sm:px-4 sm:py-8">
+          {children}
+        </main>
+      </div>
 
       <footer className="border-t border-border bg-secondary py-8 text-secondary-foreground">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between">

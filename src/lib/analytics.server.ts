@@ -3,11 +3,11 @@ import type { Database } from "@/integrations/supabase/types";
 import type { AppRole } from "./admin.server";
 
 export interface AnalyticsFilters {
-  from?: string | null;
-  to?: string | null;
-  departmentId?: string | null;
-  professionId?: string | null;
-  courseId?: string | null;
+  from?: string | null | undefined;
+  to?: string | null | undefined;
+  departmentId?: string | null | undefined;
+  professionId?: string | null | undefined;
+  courseId?: string | null | undefined;
 }
 
 export interface Scope {

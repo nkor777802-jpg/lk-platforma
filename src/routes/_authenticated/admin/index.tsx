@@ -15,12 +15,18 @@ function AdminOverviewPage() {
   if (isError) return <ErrorState message={(error as Error).message} />;
 
   const cards = [
-    { label: "Пользователи", value: data.users },
+    { label: "Активные пользователи", value: data.users },
+    { label: "Профессии", value: data.professions },
     { label: "Активные курсы", value: data.courses },
     { label: "Назначенные обучения", value: data.assignments },
     { label: "Просроченные обучения", value: data.overdue },
+    { label: "Активные тесты", value: data.tests },
+    { label: "Средний результат, %", value: data.avgScore },
+    { label: "Производственные тренажёры", value: data.trainers },
+    { label: "Рабочие центры", value: data.workCenters },
+    { label: "Категории продукции", value: data.productCategories },
     { label: "Тестирования", value: data.attempts },
-    { label: "Проблемы с доступом", value: data.blocked },
+    { label: "Ошибки импорта", value: data.importErrors },
   ];
 
   return (
@@ -42,6 +48,27 @@ function AdminOverviewPage() {
           </Card>
         ))}
       </div>
+
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold text-secondary">Последние импорты</h2>
+        {data.imports.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Импортов пока не было.</p>
+        ) : (
+          <ul className="divide-y divide-border rounded-lg border border-border">
+            {data.imports.map((r) => (
+              <li key={r.id} className="flex flex-wrap gap-2 px-4 py-3 text-sm">
+                <span className="font-medium text-foreground">{r.file_name ?? r.kind}</span>
+                <span className="text-muted-foreground">
+                  создано {r.created_rows} · обновлено {r.updated_rows} · ошибок {r.error_rows}
+                </span>
+                <span className="ml-auto text-muted-foreground">
+                  {r.actor_name ?? "—"} · {new Date(r.created_at).toLocaleString("ru-RU")}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold text-secondary">Последние административные действия</h2>

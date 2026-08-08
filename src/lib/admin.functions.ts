@@ -19,14 +19,50 @@ export const adminOverview = createServerFn({ method: "GET" })
     };
 
     const today = new Date().toISOString().slice(0, 10);
-    const [users, courses, assignments, overdue, attempts, blocked] = await Promise.all([
-      count("profiles"),
+    const [
+      users,
+      courses,
+      assignments,
+      overdue,
+      attempts,
+      blocked,
+      professions,
+      tests,
+      trainers,
+      workCenters,
+      productCategories,
+    ] = await Promise.all([
+      count("profiles", (q) => q.eq("is_active", true)),
       count("courses", (q) => q.eq("is_active", true)),
       count("assignments"),
       count("assignments", (q) => q.lt("due_date", today).neq("status", "completed")),
       count("test_attempts"),
       count("profiles", (q) => q.eq("is_active", false)),
+      count("professions", (q) => q.eq("is_active", true)),
+      count("test_settings"),
+      count("factory_zones", (q) => q.eq("is_active", true)),
+      count("work_centers", (q) => q.eq("is_active", true)),
+      count("production_products", (q) => q.eq("is_active", true)),
     ]);
+
+    const { data: scores } = await supabaseAdmin
+      .from("test_attempts")
+      .select("score_percent")
+      .eq("status", "finished")
+      .limit(2000);
+    const scoreRows = (scores ?? []) as { score_percent: number | null }[];
+    const avgScore =
+      scoreRows.length > 0
+        ? Math.round(
+            scoreRows.reduce((sum, r) => sum + Number(r.score_percent ?? 0), 0) / scoreRows.length,
+          )
+        : 0;
+
+    const { data: imports } = await supabaseAdmin
+      .from("import_runs")
+      .select("id, kind, file_name, actor_name, status, error_rows, created_rows, updated_rows, created_at")
+      .order("created_at", { ascending: false })
+      .limit(5);
 
     const { data: recent } = await supabaseAdmin
       .from("audit_log")
@@ -34,7 +70,35 @@ export const adminOverview = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(10);
 
-    return { users, courses, assignments, overdue, attempts, blocked, recent: recent ?? [] };
+    const importRows = (imports ?? []) as {
+      id: string;
+      kind: string;
+      file_name: string | null;
+      actor_name: string | null;
+      status: string;
+      error_rows: number;
+      created_rows: number;
+      updated_rows: number;
+      created_at: string;
+    }[];
+
+    return {
+      users,
+      courses,
+      assignments,
+      overdue,
+      attempts,
+      blocked,
+      professions,
+      tests,
+      trainers,
+      workCenters,
+      productCategories,
+      avgScore,
+      imports: importRows,
+      importErrors: importRows.filter((i) => i.error_rows > 0).length,
+      recent: recent ?? [],
+    };
   });
 
 export const listAdminUsers = createServerFn({ method: "GET" })
@@ -251,11 +315,15 @@ export const archiveRow = createServerFn({ method: "POST" })
     z.object({ table: z.string(), id: z.string().uuid(), active: z.boolean() }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { assertRole, isManagedTable, MANAGED_TABLES, logAction } = await import("./admin.server");
+    const { assertRole, isManagedTable, MANAGED_TABLES, MANAGED_TABLES_V2, logAction } =
+      await import("./admin.server");
     await assertRole(context.supabase, context.userId, [...STAFF]);
     if (!isManagedTable(data.table)) throw new Error("Недопустимая таблица");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    if (MANAGED_TABLES[data.table].soft !== "is_active") {
+    const soft =
+      (MANAGED_TABLES as Record<string, { soft: string }>)[data.table]?.soft ??
+      (MANAGED_TABLES_V2 as Record<string, { soft: string }>)[data.table]?.soft;
+    if (soft !== "is_active") {
       throw new Error("Для этой сущности архивирование не предусмотрено");
     }
     const { error } = await supabaseAdmin

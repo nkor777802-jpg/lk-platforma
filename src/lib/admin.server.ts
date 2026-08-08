@@ -76,10 +76,26 @@ export const MANAGED_TABLES = {
   factory_zones: { soft: "is_active" },
 } as const;
 
+/** Производственные и учебные таблицы, добавленные в v2 админ-панели. */
+export const MANAGED_TABLES_V2 = {
+  course_lessons: { soft: "is_active" },
+  production_products: { soft: "is_active" },
+  work_centers: { soft: "is_active" },
+  production_routes: { soft: "is_active" },
+  cable_constructions: { soft: "is_active" },
+  production_materials: { soft: "is_active" },
+  defects: { soft: "is_active" },
+  model_assets: { soft: "is_active" },
+  product_categories: { soft: "is_active" },
+} as const;
+
 export type ManagedTable = keyof typeof MANAGED_TABLES;
 
 export function isManagedTable(value: string): value is ManagedTable {
-  return Object.prototype.hasOwnProperty.call(MANAGED_TABLES, value);
+  return (
+    Object.prototype.hasOwnProperty.call(MANAGED_TABLES, value) ||
+    Object.prototype.hasOwnProperty.call(MANAGED_TABLES_V2, value)
+  );
 }
 
 export function toCsv(rows: Record<string, unknown>[]): string {

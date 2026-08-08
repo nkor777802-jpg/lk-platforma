@@ -1,193 +1,348 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { commitImport, validateImport } from "@/lib/admin.functions";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Download, FileSpreadsheet, Upload } from "lucide-react";
+import { IMPORT_KINDS, type ImportKind } from "@/lib/import-schemas";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  commitImportFile,
+  getImportTemplate,
+  listImportRuns,
+  previewImport,
+  type ImportRunRow,
+} from "@/lib/import.functions";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { InlineLoading } from "@/components/states";
 
 export const Route = createFileRoute("/_authenticated/admin/import")({
-  component: ImportPage,
+  component: ImportCenterPage,
 });
 
-const KINDS = [
-  { value: "questions", label: "Вопросы", columns: "text; topic; category; explanation; difficulty; is_common" },
-  { value: "materials", label: "Учебные материалы", columns: "title; material_type; description; external_url; tags" },
-  { value: "departments", label: "Подразделения", columns: "name; code; head_name; description" },
-  { value: "positions", label: "Должности", columns: "name; code; description" },
-  { value: "professions", label: "Профессии", columns: "name; code; slug; short_description; description; duration_hours" },
-];
-
-interface ValidationResult {
-  ok: boolean;
-  errors: string[];
-  unknownColumns: string[];
-  total: number;
-  preview: Record<string, string>[];
+interface ImportIssue {
+  sheet: string;
+  row: number | null;
+  column: string | null;
+  value: string | null;
+  message: string;
+  fix?: string;
+  level: "error" | "warning";
 }
 
-function ImportPage() {
-  const qc = useQueryClient();
-  const [kind, setKind] = useState("questions");
-  const [csv, setCsv] = useState("");
-  const [result, setResult] = useState<ValidationResult | null>(null);
-  const validate = useServerFn(validateImport);
-  const commit = useServerFn(commitImport);
+interface ImportReport {
+  kind: string;
+  fileName: string;
+  totalRows: number;
+  created: number;
+  updated: number;
+  unchanged: number;
+  skipped: number;
+  issues: ImportIssue[];
+  preview: { sheet: string; rows: Record<string, string>[] }[];
+  committed: boolean;
+  status: "success" | "warning" | "error";
+}
 
-  const validateMutation = useMutation({
-    mutationFn: () => validate({ data: { kind, csv } }),
-    onSuccess: (data) => setResult(data as ValidationResult),
+function downloadBase64(base64: string, fileName: string) {
+  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  const blob = new Blob([bytes], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function fileToBase64(file: File): Promise<string> {
+  const buffer = new Uint8Array(await file.arrayBuffer());
+  let binary = "";
+  for (let i = 0; i < buffer.length; i += 1) binary += String.fromCharCode(buffer[i] as number);
+  return btoa(binary);
+}
+
+function ImportCenterPage() {
+  const qc = useQueryClient();
+  const runs = useQuery({ queryKey: ["admin", "import-runs"], queryFn: () => listImportRuns() });
+  const template = useServerFn(getImportTemplate);
+  const preview = useServerFn(previewImport);
+  const commit = useServerFn(commitImportFile);
+
+  const [active, setActive] = useState<ImportKind | null>(null);
+  const [file, setFile] = useState<{ name: string; base64: string } | null>(null);
+  const [report, setReport] = useState<ImportReport | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const templateMutation = useMutation({
+    mutationFn: (kind: string) => template({ data: { kind } }),
+    onSuccess: (d) => downloadBase64(d.base64, d.fileName),
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const previewMutation = useMutation({
+    mutationFn: () =>
+      preview({ data: { kind: active!.id, fileName: file!.name, base64: file!.base64 } }),
+    onSuccess: (d) => setReport(d as ImportReport),
     onError: (e: Error) => toast.error(e.message),
   });
 
   const commitMutation = useMutation({
-    mutationFn: () => commit({ data: { kind, csv } }),
-    onSuccess: (data) => {
-      toast.success(`Загружено записей: ${(data as { inserted: number }).inserted}`);
-      setCsv("");
-      setResult(null);
-      void qc.invalidateQueries({ queryKey: ["admin"] });
+    mutationFn: () =>
+      commit({ data: { kind: active!.id, fileName: file!.name, base64: file!.base64 } }),
+    onSuccess: (d) => {
+      const r = d as ImportReport;
+      setReport(r);
+      if (r.committed) {
+        toast.success(`Импорт выполнен: создано ${r.created}, обновлено ${r.updated}`);
+        void qc.invalidateQueries({ queryKey: ["admin"] });
+      } else {
+        toast.error("Импорт не выполнен: в файле есть ошибки");
+      }
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const active = KINDS.find((k) => k.value === kind);
+  const lastRun = (kind: string) =>
+    (runs.data as ImportRunRow[] | undefined)?.find((r) => r.kind === kind);
 
-  const onFile = async (file: File | undefined) => {
-    if (!file) return;
-    setCsv(await file.text());
-    setResult(null);
+  const openKind = (kind: ImportKind) => {
+    setActive(kind);
+    setFile(null);
+    setReport(null);
   };
+
+  const onFile = async (f: File | undefined) => {
+    if (!f) return;
+    setFile({ name: f.name, base64: await fileToBase64(f) });
+    setReport(null);
+  };
+
+  const errors = report?.issues.filter((i) => i.level === "error") ?? [];
+  const warnings = report?.issues.filter((i) => i.level === "warning") ?? [];
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-secondary">Импорт данных</h1>
         <p className="text-sm text-muted-foreground">
-          Загрузка CSV-файлов. Перед сохранением выполняется проверка структуры и обязательных полей.
+          Единая точка загрузки структурированных данных платформы. Для каждого типа доступен
+          официальный шаблон Excel, предварительная проверка и протокол результата.
         </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {IMPORT_KINDS.map((kind) => {
+          const run = lastRun(kind.id);
+          return (
+            <Card key={kind.id} className="flex flex-col">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <FileSpreadsheet className="h-4 w-4 text-primary" />
+                  {kind.label}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-1 flex-col gap-3 text-sm">
+                <p className="text-muted-foreground">{kind.description}</p>
+                <p className="text-xs text-muted-foreground">
+                  Листы: {kind.sheets.map((s) => s.name).join(", ")}
+                </p>
+                <p className="text-xs text-muted-foreground">Используется: {kind.target}</p>
+                <p className="text-xs text-muted-foreground">
+                  {run
+                    ? `Последний импорт: ${new Date(run.created_at).toLocaleString("ru-RU")} · ${run.actor_name ?? "—"}`
+                    : "Импортов ещё не было"}
+                </p>
+                <div className="mt-auto flex flex-wrap gap-2 pt-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => templateMutation.mutate(kind.id)}
+                  >
+                    <Download className="mr-1.5 h-4 w-4" />
+                    Шаблон Excel
+                  </Button>
+                  <Button size="sm" onClick={() => openKind(kind)}>
+                    <Upload className="mr-1.5 h-4 w-4" />
+                    Загрузить файл
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Источник данных</CardTitle>
+          <CardTitle className="text-base">История импорта</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-2 sm:max-w-sm">
-            <Label>Тип импорта</Label>
-            <Select value={kind} onValueChange={(v) => { setKind(v); setResult(null); }}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {KINDS.map((k) => (
-                  <SelectItem key={k.value} value={k.value}>
-                    {k.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground">Колонки: {active?.columns}</p>
-          </div>
-
-          <div className="grid gap-2">
-            <Label>CSV-файл</Label>
-            <input
-              type="file"
-              accept=".csv,text/csv"
-              className="text-sm"
-              onChange={(e) => void onFile(e.target.files?.[0])}
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label>Или вставьте содержимое CSV</Label>
-            <Textarea
-              rows={8}
-              value={csv}
-              onChange={(e) => { setCsv(e.target.value); setResult(null); }}
-              placeholder="text;topic;difficulty"
-            />
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              disabled={!csv || validateMutation.isPending}
-              onClick={() => validateMutation.mutate()}
-            >
-              Проверить файл
-            </Button>
-            <Button
-              disabled={!result?.ok || commitMutation.isPending}
-              onClick={() => commitMutation.mutate()}
-            >
-              Загрузить в базу
-            </Button>
-          </div>
+        <CardContent>
+          {runs.isPending ? (
+            <InlineLoading />
+          ) : (runs.data as ImportRunRow[] | undefined)?.length ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-3 py-2">Дата</th>
+                    <th className="px-3 py-2">Тип</th>
+                    <th className="px-3 py-2">Файл</th>
+                    <th className="px-3 py-2">Пользователь</th>
+                    <th className="px-3 py-2">Строк</th>
+                    <th className="px-3 py-2">Создано</th>
+                    <th className="px-3 py-2">Обновлено</th>
+                    <th className="px-3 py-2">Пропущено</th>
+                    <th className="px-3 py-2">Ошибки</th>
+                    <th className="px-3 py-2">Статус</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(runs.data as ImportRunRow[]).map((r) => (
+                    <tr key={r.id} className="border-t border-border">
+                      <td className="px-3 py-2">{new Date(r.created_at).toLocaleString("ru-RU")}</td>
+                      <td className="px-3 py-2">{r.kind}</td>
+                      <td className="px-3 py-2">{r.file_name}</td>
+                      <td className="px-3 py-2">{r.actor_name ?? "—"}</td>
+                      <td className="px-3 py-2">{r.total_rows}</td>
+                      <td className="px-3 py-2">{r.created_rows}</td>
+                      <td className="px-3 py-2">{r.updated_rows}</td>
+                      <td className="px-3 py-2">{r.skipped_rows}</td>
+                      <td className="px-3 py-2">{r.error_rows}</td>
+                      <td className="px-3 py-2">
+                        <Badge variant={r.status === "success" ? "secondary" : "outline"}>
+                          {r.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Импортов пока не было.</p>
+          )}
         </CardContent>
       </Card>
 
-      {result ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">
-              Результат проверки: {result.ok ? "ошибок нет" : "найдены ошибки"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <p className="text-muted-foreground">Строк в файле: {result.total}</p>
-            {result.unknownColumns.length > 0 ? (
-              <p className="text-muted-foreground">
-                Игнорируемые колонки: {result.unknownColumns.join(", ")}
-              </p>
-            ) : null}
-            {result.errors.length > 0 ? (
-              <ul className="list-disc space-y-1 pl-5 text-destructive">
-                {result.errors.map((e) => (
-                  <li key={e}>{e}</li>
-                ))}
-              </ul>
-            ) : null}
-            {result.preview.length > 0 ? (
-              <div className="overflow-x-auto rounded-md border border-border">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-muted">
-                    <tr>
-                      {Object.keys(result.preview[0] ?? {}).map((h) => (
-                        <th key={h} className="px-3 py-2 font-medium">
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {result.preview.map((row, i) => (
-                      <tr key={i} className="border-t border-border">
-                        {Object.keys(result.preview[0] ?? {}).map((h) => (
-                          <td key={h} className="px-3 py-2">
-                            {row[h]}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+      <Dialog open={active !== null} onOpenChange={(o) => !o && setActive(null)}>
+        <DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Импорт: {active?.label}</DialogTitle>
+          </DialogHeader>
+
+          {active ? (
+            <div className="space-y-4 text-sm">
+              {active.sheets.map((s) => (
+                <div key={s.name} className="rounded-md border border-border p-3">
+                  <p className="font-medium text-foreground">Лист «{s.name}»</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Обязательные колонки: {s.required.join(", ")}
+                  </p>
+                  {s.optional.length > 0 ? (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Дополнительные: {s.optional.join(", ")}
+                    </p>
+                  ) : null}
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Пример: {Object.entries(s.example).slice(0, 4).map(([k, v]) => `${k}=${v}`).join("; ")}
+                  </p>
+                </div>
+              ))}
+
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  ref={inputRef}
+                  type="file"
+                  accept=".xlsx,.xls,.csv"
+                  className="hidden"
+                  onChange={(e) => void onFile(e.target.files?.[0])}
+                />
+                <Button variant="outline" onClick={() => inputRef.current?.click()}>
+                  Выбрать файл
+                </Button>
+                <span className="text-xs text-muted-foreground">
+                  {file ? file.name : "Файл не выбран"}
+                </span>
+                <Button
+                  variant="outline"
+                  disabled={!file || previewMutation.isPending}
+                  onClick={() => previewMutation.mutate()}
+                >
+                  Проверить
+                </Button>
+                <Button
+                  disabled={!report || errors.length > 0 || commitMutation.isPending}
+                  onClick={() => commitMutation.mutate()}
+                >
+                  Подтвердить импорт
+                </Button>
               </div>
-            ) : null}
-          </CardContent>
-        </Card>
-      ) : null}
+
+              {report ? (
+                <div className="space-y-3 rounded-md border border-border p-3">
+                  <p className="font-medium text-foreground">
+                    {report.committed ? "Импорт выполнен" : "Предварительная проверка"}
+                  </p>
+                  <pre className="whitespace-pre-wrap rounded bg-muted p-3 text-xs">
+{`Файл: ${report.fileName}
+
+Строк найдено: ${report.totalRows}
+Новые записи: ${report.created}
+Будут обновлены: ${report.updated}
+Без изменений: ${report.unchanged}
+Пропущено: ${report.skipped}
+Предупреждения: ${warnings.length}
+Ошибки: ${errors.length}
+
+${report.committed ? "Данные записаны в базу." : "Импорт пока не выполнен."}`}
+                  </pre>
+
+                  {report.issues.length > 0 ? (
+                    <ul className="space-y-2">
+                      {report.issues.slice(0, 50).map((i, idx) => (
+                        <li
+                          key={idx}
+                          className={
+                            i.level === "error"
+                              ? "rounded border border-destructive/40 bg-destructive/5 p-2 text-xs"
+                              : "rounded border border-border p-2 text-xs text-muted-foreground"
+                          }
+                        >
+                          <span className="font-medium">
+                            Лист: {i.sheet}
+                            {i.row ? ` · Строка: ${i.row}` : ""}
+                            {i.column ? ` · Колонка: ${i.column}` : ""}
+                          </span>
+                          {i.value ? <span> · Значение: {i.value}</span> : null}
+                          <div>{i.message}</div>
+                          {i.fix ? <div className="opacity-80">Рекомендация: {i.fix}</div> : null}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setActive(null)}>
+              Закрыть
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

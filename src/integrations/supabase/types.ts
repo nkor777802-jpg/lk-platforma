@@ -757,6 +757,88 @@ export type Database = {
           },
         ]
       }
+      employee_factory_zones: {
+        Row: {
+          id: string
+          unlocked_at: string
+          user_id: string
+          zone_id: string
+        }
+        Insert: {
+          id?: string
+          unlocked_at?: string
+          user_id: string
+          zone_id: string
+        }
+        Update: {
+          id?: string
+          unlocked_at?: string
+          user_id?: string
+          zone_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_factory_zones_zone_id_fkey"
+            columns: ["zone_id"]
+            isOneToOne: false
+            referencedRelation: "factory_zones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      factory_zones: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          name: string
+          profession_id: string | null
+          sort_order: number
+          unlock_condition: string
+          unlock_value: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          profession_id?: string | null
+          sort_order?: number
+          unlock_condition?: string
+          unlock_value?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          profession_id?: string | null
+          sort_order?: number
+          unlock_condition?: string
+          unlock_value?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "factory_zones_profession_id_fkey"
+            columns: ["profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_members: {
         Row: {
           created_at: string
@@ -1370,6 +1452,38 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      profession_collection: {
+        Row: {
+          id: string
+          level_code: string | null
+          profession_id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          level_code?: string | null
+          profession_id: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          level_code?: string | null
+          profession_id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profession_collection_profession_id_fkey"
+            columns: ["profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       professions: {
         Row: {

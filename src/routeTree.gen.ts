@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticated/company'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -21,8 +22,10 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicAboutRouteImport } from './routes/_public/about'
+import { Route as PublicConsentRouteImport } from './routes/_public/consent'
 import { Route as PublicContactsRouteImport } from './routes/_public/contacts'
 import { Route as PublicFaqRouteImport } from './routes/_public/faq'
+import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
 import { Route as AuthenticatedProfessionsIndexRouteImport } from './routes/_authenticated/professions.index'
 import { Route as AuthenticatedProfessionsSlugRouteImport } from './routes/_authenticated/professions.$slug'
 import { Route as AuthenticatedResultsAttemptIdRouteImport } from './routes/_authenticated/results.$attemptId'
@@ -41,6 +44,11 @@ const PublicRouteRoute = PublicRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -88,6 +96,11 @@ const PublicAboutRoute = PublicAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => PublicRouteRoute,
 } as any)
+const PublicConsentRoute = PublicConsentRouteImport.update({
+  id: '/consent',
+  path: '/consent',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
 const PublicContactsRoute = PublicContactsRouteImport.update({
   id: '/contacts',
   path: '/contacts',
@@ -96,6 +109,11 @@ const PublicContactsRoute = PublicContactsRouteImport.update({
 const PublicFaqRoute = PublicFaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => PublicRouteRoute,
 } as any)
 const AuthenticatedProfessionsIndexRoute =
@@ -137,6 +155,7 @@ const PublicTrainingProfessionsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -145,8 +164,10 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/about': typeof PublicAboutRoute
+  '/consent': typeof PublicConsentRoute
   '/contacts': typeof PublicContactsRoute
   '/faq': typeof PublicFaqRoute
+  '/privacy': typeof PublicPrivacyRoute
   '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
   '/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
@@ -157,6 +178,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
   '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/company': typeof AuthenticatedCompanyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -165,8 +187,10 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/about': typeof PublicAboutRoute
+  '/consent': typeof PublicConsentRoute
   '/contacts': typeof PublicContactsRoute
   '/faq': typeof PublicFaqRoute
+  '/privacy': typeof PublicPrivacyRoute
   '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
   '/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
@@ -179,6 +203,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_public': typeof PublicRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -187,8 +212,10 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_public/about': typeof PublicAboutRoute
+  '/_public/consent': typeof PublicConsentRoute
   '/_public/contacts': typeof PublicContactsRoute
   '/_public/faq': typeof PublicFaqRoute
+  '/_public/privacy': typeof PublicPrivacyRoute
   '/_public/': typeof PublicIndexRoute
   '/_authenticated/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/_authenticated/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
@@ -202,6 +229,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/sitemap.xml'
     | '/admin'
     | '/company'
     | '/dashboard'
@@ -210,8 +238,10 @@ export interface FileRouteTypes {
     | '/profile'
     | '/videos'
     | '/about'
+    | '/consent'
     | '/contacts'
     | '/faq'
+    | '/privacy'
     | '/professions/$slug'
     | '/results/$attemptId'
     | '/test/$professionId'
@@ -222,6 +252,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/sitemap.xml'
     | '/admin'
     | '/company'
     | '/dashboard'
@@ -230,8 +261,10 @@ export interface FileRouteTypes {
     | '/profile'
     | '/videos'
     | '/about'
+    | '/consent'
     | '/contacts'
     | '/faq'
+    | '/privacy'
     | '/professions/$slug'
     | '/results/$attemptId'
     | '/test/$professionId'
@@ -243,6 +276,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_public'
     | '/auth'
+    | '/sitemap.xml'
     | '/_authenticated/admin'
     | '/_authenticated/company'
     | '/_authenticated/dashboard'
@@ -251,8 +285,10 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/videos'
     | '/_public/about'
+    | '/_public/consent'
     | '/_public/contacts'
     | '/_public/faq'
+    | '/_public/privacy'
     | '/_public/'
     | '/_authenticated/professions/$slug'
     | '/_authenticated/results/$attemptId'
@@ -266,6 +302,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -289,6 +326,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -354,6 +398,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicAboutRouteImport
       parentRoute: typeof PublicRouteRoute
     }
+    '/_public/consent': {
+      id: '/_public/consent'
+      path: '/consent'
+      fullPath: '/consent'
+      preLoaderRoute: typeof PublicConsentRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
     '/_public/contacts': {
       id: '/_public/contacts'
       path: '/contacts'
@@ -366,6 +417,13 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof PublicFaqRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/privacy': {
+      id: '/_public/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PublicPrivacyRouteImport
       parentRoute: typeof PublicRouteRoute
     }
     '/_authenticated/professions/': {
@@ -446,8 +504,10 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface PublicRouteRouteChildren {
   PublicAboutRoute: typeof PublicAboutRoute
+  PublicConsentRoute: typeof PublicConsentRoute
   PublicContactsRoute: typeof PublicContactsRoute
   PublicFaqRoute: typeof PublicFaqRoute
+  PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicTrainingProfessionsRoute: typeof PublicTrainingProfessionsRoute
   PublicTrainingIndexRoute: typeof PublicTrainingIndexRoute
@@ -455,8 +515,10 @@ interface PublicRouteRouteChildren {
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicAboutRoute: PublicAboutRoute,
+  PublicConsentRoute: PublicConsentRoute,
   PublicContactsRoute: PublicContactsRoute,
   PublicFaqRoute: PublicFaqRoute,
+  PublicPrivacyRoute: PublicPrivacyRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicTrainingProfessionsRoute: PublicTrainingProfessionsRoute,
   PublicTrainingIndexRoute: PublicTrainingIndexRoute,
@@ -470,6 +532,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   PublicRouteRoute: PublicRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

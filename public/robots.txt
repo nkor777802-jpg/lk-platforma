@@ -12,3 +12,14 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /auth
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /admin
+Disallow: /library
+Disallow: /videos
+Disallow: /test
+Disallow: /results
+Disallow: /company
+Disallow: /products
+Disallow: /professions

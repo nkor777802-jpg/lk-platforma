@@ -175,6 +175,45 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_requests: {
+        Row: {
+          consent: boolean
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          message: string
+          phone: string | null
+          status: string
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          consent?: boolean
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          message: string
+          phone?: string | null
+          status?: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          consent?: boolean
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          message?: string
+          phone?: string | null
+          status?: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       course_modules: {
         Row: {
           course_id: string

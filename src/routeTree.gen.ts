@@ -21,6 +21,8 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicAboutRouteImport } from './routes/_public/about'
+import { Route as PublicContactsRouteImport } from './routes/_public/contacts'
+import { Route as PublicFaqRouteImport } from './routes/_public/faq'
 import { Route as AuthenticatedProfessionsIndexRouteImport } from './routes/_authenticated/professions.index'
 import { Route as AuthenticatedProfessionsSlugRouteImport } from './routes/_authenticated/professions.$slug'
 import { Route as AuthenticatedResultsAttemptIdRouteImport } from './routes/_authenticated/results.$attemptId'
@@ -86,6 +88,16 @@ const PublicAboutRoute = PublicAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => PublicRouteRoute,
 } as any)
+const PublicContactsRoute = PublicContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicFaqRoute = PublicFaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
 const AuthenticatedProfessionsIndexRoute =
   AuthenticatedProfessionsIndexRouteImport.update({
     id: '/professions/',
@@ -133,6 +145,8 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/about': typeof PublicAboutRoute
+  '/contacts': typeof PublicContactsRoute
+  '/faq': typeof PublicFaqRoute
   '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
   '/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
@@ -151,6 +165,8 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/about': typeof PublicAboutRoute
+  '/contacts': typeof PublicContactsRoute
+  '/faq': typeof PublicFaqRoute
   '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
   '/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
@@ -171,6 +187,8 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_public/about': typeof PublicAboutRoute
+  '/_public/contacts': typeof PublicContactsRoute
+  '/_public/faq': typeof PublicFaqRoute
   '/_public/': typeof PublicIndexRoute
   '/_authenticated/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/_authenticated/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
@@ -192,6 +210,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/videos'
     | '/about'
+    | '/contacts'
+    | '/faq'
     | '/professions/$slug'
     | '/results/$attemptId'
     | '/test/$professionId'
@@ -210,6 +230,8 @@ export interface FileRouteTypes {
     | '/profile'
     | '/videos'
     | '/about'
+    | '/contacts'
+    | '/faq'
     | '/professions/$slug'
     | '/results/$attemptId'
     | '/test/$professionId'
@@ -229,6 +251,8 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/videos'
     | '/_public/about'
+    | '/_public/contacts'
+    | '/_public/faq'
     | '/_public/'
     | '/_authenticated/professions/$slug'
     | '/_authenticated/results/$attemptId'
@@ -330,6 +354,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicAboutRouteImport
       parentRoute: typeof PublicRouteRoute
     }
+    '/_public/contacts': {
+      id: '/_public/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof PublicContactsRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/faq': {
+      id: '/_public/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof PublicFaqRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
     '/_authenticated/professions/': {
       id: '/_authenticated/professions/'
       path: '/professions'
@@ -408,6 +446,8 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface PublicRouteRouteChildren {
   PublicAboutRoute: typeof PublicAboutRoute
+  PublicContactsRoute: typeof PublicContactsRoute
+  PublicFaqRoute: typeof PublicFaqRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicTrainingProfessionsRoute: typeof PublicTrainingProfessionsRoute
   PublicTrainingIndexRoute: typeof PublicTrainingIndexRoute
@@ -415,6 +455,8 @@ interface PublicRouteRouteChildren {
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicAboutRoute: PublicAboutRoute,
+  PublicContactsRoute: PublicContactsRoute,
+  PublicFaqRoute: PublicFaqRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicTrainingProfessionsRoute: PublicTrainingProfessionsRoute,
   PublicTrainingIndexRoute: PublicTrainingIndexRoute,

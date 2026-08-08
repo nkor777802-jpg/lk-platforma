@@ -57,7 +57,7 @@ export function PublicHeader() {
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden"
+            className="h-10 w-10 lg:hidden"
             aria-label={open ? "Закрыть меню" : "Открыть меню"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}

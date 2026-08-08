@@ -9,6 +9,7 @@ import {
   myProgressQuery,
   professionsQuery,
 } from "@/lib/lms-queries";
+import { myAssignmentsQuery, myNotificationsQuery } from "@/lib/account-queries";
 import { EmptyState, InlineLoading } from "@/components/states";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,8 @@ function DashboardPage() {
   const progress = useQuery(myProgressQuery(user?.id));
   const achievements = useQuery(myAchievementsQuery(user?.id));
   const professions = useQuery(professionsQuery);
+  const assignments = useQuery(myAssignmentsQuery(user?.id));
+  const notifications = useQuery(myNotificationsQuery(user?.id));
 
   if (profile.isLoading) return <InlineLoading />;
 
@@ -42,6 +45,13 @@ function DashboardPage() {
   const totalProgress = progress.data?.length ?? 0;
   const percent = totalProgress ? Math.round((completed / totalProgress) * 100) : 0;
   const lastAttempt = attempts.data?.[0];
+  const today = new Date(new Date().toDateString());
+  const active = (assignments.data ?? []).filter((a) => a.status !== "completed");
+  const upcoming = active
+    .filter((a) => a.due_date)
+    .sort((a, b) => (a.due_date! < b.due_date! ? -1 : 1))
+    .slice(0, 5);
+  const unread = (notifications.data ?? []).filter((n) => !n.is_read).slice(0, 5);
 
   return (
     <div className="space-y-8">

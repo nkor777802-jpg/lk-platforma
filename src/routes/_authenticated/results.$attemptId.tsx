@@ -57,6 +57,12 @@ function ResultsPage() {
   if (attempt.error || !attempt.data) return <ErrorState />;
 
   const a = attempt.data;
+  const gradeLabels: Record<string, string> = {
+    confirmed: "Соответствует заявленному разряду",
+    lowered: "Подтверждён более низкий разряд",
+    failed: "Разряд не подтверждён",
+  };
+  const awaiting = a.status === "awaiting_review";
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <h1 className="text-3xl font-bold text-secondary">Результат аттестации</h1>
@@ -71,9 +77,19 @@ function ResultsPage() {
           <p className="text-sm text-muted-foreground">
             Правильных ответов: {a.correct_answers ?? 0} из {a.total_questions ?? 0}
           </p>
-          <Badge variant={a.passed ? "default" : "destructive"}>
-            {a.passed ? "Аттестован" : "Не аттестован"}
-          </Badge>
+          <p className="text-sm text-muted-foreground">Попытка №{a.attempt_number ?? 1}</p>
+          <div className="flex flex-wrap gap-2">
+            {awaiting ? (
+              <Badge variant="secondary">Развернутые ответы на проверке</Badge>
+            ) : (
+              <Badge variant={a.passed ? "default" : "destructive"}>
+                {a.passed ? "Аттестован" : "Не аттестован"}
+              </Badge>
+            )}
+            {a.grade_result ? (
+              <Badge variant="outline">{gradeLabels[a.grade_result] ?? a.grade_result}</Badge>
+            ) : null}
+          </div>
           <div>
             <Button onClick={openProtocol} disabled={busy}>
               Открыть протокол

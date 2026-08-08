@@ -14,7 +14,7 @@ function AuditPage() {
   const query = useQuery(adminAuditQuery);
 
   if (query.isPending) return <InlineLoading />;
-  if (query.isError) return <ErrorState description="Не удалось загрузить журнал действий." />;
+  if (query.isError) return <ErrorState message="Не удалось загрузить журнал действий." />;
 
   const rows = (query.data ?? []) as Row[];
 

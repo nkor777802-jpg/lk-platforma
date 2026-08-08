@@ -200,7 +200,7 @@ export const listRows = createServerFn({ method: "POST" })
       ? query.order(data.orderBy, { ascending: true })
       : query);
     if (error) throw new Error(error.message);
-    return (rows ?? []) as Record<string, unknown>[];
+    return JSON.parse(JSON.stringify(rows ?? [])) as unknown[];
   });
 
 export const saveRow = createServerFn({ method: "POST" })

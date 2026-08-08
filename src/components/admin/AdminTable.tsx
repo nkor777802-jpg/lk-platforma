@@ -69,7 +69,7 @@ export function AdminTable<T extends Record<string, unknown>>({
       </div>
 
       {filtered.length === 0 ? (
-        <EmptyState title={emptyTitle} description={emptyDescription} />
+        <EmptyState title={emptyTitle} {...(emptyDescription ? { description: emptyDescription } : {})} />
       ) : (
         <>
           <div className="overflow-x-auto rounded-lg border border-border">

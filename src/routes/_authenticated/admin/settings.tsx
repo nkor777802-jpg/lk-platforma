@@ -54,7 +54,7 @@ function SettingsPage() {
   });
 
   if (query.isPending) return <InlineLoading />;
-  if (query.isError) return <ErrorState description="Не удалось загрузить настройки платформы." />;
+  if (query.isError) return <ErrorState message="Не удалось загрузить настройки платформы." />;
 
   const submit = (key: string) => {
     const raw = draft[key] ?? "";

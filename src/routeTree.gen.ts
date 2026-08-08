@@ -19,6 +19,7 @@ import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
+import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as AuthenticatedProfessionsIndexRouteImport } from './routes/_authenticated/professions.index'
 import { Route as AuthenticatedProfessionsSlugRouteImport } from './routes/_authenticated/professions.$slug'
 import { Route as AuthenticatedResultsAttemptIdRouteImport } from './routes/_authenticated/results.$attemptId'
@@ -72,6 +73,11 @@ const AuthenticatedVideosRoute = AuthenticatedVideosRouteImport.update({
   path: '/videos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const PublicIndexRoute = PublicIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
 const AuthenticatedProfessionsIndexRoute =
   AuthenticatedProfessionsIndexRouteImport.update({
     id: '/professions/',
@@ -98,7 +104,7 @@ const AuthenticatedTestProfessionIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof PublicRouteRoute
+  '/': typeof PublicIndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/company': typeof AuthenticatedCompanyRoute
@@ -113,7 +119,7 @@ export interface FileRoutesByFullPath {
   '/professions/': typeof AuthenticatedProfessionsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof PublicRouteRoute
+  '/': typeof PublicIndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/company': typeof AuthenticatedCompanyRoute
@@ -130,7 +136,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/_public': typeof PublicRouteRoute
+  '/_public': typeof PublicRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/company': typeof AuthenticatedCompanyRoute
@@ -139,6 +145,7 @@ export interface FileRoutesById {
   '/_authenticated/products': typeof AuthenticatedProductsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
+  '/_public/': typeof PublicIndexRoute
   '/_authenticated/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/_authenticated/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
   '/_authenticated/test/$professionId': typeof AuthenticatedTestProfessionIdRoute
@@ -187,6 +194,7 @@ export interface FileRouteTypes {
     | '/_authenticated/products'
     | '/_authenticated/profile'
     | '/_authenticated/videos'
+    | '/_public/'
     | '/_authenticated/professions/$slug'
     | '/_authenticated/results/$attemptId'
     | '/_authenticated/test/$professionId'
@@ -195,7 +203,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  PublicRouteRoute: typeof PublicRouteRoute
+  PublicRouteRoute: typeof PublicRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
 }
 
@@ -271,6 +279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVideosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_public/': {
+      id: '/_public/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof PublicIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
     '/_authenticated/professions/': {
       id: '/_authenticated/professions/'
       path: '/professions'
@@ -333,9 +348,21 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface PublicRouteRouteChildren {
+  PublicIndexRoute: typeof PublicIndexRoute
+}
+
+const PublicRouteRouteChildren: PublicRouteRouteChildren = {
+  PublicIndexRoute: PublicIndexRoute,
+}
+
+const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
+  PublicRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  PublicRouteRoute: PublicRouteRoute,
+  PublicRouteRoute: PublicRouteRouteWithChildren,
   AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport

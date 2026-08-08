@@ -75,7 +75,7 @@ function CoursePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-secondary">{c.title}</h1>
+        <h1 className="text-2xl font-bold text-secondary sm:text-3xl">{c.title}</h1>
         {c.description ? <p className="mt-2 text-muted-foreground">{c.description}</p> : null}
       </div>
 

@@ -69,7 +69,7 @@ function ProfilePage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-secondary">Личный кабинет</h1>
+      <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Личный кабинет</h1>
 
       <Card>
         <CardHeader>

@@ -56,7 +56,7 @@ function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-secondary">
+        <h1 className="text-2xl font-bold text-secondary sm:text-3xl">
           Здравствуйте, {profile.data?.full_name ?? user?.email}
         </h1>
         <p className="mt-2 text-muted-foreground">

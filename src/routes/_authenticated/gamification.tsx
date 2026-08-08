@@ -61,7 +61,7 @@ function GamificationPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-secondary">Развитие навыков</h1>
+        <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Развитие навыков</h1>
         <p className="mt-2 text-muted-foreground">
           Производственные тренажёры и квесты закрепляют технологию, а достижения и участки завода
           открываются по мере обучения. Карьерный прогресс — в разделе{" "}

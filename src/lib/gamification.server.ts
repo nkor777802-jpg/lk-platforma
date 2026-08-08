@@ -32,7 +32,11 @@ export function gradeTrainer(
   taskType: string,
   maxScore: number,
   items: TrainerItem[],
-  response: { order?: string[]; matches?: Record<string, string>; selectedItemIds?: string[] },
+  response: {
+    order?: string[] | undefined;
+    matches?: Record<string, string> | undefined;
+    selectedItemIds?: string[] | undefined;
+  },
 ) {
   const units = items.length || 1;
   const kind = trainerKind(taskType);

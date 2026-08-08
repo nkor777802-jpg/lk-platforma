@@ -77,10 +77,15 @@ export function buildTemplate(kind: ImportKind): string {
   const wb = XLSX.utils.book_new();
   for (const sheet of kind.sheets) {
     const headers = [...sheet.required, ...sheet.optional];
-    const example = headers.map((h) => sheet.example[h] ?? "");
-    const ws = XLSX.utils.aoa_to_sheet([headers, example]);
+    const ws = XLSX.utils.aoa_to_sheet([headers]);
     ws["!cols"] = headers.map((h) => ({ wch: Math.max(14, h.length + 2) }));
     XLSX.utils.book_append_sheet(wb, ws, sheet.name.slice(0, 31));
+  }
+  // Примеры заполнения выносятся на отдельные листы, чтобы не попасть в импорт.
+  for (const sheet of kind.sheets) {
+    const headers = [...sheet.required, ...sheet.optional];
+    const ws = XLSX.utils.aoa_to_sheet([headers, headers.map((h) => sheet.example[h] ?? "")]);
+    XLSX.utils.book_append_sheet(wb, ws, `Пример_${sheet.name}`.slice(0, 31));
   }
   return XLSX.write(wb, { type: "base64", bookType: "xlsx" }) as string;
 }
@@ -564,6 +569,15 @@ async function importEmployees(
   }
 }
 
+function pickSheet(available: string[], name: string, sheetCount: number) {
+  const usable = available.filter((n) => !n.toLowerCase().startsWith("пример"));
+  return (
+    usable.find((n) => n === name) ??
+    usable.find((n) => n.toLowerCase() === name.toLowerCase()) ??
+    (sheetCount === 1 ? usable[0] : undefined)
+  );
+}
+
 export async function runImport(input: {
   kindId: string;
   fileName: string;
@@ -593,10 +607,7 @@ export async function runImport(input: {
 
   const available = Object.keys(sheets);
   for (const spec of kind.sheets) {
-    const key =
-      available.find((n) => n === spec.name) ??
-      available.find((n) => n.toLowerCase() === spec.name.toLowerCase()) ??
-      (kind.sheets.length === 1 ? available[0] : undefined);
+    const key = pickSheet(available, spec.name, kind.sheets.length);
     const rows = key ? (sheets[key] ?? []) : [];
     if (!key) {
       ctx.issues.push({
@@ -663,10 +674,7 @@ export async function runImport(input: {
   const dryRun = input.dryRun || hasBlocking;
 
   for (const spec of kind.sheets) {
-    const key =
-      available.find((n) => n === spec.name) ??
-      available.find((n) => n.toLowerCase() === spec.name.toLowerCase()) ??
-      (kind.sheets.length === 1 ? available[0] : undefined);
+    const key = pickSheet(available, spec.name, kind.sheets.length);
     if (!key) continue;
     const rows = (sheets[key] ?? []).filter((r) =>
       spec.required.every((c) => (r[c] ?? "").trim() !== ""),

@@ -15,6 +15,11 @@ export interface TestSettings {
   shuffle_options: boolean;
   show_correct_answer: boolean;
   lock_answer: boolean;
+  retry_interval_hours: number;
+  result_rule: "best" | "last";
+  warn_before_minutes: number;
+  mode: "learning" | "exam";
+  grading_rules?: Record<string, unknown> | null;
 }
 
 export const DEFAULT_SETTINGS: TestSettings = {
@@ -29,6 +34,31 @@ export const DEFAULT_SETTINGS: TestSettings = {
   shuffle_options: true,
   show_correct_answer: false,
   lock_answer: true,
+  retry_interval_hours: 0,
+  result_rule: "best",
+  warn_before_minutes: 5,
+  mode: "exam",
+};
+
+export type GradeResult = "confirmed" | "lowered" | "failed";
+
+/** Итог по разряду: соответствует заявленному / подтверждён более низкий / не пройден. */
+export function computeGrade(
+  percent: number,
+  passPercent: number,
+  rules?: Record<string, unknown> | null,
+): GradeResult {
+  const lower = Number((rules as { lower_percent?: number } | null)?.lower_percent);
+  const lowerThreshold = Number.isFinite(lower) ? lower : Math.max(passPercent - 15, 0);
+  if (percent >= passPercent) return "confirmed";
+  if (percent >= lowerThreshold) return "lowered";
+  return "failed";
+}
+
+export const GRADE_LABELS: Record<GradeResult, string> = {
+  confirmed: "Соответствует заявленному разряду",
+  lowered: "Подтверждён более низкий разряд",
+  failed: "Разряд не подтверждён",
 };
 
 export function shuffle<T>(items: T[]): T[] {
@@ -59,11 +89,15 @@ export interface ProtocolInput {
   date: string;
   attemptNumber: number;
   logoUrl: string;
+  mode?: "learning" | "exam";
+  gradeResult?: GradeResult | null;
+  awaitingReview?: boolean;
   answers: {
     question_text: string;
     selected_text: string | null;
     correct_text: string | null;
     is_correct: boolean | null;
+    review_status?: string | null;
   }[];
   practical: { title: string; score: number; maxScore: number; passed: boolean }[];
   correct: number;
@@ -80,7 +114,9 @@ export function renderProtocolHtml(p: ProtocolInput): string {
       <td>${escapeHtml(a.question_text)}</td>
       <td>${escapeHtml(a.selected_text ?? "—")}</td>
       <td>${escapeHtml(a.correct_text ?? "—")}</td>
-      <td class="${a.is_correct ? "ok" : "bad"}">${a.is_correct ? "Верно" : "Ошибка"}</td>
+      <td class="${a.review_status === "pending" ? "muted" : a.is_correct ? "ok" : "bad"}">${
+        a.review_status === "pending" ? "На проверке" : a.is_correct ? "Верно" : "Ошибка"
+      }</td>
     </tr>`,
     )
     .join("");
@@ -128,6 +164,7 @@ export function renderProtocolHtml(p: ProtocolInput): string {
   <div><span>Разряд:</span> <b>${escapeHtml(p.grade ?? "—")}</b></div>
   <div><span>Дата и время:</span> <b>${escapeHtml(p.date)}</b></div>
   <div><span>Попытка:</span> <b>№${p.attemptNumber}</b></div>
+  <div><span>Режим:</span> <b>${p.mode === "learning" ? "Учебный" : "Аттестационный"}</b></div>
 </div>
 <table><thead><tr><th>№</th><th>Вопрос</th><th>Ответ сотрудника</th><th>Правильный ответ</th><th>Результат</th></tr></thead>
 <tbody>${rows}</tbody></table>
@@ -138,6 +175,8 @@ export function renderProtocolHtml(p: ProtocolInput): string {
   <div>Правильных ответов: <b>${p.correct}</b></div>
   <div>Ошибок: <b>${p.total - p.correct}</b></div>
   <div>Результат: <b>${p.percent.toFixed(1)}%</b></div>
+  ${p.gradeResult ? `<div>Итог по разряду: <b>${escapeHtml(GRADE_LABELS[p.gradeResult])}</b></div>` : ""}
+  ${p.awaitingReview ? `<div class="muted">Часть развернутых ответов ожидает проверки преподавателем.</div>` : ""}
   <div class="verdict">${p.passed ? "АТТЕСТОВАН" : "НЕ АТТЕСТОВАН"}</div>
 </div>
 <footer>Документ сформирован автоматически корпоративной платформой обучения «Людиновокабель».</footer>

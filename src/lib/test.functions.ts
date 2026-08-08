@@ -18,60 +18,130 @@ export const startAttempt = createServerFn({ method: "POST" })
     const fallback = (settingsRows ?? []).find((s) => s.is_default);
     const settings = { ...DEFAULT_SETTINGS, ...(specific ?? fallback ?? {}) };
 
-    const { count: prevCount } = await supabaseAdmin
+    // Восстановление незавершённой попытки (перезагрузка страницы, обрыв связи)
+    const { data: running } = await supabaseAdmin
       .from("test_attempts")
-      .select("id", { count: "exact", head: true })
+      .select("id, started_at, attempt_number, settings_snapshot")
       .eq("user_id", userId)
-      .eq("profession_id", data.professionId);
-    const attemptNumber = (prevCount ?? 0) + 1;
-    if (!settings.allow_retry && attemptNumber > 1) throw new Error("Повторное прохождение запрещено");
-    if (settings.max_attempts && attemptNumber > settings.max_attempts)
-      throw new Error("Исчерпан лимит попыток");
+      .eq("profession_id", data.professionId)
+      .eq("status", "in_progress")
+      .order("started_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    const { data: professional } = await supabaseAdmin
-      .from("questions")
-      .select("id, text, answer_options(id, text, sort_order)")
-      .eq("is_active", true)
-      .eq("is_common", false)
-      .eq("profession_id", data.professionId);
-    const { data: common } = await supabaseAdmin
-      .from("questions")
-      .select("id, text, answer_options(id, text, sort_order)")
-      .eq("is_active", true)
-      .eq("is_common", true);
+    const questionIds: string[] | null = running
+      ? (((running.settings_snapshot ?? {}) as { question_ids?: string[] }).question_ids ?? null)
+      : null;
 
-    const pick = [
-      ...shuffle(professional ?? []).slice(0, settings.professional_questions),
-      ...shuffle(common ?? []).slice(0, settings.common_questions),
-    ];
-    if (pick.length === 0) throw new Error("Банк вопросов для этой профессии пуст");
-    const ordered = settings.shuffle_questions ? shuffle(pick) : pick;
-    const selected = ordered.slice(0, settings.total_questions || ordered.length);
+    let attemptId: string;
+    let attemptNumber: number;
+    let startedAt: string;
+    let selected: {
+      id: string;
+      text: string;
+      question_type: string;
+      answer_options: { id: string; text: string; sort_order: number | null }[];
+    }[];
 
-    const { data: attempt, error } = await supabaseAdmin
-      .from("test_attempts")
-      .insert({
-        user_id: userId,
-        profession_id: data.professionId,
-        attempt_number: attemptNumber,
-        status: "in_progress",
-        total_questions: selected.length,
-        settings_snapshot: { ...settings, question_ids: selected.map((q) => q.id) },
-      })
-      .select("id, started_at")
-      .single();
-    if (error) throw error;
+    const select = "id, text, question_type, answer_options(id, text, sort_order)";
+
+    if (running && questionIds?.length) {
+      const { data: rows } = await supabaseAdmin.from("questions").select(select).in("id", questionIds);
+      const byId = new Map((rows ?? []).map((q) => [q.id, q]));
+      selected = questionIds.map((id) => byId.get(id)).filter(Boolean) as typeof selected;
+      attemptId = running.id;
+      attemptNumber = running.attempt_number ?? 1;
+      startedAt = running.started_at;
+    } else {
+      const { data: finishedAttempts } = await supabaseAdmin
+        .from("test_attempts")
+        .select("id, finished_at")
+        .eq("user_id", userId)
+        .eq("profession_id", data.professionId)
+        .order("started_at", { ascending: false });
+      const prevCount = (finishedAttempts ?? []).length;
+      attemptNumber = prevCount + 1;
+      if (!settings.allow_retry && attemptNumber > 1)
+        throw new Error("Повторное прохождение запрещено");
+      if (settings.max_attempts && attemptNumber > settings.max_attempts)
+        throw new Error("Исчерпан лимит попыток");
+
+      const lastFinished = (finishedAttempts ?? [])[0]?.finished_at;
+      if (settings.retry_interval_hours && lastFinished) {
+        const readyAt = new Date(lastFinished).getTime() + settings.retry_interval_hours * 3600_000;
+        if (Date.now() < readyAt)
+          throw new Error(
+            `Повторная попытка будет доступна ${new Date(readyAt).toLocaleString("ru-RU")}`,
+          );
+      }
+
+      const { data: professional } = await supabaseAdmin
+        .from("questions")
+        .select(select)
+        .eq("is_active", true)
+        .eq("is_common", false)
+        .eq("profession_id", data.professionId);
+      const { data: common } = await supabaseAdmin
+        .from("questions")
+        .select(select)
+        .eq("is_active", true)
+        .eq("is_common", true);
+
+      const pick = [
+        ...shuffle(professional ?? []).slice(0, settings.professional_questions),
+        ...shuffle(common ?? []).slice(0, settings.common_questions),
+      ];
+      const unique = Array.from(new Map(pick.map((q) => [q.id, q])).values());
+      if (unique.length === 0) throw new Error("Банк вопросов для этой профессии пуст");
+      const ordered = settings.shuffle_questions ? shuffle(unique) : unique;
+      selected = ordered.slice(0, settings.total_questions || ordered.length) as typeof selected;
+
+      const { data: attempt, error } = await supabaseAdmin
+        .from("test_attempts")
+        .insert({
+          user_id: userId,
+          profession_id: data.professionId,
+          attempt_number: attemptNumber,
+          status: "in_progress",
+          total_questions: selected.length,
+          settings_snapshot: JSON.parse(
+            JSON.stringify({ ...settings, question_ids: selected.map((q) => q.id) }),
+          ),
+        })
+        .select("id, started_at")
+        .single();
+      if (error) throw error;
+      attemptId = attempt.id;
+      startedAt = attempt.started_at;
+    }
+
+    const { data: saved } = await supabaseAdmin
+      .from("test_answers")
+      .select("question_id, selected_option_ids, text_answer")
+      .eq("attempt_id", attemptId);
 
     return {
-      attemptId: attempt.id,
-      startedAt: attempt.started_at,
+      attemptId,
+      attemptNumber,
+      startedAt,
+      resumed: Boolean(running && questionIds?.length),
       timeLimitMinutes: settings.time_limit_minutes,
+      warnBeforeMinutes: settings.warn_before_minutes,
+      mode: settings.mode,
+      passPercent: settings.pass_percent,
+      maxAttempts: settings.max_attempts,
       lockAnswer: settings.lock_answer,
-      showCorrectAnswer: settings.show_correct_answer,
+      showCorrectAnswer: settings.show_correct_answer || settings.mode === "learning",
+      answered: (saved ?? []).map((a) => ({
+        questionId: a.question_id,
+        optionIds: a.selected_option_ids ?? [],
+        text: a.text_answer ?? "",
+      })),
       questions: selected.map((q, i) => ({
         id: q.id,
         index: i + 1,
         text: q.text,
+        type: (q.question_type ?? "single") as "single" | "multi" | "situational" | "open",
         options: (settings.shuffle_options
           ? shuffle(q.answer_options ?? [])
           : [...(q.answer_options ?? [])].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
@@ -87,7 +157,8 @@ export const submitAnswer = createServerFn({ method: "POST" })
       .object({
         attemptId: z.string().uuid(),
         questionId: z.string().uuid(),
-        optionId: z.string().uuid(),
+        optionIds: z.array(z.string().uuid()).max(20).default([]),
+        textAnswer: z.string().max(5000).optional(),
         sortOrder: z.number().int().min(0),
         timeSpentSeconds: z.number().int().min(0).max(86400).optional(),
       })
@@ -106,32 +177,58 @@ export const submitAnswer = createServerFn({ method: "POST" })
 
     const { data: question } = await supabaseAdmin
       .from("questions")
-      .select("id, text, answer_options(id, text, is_correct)")
+      .select("id, text, question_type, points, explanation, reference_answer, answer_options(id, text, is_correct)")
       .eq("id", data.questionId)
       .single();
     if (!question) throw new Error("Вопрос не найден");
 
     const options = question.answer_options ?? [];
-    const chosen = options.find((o) => o.id === data.optionId);
-    const correct = options.find((o) => o.is_correct);
-    const isCorrect = Boolean(chosen?.is_correct);
+    const type = question.question_type ?? "single";
+    const chosen = options.filter((o) => data.optionIds.includes(o.id));
+    const correctOptions = options.filter((o) => o.is_correct);
+    const correctText = correctOptions.map((o) => o.text).join("; ") || null;
+    const isOpen = type === "open";
 
-    await supabaseAdmin.from("test_answers").insert({
-      attempt_id: data.attemptId,
-      question_id: question.id,
-      question_text: question.text,
-      selected_option_id: chosen?.id ?? null,
-      selected_text: chosen?.text ?? null,
-      correct_text: correct?.text ?? null,
-      is_correct: isCorrect,
-      sort_order: data.sortOrder,
-      time_spent_seconds: data.timeSpentSeconds ?? null,
-    });
+    const chosenIds = new Set(chosen.map((o) => o.id));
+    const isCorrect = isOpen
+      ? null
+      : correctOptions.length > 0 &&
+        correctOptions.every((o) => chosenIds.has(o.id)) &&
+        chosen.every((o) => o.is_correct);
 
-    const snapshot = (attempt.settings_snapshot ?? {}) as { show_correct_answer?: boolean };
-    return snapshot.show_correct_answer
-      ? { recorded: true, isCorrect, correctText: correct?.text ?? null }
-      : { recorded: true };
+    const { error } = await supabaseAdmin.from("test_answers").upsert(
+      {
+        attempt_id: data.attemptId,
+        question_id: question.id,
+        question_text: question.text,
+        selected_option_id: chosen[0]?.id ?? null,
+        selected_option_ids: chosen.map((o) => o.id),
+        selected_text: isOpen ? (data.textAnswer ?? null) : chosen.map((o) => o.text).join("; ") || null,
+        text_answer: isOpen ? (data.textAnswer ?? null) : null,
+        correct_text: isOpen ? (question.reference_answer ?? null) : correctText,
+        is_correct: isOpen ? null : isCorrect,
+        review_status: isOpen ? "pending" : "auto",
+        points: question.points ?? 1,
+        sort_order: data.sortOrder,
+        time_spent_seconds: data.timeSpentSeconds ?? null,
+      },
+      { onConflict: "attempt_id,question_id" },
+    );
+    if (error) throw error;
+
+    const snapshot = (attempt.settings_snapshot ?? {}) as {
+      show_correct_answer?: boolean;
+      mode?: string;
+    };
+    const reveal = Boolean(snapshot.show_correct_answer) || snapshot.mode === "learning";
+    return reveal && !isOpen
+      ? {
+          recorded: true,
+          isCorrect,
+          correctText,
+          explanation: question.explanation ?? null,
+        }
+      : { recorded: true, isCorrect: null, correctText: null, explanation: null };
   });
 
 export const finishAttempt = createServerFn({ method: "POST" })
@@ -139,38 +236,102 @@ export const finishAttempt = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ attemptId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { DEFAULT_SETTINGS } = await import("./test-engine.server");
+    const { finalizeAttempt } = await import("./test-engine.server");
 
     const { data: attempt } = await supabaseAdmin
       .from("test_attempts")
-      .select("id, user_id, profession_id, total_questions, settings_snapshot, status")
+      .select("id, user_id")
       .eq("id", data.attemptId)
       .single();
     if (!attempt || attempt.user_id !== context.userId) throw new Error("Попытка не найдена");
 
-    const { data: answers } = await supabaseAdmin
+    return finalizeAttempt(supabaseAdmin, data.attemptId);
+  });
+
+/** Очередь развернутых ответов на ручную проверку (преподаватель, HR, администратор). */
+export const listPendingReviews = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: isStaff } = await supabaseAdmin.rpc("is_staff", { _user_id: context.userId });
+    const { data: isTeacher } = await supabaseAdmin.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "teacher",
+    });
+    if (!isStaff && !isTeacher) throw new Error("Нет доступа");
+
+    const { data: rows } = await supabaseAdmin
       .from("test_answers")
-      .select("is_correct")
-      .eq("attempt_id", data.attemptId);
-    const correct = (answers ?? []).filter((a) => a.is_correct).length;
-    const total = attempt.total_questions || (answers ?? []).length || 1;
-    const percent = Math.round((correct / total) * 1000) / 10;
-    const snapshot = (attempt.settings_snapshot ?? {}) as { pass_percent?: number };
-    const passPercent = snapshot.pass_percent ?? DEFAULT_SETTINGS.pass_percent;
-    const passed = percent >= passPercent;
+      .select(
+        "id, question_text, text_answer, correct_text, points, attempt_id, test_attempts(user_id, attempt_number, profiles:user_id(full_name))",
+      )
+      .eq("review_status", "pending")
+      .order("answered_at", { ascending: true })
+      .limit(200);
+
+    return (rows ?? []).map((r) => {
+      const attempt = r.test_attempts as unknown as
+        | { attempt_number?: number; profiles?: { full_name?: string } }
+        | null;
+      return {
+        id: r.id,
+        attemptId: r.attempt_id,
+        questionText: r.question_text,
+        answer: r.text_answer ?? "",
+        reference: r.correct_text ?? "",
+        points: r.points ?? 1,
+        attemptNumber: attempt?.attempt_number ?? 1,
+        employee: attempt?.profiles?.full_name ?? "—",
+      };
+    });
+  });
+
+/** Выставление балла за развернутый ответ и пересчёт итога попытки. */
+export const gradeOpenAnswer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        answerId: z.string().uuid(),
+        score: z.number().int().min(0).max(100),
+        comment: z.string().max(2000).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { finalizeAttempt } = await import("./test-engine.server");
+    const { data: isStaff } = await supabaseAdmin.rpc("is_staff", { _user_id: context.userId });
+    const { data: isTeacher } = await supabaseAdmin.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "teacher",
+    });
+    if (!isStaff && !isTeacher) throw new Error("Нет доступа");
+
+    const { data: answer } = await supabaseAdmin
+      .from("test_answers")
+      .select("id, attempt_id, points")
+      .eq("id", data.answerId)
+      .single();
+    if (!answer) throw new Error("Ответ не найден");
+
+    const max = answer.points ?? 1;
+    const score = Math.min(data.score, max);
 
     await supabaseAdmin
-      .from("test_attempts")
+      .from("test_answers")
       .update({
-        status: "finished",
-        correct_answers: correct,
-        score_percent: percent,
-        passed,
-        finished_at: new Date().toISOString(),
+        review_status: "graded",
+        review_score: score,
+        review_comment: data.comment ?? null,
+        is_correct: score >= max,
+        reviewer_id: context.userId,
+        reviewed_at: new Date().toISOString(),
       })
-      .eq("id", data.attemptId);
+      .eq("id", data.answerId);
 
-    return { correct, total, percent, passed, passPercent };
+    const result = await finalizeAttempt(supabaseAdmin, answer.attempt_id);
+    return { graded: true, ...result };
   });
 
 export const submitPractical = createServerFn({ method: "POST" })

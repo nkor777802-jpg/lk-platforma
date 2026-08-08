@@ -89,7 +89,7 @@ function DevelopmentPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-secondary">Профессиональное развитие</h1>
+        <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Профессиональное развитие</h1>
         <p className="mt-2 text-muted-foreground">
           Текущая квалификация, карьерный маршрут и индивидуальный план. История обучения
           сохраняется при смене должности и подразделения.

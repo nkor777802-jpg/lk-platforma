@@ -23,7 +23,7 @@ function ProfessionsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-secondary">Профессии</h1>
+        <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Профессии</h1>
         <p className="mt-2 text-muted-foreground">
           Выберите профессию, чтобы изучить материалы и пройти аттестацию.
         </p>

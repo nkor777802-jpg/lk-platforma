@@ -52,7 +52,7 @@ export function AdminTable<T extends Record<string, unknown>>({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         {searchKeys?.length ? (
           <Input
             value={query}
@@ -61,18 +61,40 @@ export function AdminTable<T extends Record<string, unknown>>({
               setPage(0);
             }}
             placeholder="Поиск…"
-            className="max-w-xs"
+            className="w-full sm:max-w-xs"
             aria-label="Поиск по таблице"
           />
         ) : null}
-        <div className="ml-auto flex items-center gap-2">{toolbar}</div>
+        <div className="flex flex-wrap items-center gap-2 sm:ml-auto">{toolbar}</div>
       </div>
 
       {filtered.length === 0 ? (
         <EmptyState title={emptyTitle} {...(emptyDescription ? { description: emptyDescription } : {})} />
       ) : (
         <>
-          <div className="overflow-x-auto rounded-lg border border-border">
+          <ul className="space-y-3 sm:hidden">
+            {visible.map((row, i) => (
+              <li
+                key={String(row["id"] ?? row["key"] ?? i)}
+                className="rounded-lg border border-border bg-card p-3"
+              >
+                <dl className="space-y-2">
+                  {columns.map((c) => (
+                    <div
+                      key={c.key}
+                      className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] gap-2 text-sm"
+                    >
+                      <dt className="min-w-0 text-muted-foreground">{c.label}</dt>
+                      <dd className="min-w-0 break-words">
+                        {c.render ? c.render(row) : String(row[c.key] ?? "—")}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </li>
+            ))}
+          </ul>
+          <div className="hidden overflow-x-auto rounded-lg border border-border sm:block">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -97,7 +119,7 @@ export function AdminTable<T extends Record<string, unknown>>({
             </Table>
           </div>
           {pageCount > 1 ? (
-            <div className="flex items-center justify-end gap-3 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground sm:justify-end">
               <span>
                 Страница {current + 1} из {pageCount}
               </span>

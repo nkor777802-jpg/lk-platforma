@@ -57,7 +57,7 @@ function LearningPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-secondary">Мое обучение</h1>
+        <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Мое обучение</h1>
         <p className="mt-2 text-muted-foreground">
           Программы, назначенные вам руководителем или отделом кадров.
         </p>

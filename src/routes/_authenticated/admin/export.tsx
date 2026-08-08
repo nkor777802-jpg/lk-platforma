@@ -117,8 +117,8 @@ function ExportPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           {CSV_KINDS.map((k) => (
             <Card key={k.value}>
-              <CardContent className="flex items-center justify-between gap-4 pt-6">
-                <p className="font-medium text-foreground">{k.label}</p>
+              <CardContent className="flex flex-wrap items-center justify-between gap-3 pt-6">
+                <p className="min-w-0 flex-1 font-medium text-foreground">{k.label}</p>
                 <Button
                   variant="outline"
                   size="sm"

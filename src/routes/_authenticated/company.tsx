@@ -28,7 +28,7 @@ function CompanyPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-secondary">О компании</h1>
+      <h1 className="text-2xl font-bold text-secondary sm:text-3xl">О компании</h1>
 
       <Tabs defaultValue="about">
         <TabsList className="flex flex-wrap">

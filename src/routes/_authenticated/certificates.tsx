@@ -62,7 +62,7 @@ function CertificatesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-secondary">Сертификаты</h1>
+        <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Сертификаты</h1>
         <p className="mt-2 text-muted-foreground">
           Документы, подтверждающие завершение программ обучения.
         </p>

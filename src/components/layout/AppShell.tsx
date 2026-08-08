@@ -38,9 +38,18 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur">
-        <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-6 px-4">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-3 px-3 sm:gap-6 sm:px-4">
           <Link to="/dashboard" className="shrink-0">
-            <img src={brandLogos.fullColor} alt={brandLogos.alt} className="h-9 w-auto" />
+            <img
+              src={brandLogos.markColor}
+              alt={brandLogos.alt}
+              className="h-8 w-auto sm:hidden"
+            />
+            <img
+              src={brandLogos.fullColor}
+              alt={brandLogos.alt}
+              className="hidden h-9 w-auto sm:block"
+            />
           </Link>
           <nav className="hidden flex-1 items-center gap-1 lg:flex">
             {NAV.map((item) => (
@@ -54,7 +63,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Link>
             ))}
           </nav>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-0.5 sm:gap-2">
             <NotificationBell />
             {isStaff ? (
               <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
@@ -64,12 +73,24 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </Link>
               </Button>
             ) : null}
-            <Button asChild variant="ghost" size="icon" aria-label="Личный кабинет">
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              aria-label="Личный кабинет"
+              className="hidden sm:inline-flex"
+            >
               <Link to="/profile">
                 <UserIcon className="h-5 w-5" />
               </Link>
             </Button>
-            <Button variant="ghost" size="icon" aria-label="Выйти" onClick={handleSignOut}>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Выйти"
+              className="hidden sm:inline-flex"
+              onClick={handleSignOut}
+            >
               <LogOut className="h-5 w-5" />
             </Button>
             <Button
@@ -84,7 +105,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         {open ? (
-          <nav className="border-t border-border bg-card px-4 py-2 lg:hidden">
+          <nav className="max-h-[70vh] overflow-y-auto border-t border-border bg-card px-4 py-2 lg:hidden">
             {[...NAV, ...SECONDARY_NAV].map((item) => (
               <Link
                 key={item.to}
@@ -105,16 +126,33 @@ export function AppShell({ children }: { children: ReactNode }) {
                 Админ-панель
               </Link>
             ) : null}
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                void handleSignOut();
+              }}
+              className="mt-1 flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground sm:hidden"
+            >
+              <LogOut className="h-4 w-4" />
+              Выйти
+            </button>
           </nav>
         ) : null}
       </header>
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">{children}</main>
+      <main className="mx-auto w-full min-w-0 max-w-7xl flex-1 px-3 py-6 sm:px-4 sm:py-8">
+        {children}
+      </main>
 
       <footer className="border-t border-border bg-secondary py-8 text-secondary-foreground">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between">
-          <img src={brandLogos.fullWhite} alt={brandLogos.alt} className="h-8 w-auto" />
-          <p className="text-sm opacity-80">
+          <img
+            src={brandLogos.fullWhite}
+            alt={brandLogos.alt}
+            className="h-7 w-auto max-w-[180px] object-contain sm:h-8 sm:max-w-none"
+          />
+          <p className="break-words text-sm opacity-80">
             Корпоративная платформа обучения и аттестации · {user?.email}
           </p>
         </div>

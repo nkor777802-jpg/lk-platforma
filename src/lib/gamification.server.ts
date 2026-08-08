@@ -208,9 +208,19 @@ export async function buildLeaderboards(admin: Admin) {
     points.set(r.user_id, (points.get(r.user_id) ?? 0) + (r.score ?? 0) + (r.passed ? 5 : 0));
   }
 
-  const group = (getKey: (p: (typeof profiles)[number]) => { key: string; label: string } | null) => {
+  type ProfileRow = {
+    id: string;
+    full_name: string;
+    department_id: string | null;
+    profession_id: string | null;
+    departments?: { name?: string } | null;
+    professions?: { name?: string } | null;
+  };
+  const list = (profiles ?? []) as ProfileRow[];
+
+  const group = (getKey: (p: ProfileRow) => { key: string; label: string } | null) => {
     const map = new Map<string, LeaderboardEntry>();
-    for (const p of profiles ?? []) {
+    for (const p of list) {
       const g = getKey(p);
       if (!g) continue;
       const prev = map.get(g.key) ?? { key: g.key, label: g.label, points: 0, people: 0 };
@@ -225,21 +235,13 @@ export async function buildLeaderboards(admin: Admin) {
 
   const byDepartment = group((p) =>
     p.department_id
-      ? {
-          key: p.department_id,
-          label: (p as { departments?: { name?: string } }).departments?.name ?? "Подразделение",
-        }
+      ? { key: p.department_id, label: p.departments?.name ?? "Подразделение" }
       : null,
   );
   const byProfession = group((p) =>
-    p.profession_id
-      ? {
-          key: p.profession_id,
-          label: (p as { professions?: { name?: string } }).professions?.name ?? "Профессия",
-        }
-      : null,
+    p.profession_id ? { key: p.profession_id, label: p.professions?.name ?? "Профессия" } : null,
   );
-  const byActivity = (profiles ?? [])
+  const byActivity = list
     .map((p) => ({
       key: p.id,
       label: p.full_name,

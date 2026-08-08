@@ -36,6 +36,7 @@ import { Route as AuthenticatedAdminExportRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin/import'
 import { Route as AuthenticatedAdminMaterialsRouteImport } from './routes/_authenticated/admin/materials'
 import { Route as AuthenticatedAdminOrgRouteImport } from './routes/_authenticated/admin/org'
+import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin/reviews'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminTestsRouteImport } from './routes/_authenticated/admin/tests'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
@@ -185,6 +186,12 @@ const AuthenticatedAdminOrgRoute = AuthenticatedAdminOrgRouteImport.update({
   path: '/org',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminReviewsRoute =
+  AuthenticatedAdminReviewsRouteImport.update({
+    id: '/reviews',
+    path: '/reviews',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminSettingsRoute =
   AuthenticatedAdminSettingsRouteImport.update({
     id: '/settings',
@@ -262,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/materials': typeof AuthenticatedAdminMaterialsRoute
   '/admin/org': typeof AuthenticatedAdminOrgRoute
+  '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -297,6 +305,7 @@ export interface FileRoutesByTo {
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/materials': typeof AuthenticatedAdminMaterialsRoute
   '/admin/org': typeof AuthenticatedAdminOrgRoute
+  '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -336,6 +345,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/materials': typeof AuthenticatedAdminMaterialsRoute
   '/_authenticated/admin/org': typeof AuthenticatedAdminOrgRoute
+  '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -374,6 +384,7 @@ export interface FileRouteTypes {
     | '/admin/import'
     | '/admin/materials'
     | '/admin/org'
+    | '/admin/reviews'
     | '/admin/settings'
     | '/admin/tests'
     | '/admin/users'
@@ -409,6 +420,7 @@ export interface FileRouteTypes {
     | '/admin/import'
     | '/admin/materials'
     | '/admin/org'
+    | '/admin/reviews'
     | '/admin/settings'
     | '/admin/tests'
     | '/admin/users'
@@ -447,6 +459,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/import'
     | '/_authenticated/admin/materials'
     | '/_authenticated/admin/org'
+    | '/_authenticated/admin/reviews'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/tests'
     | '/_authenticated/admin/users'
@@ -658,6 +671,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminOrgRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/reviews': {
+      id: '/_authenticated/admin/reviews'
+      path: '/reviews'
+      fullPath: '/admin/reviews'
+      preLoaderRoute: typeof AuthenticatedAdminReviewsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/settings': {
       id: '/_authenticated/admin/settings'
       path: '/settings'
@@ -733,6 +753,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminMaterialsRoute: typeof AuthenticatedAdminMaterialsRoute
   AuthenticatedAdminOrgRoute: typeof AuthenticatedAdminOrgRoute
+  AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminTestsRoute: typeof AuthenticatedAdminTestsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
@@ -749,6 +770,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
     AuthenticatedAdminMaterialsRoute: AuthenticatedAdminMaterialsRoute,
     AuthenticatedAdminOrgRoute: AuthenticatedAdminOrgRoute,
+    AuthenticatedAdminReviewsRoute: AuthenticatedAdminReviewsRoute,
     AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
     AuthenticatedAdminTestsRoute: AuthenticatedAdminTestsRoute,
     AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,

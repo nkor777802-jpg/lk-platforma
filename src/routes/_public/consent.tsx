@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { company } from "@/content/site";
+import { useCompany } from "@/hooks/useCompany";
 import { Section } from "@/components/public/sections";
 
 const TITLE = "Согласие на обработку персональных данных — Людиновокабель";
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/_public/consent")({
 });
 
 function ConsentPage() {
+  const company = useCompany();
   return (
     <Section title="Согласие на обработку персональных данных">
       <div className="max-w-3xl space-y-6 text-muted-foreground">

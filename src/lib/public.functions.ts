@@ -44,3 +44,18 @@ export const submitContactRequest = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
+export const getSiteContacts = createServerFn({ method: "GET" }).handler(async () => {
+  const { createPublicSupabase } = await import("./public-supabase.server");
+  try {
+    const supabase = createPublicSupabase();
+    const { data } = await supabase
+      .from("site_content")
+      .select("data")
+      .eq("key", "contacts")
+      .maybeSingle();
+    return (data?.data ?? null) as Record<string, string> | null;
+  } catch {
+    return null;
+  }
+});

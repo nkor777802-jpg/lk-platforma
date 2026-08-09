@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { company } from "@/content/site";
+import { useCompany } from "@/hooks/useCompany";
 import { Section } from "@/components/public/sections";
 import { ContactForm } from "@/components/public/ContactForm";
 
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/_public/contacts")({
 });
 
 function ContactsPage() {
+  const company = useCompany();
   return (
     <>
       <div className="brand-pattern-blue text-secondary-foreground">

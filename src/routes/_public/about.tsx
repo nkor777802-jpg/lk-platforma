@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { about, company } from "@/content/site";
+import { useCompany } from "@/hooks/useCompany";
 import { Section, InfoCard } from "@/components/public/sections";
 
 const TITLE = "О предприятии — Людиновокабель";
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/_public/about")({
 });
 
 function AboutPage() {
+  const company = useCompany();
   return (
     <>
       <div className="brand-pattern-blue text-secondary-foreground">

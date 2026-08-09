@@ -1,8 +1,12 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { PublicHeader } from "@/components/public/PublicHeader";
 import { PublicFooter } from "@/components/public/PublicFooter";
+import { siteContactsQuery } from "@/lib/public-queries";
 
 export const Route = createFileRoute("/_public")({
+  loader: ({ context }) => {
+    void context.queryClient.ensureQueryData(siteContactsQuery);
+  },
   component: PublicLayout,
 });
 

@@ -52,7 +52,9 @@ export const ADMIN_NAV = [
   { to: "/admin/courses", label: "Курсы", icon: BookOpen, roles: ["admin", "hr", "teacher"] },
   { to: "/admin/materials", label: "Материалы", icon: FileText, roles: ["admin", "hr", "teacher"] },
   { to: "/admin/assignments", label: "Назначения", icon: ClipboardList, roles: ["admin", "hr", "manager"] },
+  { to: "/admin/requests", label: "Заявки", icon: Inbox, roles: STAFF },
   { to: "/admin/development", label: "Развитие", icon: TrendingUp, roles: STAFF },
+
   { to: "/admin/gamification", label: "Геймификация", icon: Trophy, roles: STAFF },
   { to: "/admin/production", label: "Производственные данные", icon: Factory, roles: STAFF },
   { to: "/admin/tests", label: "Тесты", icon: ListChecks, roles: ["admin", "hr", "teacher"] },

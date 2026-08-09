@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { UserPlus } from "lucide-react";
+import { Copy, Eye, EyeOff, RefreshCw, UserPlus } from "lucide-react";
 import { adminTableQuery, adminUsersQuery } from "@/lib/admin-queries";
 import { createAdminUser, setUserRoles, updateAdminUser } from "@/lib/admin.functions";
 import { ROLE_LABEL, getAssignableRoles, primaryRole, type AppRole } from "@/lib/roles";
@@ -30,6 +30,33 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+function generatePassword(length = 16) {
+  const lower = "abcdefghjkmnpqrstuvwxyz";
+  const upper = "ABCDEFGHJKMNPQRSTUVWXYZ";
+  const digits = "23456789";
+  const symbols = "!@#$%^&*-_=+?";
+  const all = lower + upper + digits + symbols;
+  let pwd = "";
+  pwd += lower.charAt(Math.floor(Math.random() * lower.length));
+  pwd += upper.charAt(Math.floor(Math.random() * upper.length));
+  pwd += digits.charAt(Math.floor(Math.random() * digits.length));
+  pwd += symbols.charAt(Math.floor(Math.random() * symbols.length));
+  for (let i = 4; i < length; i++) {
+    pwd += all.charAt(Math.floor(Math.random() * all.length));
+  }
+  return pwd
+    .split("")
+    .sort(() => Math.random() - 0.5)
+    .join("");
+}
+
+function normalizePasswordError(message: string) {
+  if (message.toLowerCase().includes("weak") || message.toLowerCase().includes("pwned")) {
+    return "Пароль слишком простой или скомпрометирован. Сгенерируйте другой.";
+  }
+  return message;
+}
+
 export const Route = createFileRoute("/_authenticated/admin/users")({
   component: AdminUsersPage,
 });
@@ -54,6 +81,15 @@ function AdminUsersPage() {
   const [createRoles, setCreateRoles] = useState<AppRole[]>(["employee"]);
   const [editing, setEditing] = useState<UserRow | null>(null);
   const [form, setForm] = useState<Record<string, string>>({});
+  const [showCreatePassword, setShowCreatePassword] = useState(false);
+  const [showEditPassword, setShowEditPassword] = useState(false);
+  const [createdCredentials, setCreatedCredentials] = useState<{ email: string; password: string } | null>(null);
+
+  useEffect(() => {
+    if (createOpen && !form["password"]) {
+      setForm((f) => ({ ...f, password: generatePassword() }));
+    }
+  }, [createOpen]);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin"] });
 
@@ -72,15 +108,15 @@ function AdminUsersPage() {
         },
       }),
     onSuccess: () => {
-      toast.success("Пользователь создан", {
-        description: "Передайте сотруднику e-mail и пароль — письмо не отправляется.",
-      });
+      toast.success("Пользователь создан");
+      setCreatedCredentials({ email: form["email"] ?? "", password: form["password"] ?? "" });
       setCreateOpen(false);
       setForm({});
       setCreateRoles(["employee"]);
+      setShowCreatePassword(false);
       void invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(normalizePasswordError(e.message)),
   });
 
   const updateMutation = useMutation({
@@ -95,14 +131,16 @@ function AdminUsersPage() {
           professionId: form["professionId"] || null,
           personnelNumber: form["personnelNumber"] || null,
           grade: form["grade"] || null,
+          password: form["editPassword"] || undefined,
         },
       }),
     onSuccess: () => {
       toast.success("Профиль обновлён");
       setEditing(null);
+      setShowEditPassword(false);
       void invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(normalizePasswordError(e.message)),
   });
 
   const blockMutation = useMutation({
@@ -191,7 +229,9 @@ function AdminUsersPage() {
                 professionId: String(r["profession_id"] ?? ""),
                 personnelNumber: String(r["personnel_number"] ?? ""),
                 grade: String(r["grade"] ?? ""),
+                editPassword: "",
               });
+              setShowEditPassword(false);
             }}
           >
             Изменить
@@ -250,6 +290,53 @@ function AdminUsersPage() {
     </div>
   );
 
+  const passwordField = (key: string, label: string, show: boolean, setShow: (v: boolean) => void, canRegenerate = false) => (
+    <div className="space-y-1.5">
+      <Label htmlFor={`u-${key}`}>{label}</Label>
+      <div className="flex gap-2">
+        <Input
+          id={`u-${key}`}
+          type={show ? "text" : "password"}
+          value={form[key] ?? ""}
+          onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+          className="flex-1"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => setShow(!show)}
+          title={show ? "Скрыть" : "Показать"}
+        >
+          {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => {
+            void navigator.clipboard.writeText(form[key] ?? "");
+            toast.success("Пароль скопирован");
+          }}
+          title="Скопировать"
+        >
+          <Copy className="h-4 w-4" />
+        </Button>
+        {canRegenerate && (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => setForm((f) => ({ ...f, [key]: generatePassword() }))}
+            title="Сгенерировать новый"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+
   if (authLoading) return <InlineLoading />;
 
   return (
@@ -296,7 +383,13 @@ function AdminUsersPage() {
           <div className="space-y-4">
             {textField("fullName", "ФИО *")}
             {textField("email", "Email *", "email")}
-            {textField("password", "Временный пароль * (мин. 8 символов)", "password")}
+            {passwordField(
+              "password",
+              "Временный пароль * (мин. 8 символов)",
+              showCreatePassword,
+              setShowCreatePassword,
+              true,
+            )}
             {textField("personnelNumber", "Табельный номер")}
             <div className="space-y-1.5">
               <Label>Роли</Label>
@@ -321,6 +414,69 @@ function AdminUsersPage() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={Boolean(createdCredentials)} onOpenChange={() => setCreatedCredentials(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Учётные данные сотрудника</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Передайте сотруднику логин и пароль — письмо не отправляется.
+            </p>
+            <div className="space-y-1.5">
+              <Label>Логин (email)</Label>
+              <div className="flex gap-2">
+                <Input readOnly value={createdCredentials?.email ?? ""} className="flex-1" />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(createdCredentials?.email ?? "");
+                    toast.success("Логин скопирован");
+                  }}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Пароль</Label>
+              <div className="flex gap-2">
+                <Input
+                  readOnly
+                  type={showCreatePassword ? "text" : "password"}
+                  value={createdCredentials?.password ?? ""}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setShowCreatePassword(!showCreatePassword)}
+                >
+                  {showCreatePassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(createdCredentials?.password ?? "");
+                    toast.success("Пароль скопирован");
+                  }}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setCreatedCredentials(null)}>Закрыть</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={Boolean(editing)} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader>
@@ -329,6 +485,13 @@ function AdminUsersPage() {
           <div className="space-y-4">
             {textField("fullName", "ФИО")}
             {textField("email", "Email", "email")}
+            {passwordField(
+              "editPassword",
+              "Новый пароль (мин. 8 символов, оставьте пустым, чтобы не менять)",
+              showEditPassword,
+              setShowEditPassword,
+              true,
+            )}
             {textField("personnelNumber", "Табельный номер")}
             {textField("grade", "Разряд")}
             {selectField("departmentId", "Подразделение", optionList(departments))}

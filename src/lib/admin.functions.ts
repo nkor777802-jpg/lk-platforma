@@ -219,6 +219,7 @@ export const updateAdminUser = createServerFn({ method: "POST" })
         personnelNumber: z.string().nullish(),
         grade: z.string().nullish(),
         isActive: z.boolean().optional(),
+        password: z.string().min(8).optional(),
       })
       .parse(input),
   )
@@ -258,6 +259,13 @@ export const updateAdminUser = createServerFn({ method: "POST" })
       patch["email"] = data.email;
     }
 
+    if (data.password) {
+      const { error: pwdError } = await supabaseAdmin.auth.admin.updateUserById(data.userId, {
+        password: data.password,
+      });
+      if (pwdError) throw new Error(pwdError.message);
+    }
+
     const { error } = await supabaseAdmin
       .from("profiles")
       .update(patch as never)
@@ -268,7 +276,7 @@ export const updateAdminUser = createServerFn({ method: "POST" })
       action: data.isActive === false ? "user.block" : "user.update",
       entity: "profiles",
       entityId: data.userId,
-      details: { ...patch, oldEmail, newEmail: data.email ?? null },
+      details: { ...patch, oldEmail, newEmail: data.email ?? null, passwordChanged: Boolean(data.password) },
     });
     return { ok: true };
   });

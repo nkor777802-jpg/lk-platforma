@@ -211,7 +211,9 @@ function AdminUsersPage() {
                 professionId: String(r["profession_id"] ?? ""),
                 personnelNumber: String(r["personnel_number"] ?? ""),
                 grade: String(r["grade"] ?? ""),
+                editPassword: "",
               });
+              setShowEditPassword(false);
             }}
           >
             Изменить

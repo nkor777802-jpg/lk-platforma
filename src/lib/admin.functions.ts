@@ -149,7 +149,7 @@ export const createAdminUser = createServerFn({ method: "POST" })
         email: z.string().email(),
         password: z.string().min(8),
         fullName: z.string().min(2),
-        role: z.enum(["employee", "manager", "hr", "admin", "teacher"]),
+        roles: z.array(z.enum(ALL_ROLES)).min(1),
         departmentId: z.string().uuid().nullish(),
         positionId: z.string().uuid().nullish(),
         professionId: z.string().uuid().nullish(),
@@ -159,9 +159,11 @@ export const createAdminUser = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { assertRole, logAction } = await import("./admin.server");
-    const roles = await assertRole(context.supabase, context.userId, [...STAFF]);
-    if (data.role === "admin" && !roles.includes("admin"))
-      throw new Error("Права администратора выдаёт только администратор");
+    const actorRoles = await assertRole(context.supabase, context.userId, [...STAFF]);
+    const forbidden = data.roles.find((r) => !canAssignRole(actorRoles, r));
+    if (forbidden) {
+      throw new Error(`Роль «${forbidden}» не может быть назначена вашей ролью`);
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
@@ -183,15 +185,19 @@ export const createAdminUser = createServerFn({ method: "POST" })
       })
       .eq("id", created.user.id);
 
-    if (data.role !== "employee") {
-      await supabaseAdmin.from("user_roles").insert({ user_id: created.user.id, role: data.role });
+    const extraRoles = data.roles.filter((r) => r !== "employee");
+    if (extraRoles.length > 0) {
+      const { error: roleError } = await supabaseAdmin
+        .from("user_roles")
+        .insert(extraRoles.map((role) => ({ user_id: created.user.id, role })));
+      if (roleError) throw new Error(roleError.message);
     }
     await logAction({
       actorId: context.userId,
       action: "user.create",
       entity: "profiles",
       entityId: created.user.id,
-      details: { email: data.email, role: data.role },
+      details: { email: data.email, roles: data.roles },
     });
     return { id: created.user.id };
   });

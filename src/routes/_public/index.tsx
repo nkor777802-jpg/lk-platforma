@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { about, advantages, company, faq, platform, stages } from "@/content/site";
+import { useCompany } from "@/hooks/useCompany";
 import { publicProfessionsQuery } from "@/lib/public-queries";
 import { Section, InfoCard, StageList } from "@/components/public/sections";
 import { ProfessionGrid } from "@/components/public/ProfessionGrid";

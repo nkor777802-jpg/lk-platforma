@@ -26,7 +26,6 @@ export const listPublicProfessions = createServerFn({ method: "GET" }).handler(a
 });
 
 export const submitContactRequest = createServerFn({ method: "POST" })
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   .inputValidator((input: unknown) => contactSchema.parse(input))
   .handler(async ({ data }) => {
     if (!data.email && !data.phone) {
@@ -59,4 +58,49 @@ export const getSiteContacts = createServerFn({ method: "GET" }).handler(async (
   } catch {
     return null;
   }
+});
+
+export type PublicManagementMember = {
+  id: string;
+  full_name: string;
+  position: string;
+  bio: string | null;
+  photo_url: string | null;
+};
+
+export const listPublicManagement = createServerFn({ method: "GET" }).handler(async () => {
+  const { createPublicSupabase } = await import("./public-supabase.server");
+  const supabase = createPublicSupabase();
+  const { data, error } = await supabase
+    .from("management")
+    .select("id, full_name, position, bio, photo_url")
+    .eq("is_active", true)
+    .order("sort_order")
+    .order("full_name");
+  if (error) throw new Error(error.message);
+
+  const rows = data ?? [];
+  const members: PublicManagementMember[] = await Promise.all(
+    rows.map(async (row) => {
+      let photo: string | null = null;
+      if (row.photo_url) {
+        if (row.photo_url.startsWith("http")) {
+          photo = row.photo_url;
+        } else {
+          const { data: signed } = await supabase.storage
+            .from("management")
+            .createSignedUrl(row.photo_url, 60 * 60);
+          photo = signed?.signedUrl ?? null;
+        }
+      }
+      return {
+        id: row.id,
+        full_name: row.full_name,
+        position: row.position,
+        bio: row.bio ?? null,
+        photo_url: photo,
+      };
+    }),
+  );
+  return members;
 });

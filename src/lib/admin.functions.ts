@@ -1,8 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { type AppRole, canAssignRole, getAssignableRoles } from "@/lib/roles";
 
 const STAFF = ["admin", "hr"] as const;
+const ALL_ROLES = ["employee", "manager", "hr", "admin", "teacher"] as const satisfies AppRole[];
 
 export const adminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

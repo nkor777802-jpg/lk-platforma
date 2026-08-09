@@ -193,3 +193,29 @@ function PlatformSettingsTab() {
     </div>
   );
 }
+
+function SettingsPage() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-secondary">Настройки платформы</h1>
+        <p className="text-sm text-muted-foreground">
+          Контактные данные предприятия и общие параметры системы обучения.
+        </p>
+      </div>
+
+      <Tabs defaultValue="contacts">
+        <TabsList className="flex-wrap">
+          <TabsTrigger value="contacts">Контакты</TabsTrigger>
+          <TabsTrigger value="platform">Параметры платформы</TabsTrigger>
+        </TabsList>
+        <TabsContent value="contacts" className="pt-6">
+          <ContactsTab />
+        </TabsContent>
+        <TabsContent value="platform" className="pt-6">
+          <PlatformSettingsTab />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

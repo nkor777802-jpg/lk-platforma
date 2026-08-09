@@ -335,7 +335,10 @@ export const setUserRoles = createServerFn({ method: "POST" })
     if (finalRoles.length > 0) {
       const { error } = await supabaseAdmin
         .from("user_roles")
-        .insert(finalRoles.map((role) => ({ user_id: data.userId, role })));
+        .upsert(
+          finalRoles.map((role) => ({ user_id: data.userId, role })),
+          { onConflict: "user_id,role", ignoreDuplicates: true },
+        );
       if (error) throw new Error(error.message);
     }
     await logAction({

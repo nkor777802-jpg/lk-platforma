@@ -122,6 +122,7 @@ function ImportCenterPage() {
       setReport(r);
       if (r.committed) {
         toast.success(`Импорт выполнен: создано ${r.created}, обновлено ${r.updated}`);
+        if (r.credentials?.length) downloadCredentialsCsv(r.credentials);
         void qc.invalidateQueries({ queryKey: ["admin"] });
       } else {
         toast.error("Импорт не выполнен: в файле есть ошибки");
@@ -311,6 +312,22 @@ function ImportCenterPage() {
                   <p className="font-medium text-foreground">
                     {report.committed ? "Импорт выполнен" : "Предварительная проверка"}
                   </p>
+                  {report.credentials?.length ? (
+                    <div className="flex flex-wrap items-center gap-2 rounded-md border border-border p-2 text-xs">
+                      <span className="text-muted-foreground">
+                        Созданы учётные записи ({report.credentials.length}), роль «Сотрудник».
+                        Файл с логинами и паролями выгружен автоматически.
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => downloadCredentialsCsv(report.credentials ?? [])}
+                      >
+                        <Download className="mr-1.5 h-4 w-4" />
+                        Скачать логины и пароли
+                      </Button>
+                    </div>
+                  ) : null}
                   <pre className="whitespace-pre-wrap break-words rounded bg-muted p-3 text-xs">
 {`Файл: ${report.fileName}
 

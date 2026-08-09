@@ -29,6 +29,7 @@ import { Route as PublicAboutRouteImport } from './routes/_public/about'
 import { Route as PublicConsentRouteImport } from './routes/_public/consent'
 import { Route as PublicContactsRouteImport } from './routes/_public/contacts'
 import { Route as PublicFaqRouteImport } from './routes/_public/faq'
+import { Route as PublicManagementRouteImport } from './routes/_public/management'
 import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
@@ -156,6 +157,11 @@ const PublicContactsRoute = PublicContactsRouteImport.update({
 const PublicFaqRoute = PublicFaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicManagementRoute = PublicManagementRouteImport.update({
+  id: '/management',
+  path: '/management',
   getParentRoute: () => PublicRouteRoute,
 } as any)
 const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
@@ -333,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/consent': typeof PublicConsentRoute
   '/contacts': typeof PublicContactsRoute
   '/faq': typeof PublicFaqRoute
+  '/management': typeof PublicManagementRoute
   '/privacy': typeof PublicPrivacyRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
@@ -379,6 +386,7 @@ export interface FileRoutesByTo {
   '/consent': typeof PublicConsentRoute
   '/contacts': typeof PublicContactsRoute
   '/faq': typeof PublicFaqRoute
+  '/management': typeof PublicManagementRoute
   '/privacy': typeof PublicPrivacyRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
@@ -428,6 +436,7 @@ export interface FileRoutesById {
   '/_public/consent': typeof PublicConsentRoute
   '/_public/contacts': typeof PublicContactsRoute
   '/_public/faq': typeof PublicFaqRoute
+  '/_public/management': typeof PublicManagementRoute
   '/_public/privacy': typeof PublicPrivacyRoute
   '/_public/': typeof PublicIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -478,6 +487,7 @@ export interface FileRouteTypes {
     | '/consent'
     | '/contacts'
     | '/faq'
+    | '/management'
     | '/privacy'
     | '/admin/analytics'
     | '/admin/assignments'
@@ -524,6 +534,7 @@ export interface FileRouteTypes {
     | '/consent'
     | '/contacts'
     | '/faq'
+    | '/management'
     | '/privacy'
     | '/admin/analytics'
     | '/admin/assignments'
@@ -572,6 +583,7 @@ export interface FileRouteTypes {
     | '/_public/consent'
     | '/_public/contacts'
     | '/_public/faq'
+    | '/_public/management'
     | '/_public/privacy'
     | '/_public/'
     | '/_authenticated/admin/analytics'
@@ -749,6 +761,13 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof PublicFaqRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/management': {
+      id: '/_public/management'
+      path: '/management'
+      fullPath: '/management'
+      preLoaderRoute: typeof PublicManagementRouteImport
       parentRoute: typeof PublicRouteRoute
     }
     '/_public/privacy': {
@@ -1039,6 +1058,7 @@ interface PublicRouteRouteChildren {
   PublicConsentRoute: typeof PublicConsentRoute
   PublicContactsRoute: typeof PublicContactsRoute
   PublicFaqRoute: typeof PublicFaqRoute
+  PublicManagementRoute: typeof PublicManagementRoute
   PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicTrainingProfessionsRoute: typeof PublicTrainingProfessionsRoute
@@ -1050,6 +1070,7 @@ const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicConsentRoute: PublicConsentRoute,
   PublicContactsRoute: PublicContactsRoute,
   PublicFaqRoute: PublicFaqRoute,
+  PublicManagementRoute: PublicManagementRoute,
   PublicPrivacyRoute: PublicPrivacyRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicTrainingProfessionsRoute: PublicTrainingProfessionsRoute,
@@ -1069,13 +1090,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

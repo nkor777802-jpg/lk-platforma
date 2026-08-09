@@ -50,6 +50,7 @@ interface ImportReport {
   preview: { sheet: string; rows: Record<string, string>[] }[];
   committed: boolean;
   status: "success" | "warning" | "error";
+  credentials?: { fullName: string; email: string; password: string }[];
 }
 
 function downloadBase64(base64: string, fileName: string) {
@@ -70,6 +71,22 @@ async function fileToBase64(file: File): Promise<string> {
   let binary = "";
   for (let i = 0; i < buffer.length; i += 1) binary += String.fromCharCode(buffer[i] as number);
   return btoa(binary);
+}
+
+function downloadCredentialsCsv(rows: { fullName: string; email: string; password: string }[]) {
+  const csv = [
+    ["ФИО", "Логин (email)", "Пароль", "Роль"],
+    ...rows.map((r) => [r.fullName, r.email, r.password, "Сотрудник"]),
+  ]
+    .map((line) => line.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(";"))
+    .join("\r\n");
+  const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Учетные_данные_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function ImportCenterPage() {

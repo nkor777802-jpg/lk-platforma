@@ -72,7 +72,9 @@ function AdminUsersPage() {
         },
       }),
     onSuccess: () => {
-      toast.success("Пользователь создан");
+      toast.success("Пользователь создан", {
+        description: "Передайте сотруднику e-mail и пароль — письмо не отправляется.",
+      });
       setCreateOpen(false);
       setForm({});
       setCreateRoles(["employee"]);

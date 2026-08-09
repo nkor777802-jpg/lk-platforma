@@ -89,6 +89,7 @@ function AdminUsersPage() {
         data: {
           userId: editing?.["id"] as string,
           fullName: form["fullName"] || undefined,
+          email: form["email"] || undefined,
           departmentId: form["departmentId"] || null,
           positionId: form["positionId"] || null,
           professionId: form["professionId"] || null,
@@ -184,6 +185,7 @@ function AdminUsersPage() {
               setEditing(r);
               setForm({
                 fullName: String(r["full_name"] ?? ""),
+                email: String(r["email"] ?? ""),
                 departmentId: String(r["department_id"] ?? ""),
                 positionId: String(r["position_id"] ?? ""),
                 professionId: String(r["profession_id"] ?? ""),
@@ -326,6 +328,7 @@ function AdminUsersPage() {
           </DialogHeader>
           <div className="space-y-4">
             {textField("fullName", "ФИО")}
+            {textField("email", "Email", "email")}
             {textField("personnelNumber", "Табельный номер")}
             {textField("grade", "Разряд")}
             {selectField("departmentId", "Подразделение", optionList(departments))}

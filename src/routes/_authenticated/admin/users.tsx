@@ -99,7 +99,11 @@ function AdminUsersPage() {
   const [form, setForm] = useState<Record<string, string>>({});
   const [showCreatePassword, setShowCreatePassword] = useState(false);
   const [showEditPassword, setShowEditPassword] = useState(false);
-  const [createdCredentials, setCreatedCredentials] = useState<{ email: string; password: string } | null>(null);
+  const [createdCredentials, setCreatedCredentials] = useState<{
+    fullName: string;
+    email: string;
+    password: string;
+  } | null>(null);
 
   useEffect(() => {
     if (createOpen && !form["password"]) {
@@ -125,7 +129,13 @@ function AdminUsersPage() {
       }),
     onSuccess: () => {
       toast.success("Пользователь создан");
-      setCreatedCredentials({ email: form["email"] ?? "", password: form["password"] ?? "" });
+      const credentials = {
+        fullName: form["fullName"] ?? "",
+        email: form["email"] ?? "",
+        password: form["password"] ?? "",
+      };
+      setCreatedCredentials(credentials);
+      downloadCredentialsCsv([credentials]);
       setCreateOpen(false);
       setForm({});
       setCreateRoles(["employee"]);

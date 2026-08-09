@@ -579,3 +579,37 @@ export const exportCsv = createServerFn({ method: "POST" })
     await logAction({ actorId: context.userId, action: "export", entity: data.kind });
     return { csv: toCsv(rows), count: rows.length };
   });
+
+const contactsSchema = z.object({
+  legalName: z.string().trim().min(2).max(160),
+  shortName: z.string().trim().min(2).max(120),
+  address: z.string().trim().min(5).max(400),
+  phone: z.string().trim().min(3).max(60),
+  internalPhones: z.string().trim().max(120),
+  email: z.string().trim().email().max(160),
+  unit: z.string().trim().min(2).max(160),
+  workHours: z.string().trim().max(160),
+});
+
+export const saveSiteContacts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => contactsSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { assertRole, logAction } = await import("./admin.server");
+    await assertRole(context.supabase, context.userId, ["admin"]);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("site_content").upsert({
+      key: "contacts",
+      title: "Контактные данные",
+      data: data as never,
+    });
+    if (error) throw new Error(error.message);
+    await logAction({
+      actorId: context.userId,
+      action: "settings.contacts.save",
+      entity: "site_content",
+      entityId: "contacts",
+      details: data,
+    });
+    return { ok: true };
+  });

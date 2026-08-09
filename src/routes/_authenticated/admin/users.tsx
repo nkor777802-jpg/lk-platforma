@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Copy, Eye, EyeOff, RefreshCw, UserPlus } from "lucide-react";
+import { Copy, Download, Eye, EyeOff, RefreshCw, UserPlus } from "lucide-react";
 import { adminTableQuery, adminUsersQuery } from "@/lib/admin-queries";
 import { createAdminUser, setUserRoles, updateAdminUser } from "@/lib/admin.functions";
 import { ROLE_LABEL, getAssignableRoles, primaryRole, type AppRole } from "@/lib/roles";
@@ -29,6 +29,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+function downloadCredentialsCsv(rows: { fullName: string; email: string; password: string }[]) {
+  const csv = [
+    ["ФИО", "Логин (email)", "Пароль", "Роль"],
+    ...rows.map((r) => [r.fullName, r.email, r.password, "Сотрудник"]),
+  ]
+    .map((line) => line.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(";"))
+    .join("\r\n");
+  const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Учетные_данные_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 function generatePassword(length = 16) {
   const lower = "abcdefghjkmnpqrstuvwxyz";
@@ -83,7 +99,11 @@ function AdminUsersPage() {
   const [form, setForm] = useState<Record<string, string>>({});
   const [showCreatePassword, setShowCreatePassword] = useState(false);
   const [showEditPassword, setShowEditPassword] = useState(false);
-  const [createdCredentials, setCreatedCredentials] = useState<{ email: string; password: string } | null>(null);
+  const [createdCredentials, setCreatedCredentials] = useState<{
+    fullName: string;
+    email: string;
+    password: string;
+  } | null>(null);
 
   useEffect(() => {
     if (createOpen && !form["password"]) {
@@ -109,7 +129,13 @@ function AdminUsersPage() {
       }),
     onSuccess: () => {
       toast.success("Пользователь создан");
-      setCreatedCredentials({ email: form["email"] ?? "", password: form["password"] ?? "" });
+      const credentials = {
+        fullName: form["fullName"] ?? "",
+        email: form["email"] ?? "",
+        password: form["password"] ?? "",
+      };
+      setCreatedCredentials(credentials);
+      downloadCredentialsCsv([credentials]);
       setCreateOpen(false);
       setForm({});
       setCreateRoles(["employee"]);
@@ -421,7 +447,9 @@ function AdminUsersPage() {
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Передайте сотруднику логин и пароль — письмо не отправляется.
+              Файл с логином и паролем выгружен автоматически. Передайте данные сотруднику — письмо
+              не отправляется. Роль по умолчанию: «Сотрудник», изменить можно в таблице
+              пользователей.
             </p>
             <div className="space-y-1.5">
               <Label>Логин (email)</Label>
@@ -472,6 +500,13 @@ function AdminUsersPage() {
             </div>
           </div>
           <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => createdCredentials && downloadCredentialsCsv([createdCredentials])}
+            >
+              <Download className="mr-1.5 h-4 w-4" />
+              Скачать файл
+            </Button>
             <Button onClick={() => setCreatedCredentials(null)}>Закрыть</Button>
           </DialogFooter>
         </DialogContent>

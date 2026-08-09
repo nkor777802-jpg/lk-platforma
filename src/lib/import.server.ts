@@ -23,6 +23,7 @@ export interface ImportReport {
   preview: { sheet: string; rows: Record<string, string>[] }[];
   committed: boolean;
   status: "success" | "warning" | "error";
+  credentials?: { fullName: string; email: string; password: string }[];
 }
 
 type Row = Record<string, string>;
@@ -544,7 +545,7 @@ async function importEmployees(
     }
     report.created += 1;
     if (dryRun) continue;
-    const password = `Lk-${crypto.randomUUID().slice(0, 12)}`;
+    const password = `Lk${crypto.randomUUID().replace(/-/g, "").slice(0, 10)}!7`;
     const { data: created, error } = await admin.auth.admin.createUser({
       email,
       password,
@@ -566,6 +567,7 @@ async function importEmployees(
     }
     await admin.from("profiles").update(values).eq("id", created.user.id);
     ctx.refs["profiles"]?.set(code, created.user.id);
+    report.credentials?.push({ fullName, email, password });
   }
 }
 
@@ -603,6 +605,7 @@ export async function runImport(input: {
     preview: [],
     committed: !input.dryRun,
     status: "success",
+    credentials: [],
   };
 
   const available = Object.keys(sheets);

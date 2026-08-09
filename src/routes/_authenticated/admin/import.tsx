@@ -50,6 +50,7 @@ interface ImportReport {
   preview: { sheet: string; rows: Record<string, string>[] }[];
   committed: boolean;
   status: "success" | "warning" | "error";
+  credentials?: { fullName: string; email: string; password: string }[];
 }
 
 function downloadBase64(base64: string, fileName: string) {
@@ -70,6 +71,22 @@ async function fileToBase64(file: File): Promise<string> {
   let binary = "";
   for (let i = 0; i < buffer.length; i += 1) binary += String.fromCharCode(buffer[i] as number);
   return btoa(binary);
+}
+
+function downloadCredentialsCsv(rows: { fullName: string; email: string; password: string }[]) {
+  const csv = [
+    ["ФИО", "Логин (email)", "Пароль", "Роль"],
+    ...rows.map((r) => [r.fullName, r.email, r.password, "Сотрудник"]),
+  ]
+    .map((line) => line.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(";"))
+    .join("\r\n");
+  const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Учетные_данные_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function ImportCenterPage() {
@@ -105,6 +122,7 @@ function ImportCenterPage() {
       setReport(r);
       if (r.committed) {
         toast.success(`Импорт выполнен: создано ${r.created}, обновлено ${r.updated}`);
+        if (r.credentials?.length) downloadCredentialsCsv(r.credentials);
         void qc.invalidateQueries({ queryKey: ["admin"] });
       } else {
         toast.error("Импорт не выполнен: в файле есть ошибки");
@@ -294,6 +312,22 @@ function ImportCenterPage() {
                   <p className="font-medium text-foreground">
                     {report.committed ? "Импорт выполнен" : "Предварительная проверка"}
                   </p>
+                  {report.credentials?.length ? (
+                    <div className="flex flex-wrap items-center gap-2 rounded-md border border-border p-2 text-xs">
+                      <span className="text-muted-foreground">
+                        Созданы учётные записи ({report.credentials.length}), роль «Сотрудник».
+                        Файл с логинами и паролями выгружен автоматически.
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => downloadCredentialsCsv(report.credentials ?? [])}
+                      >
+                        <Download className="mr-1.5 h-4 w-4" />
+                        Скачать логины и пароли
+                      </Button>
+                    </div>
+                  ) : null}
                   <pre className="whitespace-pre-wrap break-words rounded bg-muted p-3 text-xs">
 {`Файл: ${report.fileName}
 

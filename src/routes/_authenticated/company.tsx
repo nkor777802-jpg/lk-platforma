@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { departmentsQuery, historyQuery, managementQuery, siteContentQuery } from "@/lib/lms-queries";
-import { signedUrl } from "@/lib/storage";
+import { departmentsQuery, historyQuery, siteContentQuery } from "@/lib/lms-queries";
 import { EmptyState, InlineLoading } from "@/components/states";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,9 +9,9 @@ export const Route = createFileRoute("/_authenticated/company")({
   head: () => ({
     meta: [
       { title: "О компании — Академия «Людиновокабель»" },
-      { name: "description", content: "История завода, руководство, структура и ценности «Людиновокабель»." },
+      { name: "description", content: "История завода, структура и ценности «Людиновокабель»." },
       { property: "og:title", content: "О компании — Людиновокабель" },
-      { property: "og:description", content: "История, руководство и структура кабельного завода." },
+      { property: "og:description", content: "История и структура кабельного завода." },
     ],
   }),
   component: CompanyPage,
@@ -21,7 +19,6 @@ export const Route = createFileRoute("/_authenticated/company")({
 
 function CompanyPage() {
   const history = useQuery(historyQuery);
-  const management = useQuery(managementQuery);
   const departments = useQuery(departmentsQuery);
   const content = useQuery(siteContentQuery);
 
@@ -36,7 +33,6 @@ function CompanyPage() {
         <TabsList className="flex flex-wrap">
           <TabsTrigger value="about">Общее</TabsTrigger>
           <TabsTrigger value="history">История</TabsTrigger>
-          <TabsTrigger value="management">Руководство</TabsTrigger>
           <TabsTrigger value="structure">Структура</TabsTrigger>
           <TabsTrigger value="values">Ценности</TabsTrigger>
         </TabsList>

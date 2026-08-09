@@ -113,11 +113,13 @@ function AdminUsersPage() {
           professionId: form["professionId"] || null,
           personnelNumber: form["personnelNumber"] || null,
           grade: form["grade"] || null,
+          password: form["editPassword"] || undefined,
         },
       }),
     onSuccess: () => {
       toast.success("Профиль обновлён");
       setEditing(null);
+      setShowEditPassword(false);
       void invalidate();
     },
     onError: (e: Error) => toast.error(e.message),

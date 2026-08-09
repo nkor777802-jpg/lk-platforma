@@ -1,11 +1,14 @@
 import { queryOptions } from "@tanstack/react-query";
 import {
   adminOverview,
+  countNewContactRequests,
   getPlatformSettings,
   listAdminUsers,
   listAuditLog,
+  listContactRequests,
   listRows,
 } from "./admin.functions";
+
 
 export const adminOverviewQuery = queryOptions({
   queryKey: ["admin", "overview"],

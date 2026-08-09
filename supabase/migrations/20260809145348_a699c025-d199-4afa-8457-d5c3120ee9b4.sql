@@ -1,0 +1,1 @@
+DELETE FROM public.contact_requests WHERE email = 'audit@example.com' AND full_name = 'Тестовый Аудит';

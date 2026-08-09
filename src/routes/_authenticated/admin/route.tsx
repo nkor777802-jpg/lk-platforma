@@ -38,33 +38,40 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminLayout,
 });
 
+/** Роли соответствуют серверным проверкам доступа для каждого раздела. */
+const ALL = ["admin", "hr", "teacher", "manager"] as const;
+const STAFF = ["admin", "hr"] as const;
+
 export const ADMIN_NAV = [
-  { to: "/admin", label: "Обзор", icon: BarChart3, exact: true },
-  { to: "/admin/analytics", label: "Аналитика", icon: BarChart3 },
-  { to: "/admin/users", label: "Пользователи", icon: Users },
-  { to: "/admin/org", label: "Оргструктура", icon: FolderTree },
-  { to: "/admin/courses", label: "Курсы", icon: BookOpen },
-  { to: "/admin/materials", label: "Материалы", icon: FileText },
-  { to: "/admin/assignments", label: "Назначения", icon: ClipboardList },
-  { to: "/admin/development", label: "Развитие", icon: TrendingUp },
-  { to: "/admin/gamification", label: "Геймификация", icon: Trophy },
-  { to: "/admin/production", label: "Производственные данные", icon: Factory },
-  { to: "/admin/tests", label: "Тесты", icon: ListChecks },
-  { to: "/admin/reviews", label: "Проверка ответов", icon: PenLine },
-  { to: "/admin/dictionaries", label: "Справочники", icon: FolderTree },
-  { to: "/admin/import", label: "Импорт", icon: Upload },
-  { to: "/admin/export", label: "Экспорт", icon: Download },
-  { to: "/admin/audit", label: "Журнал действий", icon: ScrollText },
-  { to: "/admin/settings", label: "Настройки", icon: Settings },
+  { to: "/admin", label: "Обзор", icon: BarChart3, exact: true, roles: ALL },
+  { to: "/admin/analytics", label: "Аналитика", icon: BarChart3, roles: ALL },
+  { to: "/admin/users", label: "Пользователи", icon: Users, roles: ["admin", "hr", "manager"] },
+  { to: "/admin/org", label: "Оргструктура", icon: FolderTree, roles: STAFF },
+  { to: "/admin/courses", label: "Курсы", icon: BookOpen, roles: ["admin", "hr", "teacher"] },
+  { to: "/admin/materials", label: "Материалы", icon: FileText, roles: ["admin", "hr", "teacher"] },
+  { to: "/admin/assignments", label: "Назначения", icon: ClipboardList, roles: ["admin", "hr", "manager"] },
+  { to: "/admin/development", label: "Развитие", icon: TrendingUp, roles: STAFF },
+  { to: "/admin/gamification", label: "Геймификация", icon: Trophy, roles: STAFF },
+  { to: "/admin/production", label: "Производственные данные", icon: Factory, roles: STAFF },
+  { to: "/admin/tests", label: "Тесты", icon: ListChecks, roles: ["admin", "hr", "teacher"] },
+  { to: "/admin/reviews", label: "Проверка ответов", icon: PenLine, roles: ["admin", "hr", "teacher"] },
+  { to: "/admin/dictionaries", label: "Справочники", icon: FolderTree, roles: STAFF },
+  { to: "/admin/import", label: "Импорт", icon: Upload, roles: ["admin", "hr", "teacher"] },
+  { to: "/admin/export", label: "Экспорт", icon: Download, roles: ALL },
+  { to: "/admin/audit", label: "Журнал действий", icon: ScrollText, roles: ["admin"] },
+  { to: "/admin/settings", label: "Настройки", icon: Settings, roles: ["admin"] },
 ] as const;
 
 function AdminLayout() {
   const { roles, loading } = useAuth();
   const allowed = roles.some((r) => ["admin", "hr", "teacher", "manager"].includes(r));
+  const navItems = ADMIN_NAV.filter((item) =>
+    (item.roles as readonly string[]).some((r) => roles.includes(r as never)),
+  );
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const currentLabel =
-    [...ADMIN_NAV]
+    [...navItems]
       .sort((a, b) => b.to.length - a.to.length)
       .find((i) => pathname === i.to || pathname.startsWith(`${i.to}/`))?.label ?? "Обзор";
 
@@ -94,7 +101,7 @@ function AdminLayout() {
           </SheetTrigger>
           <SheetContent side="left" className="w-[17rem] overflow-y-auto p-4">
             <nav className="mt-8 flex flex-col gap-1">
-              {ADMIN_NAV.map((item) => (
+              {navItems.map((item) => (
                 <Link
                   key={item.to}
                   to={item.to}
@@ -113,7 +120,7 @@ function AdminLayout() {
       </div>
       <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
         <nav className="flex flex-col gap-1">
-          {ADMIN_NAV.map((item) => (
+          {navItems.map((item) => (
             <Link
               key={item.to}
               to={item.to}

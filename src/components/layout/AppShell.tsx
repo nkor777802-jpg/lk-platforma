@@ -1,5 +1,6 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { LogOut, Shield, User as UserIcon, X } from "lucide-react";
 import { brandLogos } from "@/lib/brand";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,11 +27,15 @@ const SECONDARY_NAV = [
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { isStaff, signOut, user } = useAuth();
+  const { roles, signOut, user } = useAuth();
+  const canAccessAdmin = roles.some((r) => ["admin", "hr", "teacher", "manager"].includes(r));
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
 
   const handleSignOut = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
     await signOut();
     void router.navigate({ to: "/auth", replace: true });
   };
@@ -69,7 +74,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
           <div className="ml-auto flex items-center gap-0.5 sm:gap-2">
             <NotificationBell />
-            {isStaff ? (
+            {canAccessAdmin ? (
               <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
                 <Link to="/admin">
                   <Shield className="mr-1.5 h-4 w-4" />
@@ -133,7 +138,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {item.label}
               </Link>
             ))}
-            {isStaff ? (
+            {canAccessAdmin ? (
               <Link
                 to="/admin"
                 onClick={() => setOpen(false)}

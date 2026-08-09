@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-// TODO: заменить на адрес проекта, когда будет назначено имя или подключён домен.
-const BASE_URL = "";
+const BASE_URL = "https://brand-palette-decoder.lovable.app";
 
 interface SitemapEntry {
   path: string;

@@ -41,6 +41,13 @@ const ROLE_LABEL: Record<string, string> = {
 
 type UserRow = Record<string, unknown>;
 
+/** Порядок приоритета: в таблице показываем максимальную роль сотрудника. */
+const ROLE_PRIORITY = ["admin", "hr", "teacher", "manager", "employee"] as const;
+
+function primaryRole(list: string[]): string {
+  return ROLE_PRIORITY.find((r) => list.includes(r)) ?? "employee";
+}
+
 function AdminUsersPage() {
   const qc = useQueryClient();
   const users = useQuery(adminUsersQuery);
@@ -143,7 +150,7 @@ function AdminUsersPage() {
       label: "Роль",
       render: (r) => {
         const list = (r["roles"] as string[]) ?? [];
-        const value = list[0] ?? "employee";
+        const value = primaryRole(list);
         return (
           <Select
             value={value}

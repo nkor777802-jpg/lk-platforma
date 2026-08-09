@@ -272,6 +272,53 @@ function AdminUsersPage() {
     </div>
   );
 
+  const passwordField = (key: string, label: string, show: boolean, setShow: (v: boolean) => void, canRegenerate = false) => (
+    <div className="space-y-1.5">
+      <Label htmlFor={`u-${key}`}>{label}</Label>
+      <div className="flex gap-2">
+        <Input
+          id={`u-${key}`}
+          type={show ? "text" : "password"}
+          value={form[key] ?? ""}
+          onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+          className="flex-1"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => setShow(!show)}
+          title={show ? "Скрыть" : "Показать"}
+        >
+          {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => {
+            void navigator.clipboard.writeText(form[key] ?? "");
+            toast.success("Пароль скопирован");
+          }}
+          title="Скопировать"
+        >
+          <Copy className="h-4 w-4" />
+        </Button>
+        {canRegenerate && (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => setForm((f) => ({ ...f, [key]: generatePassword() }))}
+            title="Сгенерировать новый"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+
   if (authLoading) return <InlineLoading />;
 
   return (

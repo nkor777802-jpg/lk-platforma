@@ -38,7 +38,7 @@ type UserRow = Record<string, unknown>;
 
 function AdminUsersPage() {
   const qc = useQueryClient();
-  const { roles: actorRoles, isStaff } = useAuth();
+  const { roles: actorRoles, isStaff, loading: authLoading } = useAuth();
   const assignableRoles = getAssignableRoles(actorRoles);
 
   const users = useQuery(adminUsersQuery);

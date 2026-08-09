@@ -365,7 +365,13 @@ function AdminUsersPage() {
           <div className="space-y-4">
             {textField("fullName", "ФИО *")}
             {textField("email", "Email *", "email")}
-            {textField("password", "Временный пароль * (мин. 8 символов)", "password")}
+            {passwordField(
+              "password",
+              "Временный пароль * (мин. 8 символов)",
+              showCreatePassword,
+              setShowCreatePassword,
+              true,
+            )}
             {textField("personnelNumber", "Табельный номер")}
             <div className="space-y-1.5">
               <Label>Роли</Label>
@@ -386,6 +392,69 @@ function AdminUsersPage() {
             <Button onClick={() => createMutation.mutate()} disabled={createMutation.isPending}>
               Создать
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(createdCredentials)} onOpenChange={() => setCreatedCredentials(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Учётные данные сотрудника</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Передайте сотруднику логин и пароль — письмо не отправляется.
+            </p>
+            <div className="space-y-1.5">
+              <Label>Логин (email)</Label>
+              <div className="flex gap-2">
+                <Input readOnly value={createdCredentials?.email ?? ""} className="flex-1" />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(createdCredentials?.email ?? "");
+                    toast.success("Логин скопирован");
+                  }}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Пароль</Label>
+              <div className="flex gap-2">
+                <Input
+                  readOnly
+                  type={showCreatePassword ? "text" : "password"}
+                  value={createdCredentials?.password ?? ""}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setShowCreatePassword(!showCreatePassword)}
+                >
+                  {showCreatePassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(createdCredentials?.password ?? "");
+                    toast.success("Пароль скопирован");
+                  }}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setCreatedCredentials(null)}>Закрыть</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

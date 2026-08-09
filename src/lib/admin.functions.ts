@@ -189,7 +189,10 @@ export const createAdminUser = createServerFn({ method: "POST" })
     if (extraRoles.length > 0) {
       const { error: roleError } = await supabaseAdmin
         .from("user_roles")
-        .insert(extraRoles.map((role) => ({ user_id: created.user.id, role })));
+        .upsert(
+          extraRoles.map((role) => ({ user_id: created.user.id, role })),
+          { onConflict: "user_id,role", ignoreDuplicates: true },
+        );
       if (roleError) throw new Error(roleError.message);
     }
     await logAction({
@@ -209,6 +212,7 @@ export const updateAdminUser = createServerFn({ method: "POST" })
       .object({
         userId: z.string().uuid(),
         fullName: z.string().min(2).optional(),
+        email: z.string().email().optional(),
         departmentId: z.string().uuid().nullish(),
         positionId: z.string().uuid().nullish(),
         professionId: z.string().uuid().nullish(),
@@ -222,6 +226,14 @@ export const updateAdminUser = createServerFn({ method: "POST" })
     const { assertRole, logAction } = await import("./admin.server");
     await assertRole(context.supabase, context.userId, [...STAFF]);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: currentProfile } = await supabaseAdmin
+      .from("profiles")
+      .select("email")
+      .eq("id", data.userId)
+      .maybeSingle();
+    const oldEmail = currentProfile?.email ?? null;
+
     const patch: Record<string, unknown> = {};
     if (data.fullName !== undefined) patch["full_name"] = data.fullName;
     if (data.departmentId !== undefined) patch["department_id"] = data.departmentId;
@@ -230,6 +242,22 @@ export const updateAdminUser = createServerFn({ method: "POST" })
     if (data.personnelNumber !== undefined) patch["personnel_number"] = data.personnelNumber;
     if (data.grade !== undefined) patch["grade"] = data.grade;
     if (data.isActive !== undefined) patch["is_active"] = data.isActive;
+
+    if (data.email && data.email !== oldEmail) {
+      const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(data.userId, {
+        email: data.email,
+        email_confirm: true,
+      });
+      if (authError) {
+        const msg = authError.message.toLowerCase();
+        if (msg.includes("already") || msg.includes("duplicate") || msg.includes("taken")) {
+          throw new Error("Этот email уже используется другим пользователем");
+        }
+        throw new Error(authError.message);
+      }
+      patch["email"] = data.email;
+    }
+
     const { error } = await supabaseAdmin
       .from("profiles")
       .update(patch as never)
@@ -240,7 +268,7 @@ export const updateAdminUser = createServerFn({ method: "POST" })
       action: data.isActive === false ? "user.block" : "user.update",
       entity: "profiles",
       entityId: data.userId,
-      details: patch,
+      details: { ...patch, oldEmail, newEmail: data.email ?? null },
     });
     return { ok: true };
   });

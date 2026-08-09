@@ -567,6 +567,7 @@ async function importEmployees(
     }
     await admin.from("profiles").update(values).eq("id", created.user.id);
     ctx.refs["profiles"]?.set(code, created.user.id);
+    report.credentials?.push({ fullName, email, password });
   }
 }
 

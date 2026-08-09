@@ -50,9 +50,9 @@ function ManagementPage() {
         {data.length === 0 ? (
           <EmptyState title="Раздел ещё не заполнен" description="Информация появится позже." />
         ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
-            {data.map((m) => (
-              <ManagementCard key={m.id} member={m} />
+          <div className="grid auto-rows-fr grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+            {data.map((m, i) => (
+              <ManagementCard key={m.id} member={m} index={i} />
             ))}
           </div>
         )}

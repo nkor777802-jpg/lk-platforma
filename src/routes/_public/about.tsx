@@ -23,6 +23,7 @@ export const Route = createFileRoute("/_public/about")({
 });
 
 function AboutPage() {
+  const company = useCompany();
   return (
     <>
       <div className="brand-pattern-blue text-secondary-foreground">

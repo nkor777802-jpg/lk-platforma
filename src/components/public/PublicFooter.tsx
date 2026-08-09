@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { brandLogos } from "@/lib/brand";
 import { company } from "@/content/site";
+import { useCompany } from "@/hooks/useCompany";
 
 export function PublicFooter() {
+  const company = useCompany();
   return (
     <footer className="brand-pattern-blue mt-auto text-secondary-foreground">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-3">

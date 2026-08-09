@@ -51,6 +51,7 @@ export const Route = createFileRoute("/_public/")({
 });
 
 function HomePage() {
+  const company = useCompany();
   const { data: professions } = useSuspenseQuery(publicProfessionsQuery);
 
   return (

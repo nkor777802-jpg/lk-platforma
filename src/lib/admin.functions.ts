@@ -613,3 +613,72 @@ export const saveSiteContacts = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+const contactRequestStatusSchema = z.enum(["new", "in_progress", "done", "archived"]);
+
+export const listContactRequests = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { assertRole } = await import("./admin.server");
+    await assertRole(context.supabase, context.userId, ["admin", "hr"]);
+    const { data, error } = await context.supabase
+      .from("contact_requests")
+      .select("id, full_name, unit, email, phone, message, status, created_at, updated_at")
+      .order("created_at", { ascending: false })
+      .limit(1000);
+    if (error) throw new Error(error.message);
+    return (data ?? []) as {
+      id: string;
+      full_name: string;
+      unit: string | null;
+      email: string | null;
+      phone: string | null;
+      message: string;
+      status: string;
+      created_at: string;
+      updated_at: string;
+    }[];
+  });
+
+export const updateContactRequestStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        status: contactRequestStatusSchema,
+        comment: z.string().trim().max(500).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { assertRole, logAction } = await import("./admin.server");
+    await assertRole(context.supabase, context.userId, ["admin", "hr"]);
+    const { error } = await context.supabase
+      .from("contact_requests")
+      .update({ status: data.status })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await logAction({
+      actorId: context.userId,
+      action: "contact_request.status.update",
+      entity: "contact_requests",
+      entityId: data.id,
+      details: { status: data.status, comment: data.comment ?? null },
+    });
+    return { ok: true as const };
+  });
+
+export const countNewContactRequests = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { assertRole } = await import("./admin.server");
+    await assertRole(context.supabase, context.userId, ["admin", "hr"]);
+    const { count, error } = await context.supabase
+      .from("contact_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "new");
+    if (error) throw new Error(error.message);
+    return count ?? 0;
+  });
+

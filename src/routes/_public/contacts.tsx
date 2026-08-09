@@ -5,7 +5,7 @@ import { ContactForm } from "@/components/public/ContactForm";
 
 const TITLE = "Контакты — Людиновокабель";
 const DESCRIPTION =
-  "Адрес, телефон и e-mail предприятия «Людиновокабель», контакты отдела подготовки и развития персонала.";
+  "Адрес, телефон и e-mail предприятия «Людиновокабель», контакты отдела персонала.";
 
 export const Route = createFileRoute("/_public/contacts")({
   head: () => ({
@@ -48,6 +48,7 @@ function ContactsPage() {
                     {company.phone}
                   </a>
                 </p>
+                <p>Внутренние телефоны отдела персонала: {company.internalPhones}</p>
                 <p>
                   E-mail:{" "}
                   <a className="text-primary underline underline-offset-4" href={`mailto:${company.email}`}>

@@ -26,6 +26,7 @@ export const listPublicProfessions = createServerFn({ method: "GET" }).handler(a
 });
 
 export const submitContactRequest = createServerFn({ method: "POST" })
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   .inputValidator((input: unknown) => contactSchema.parse(input))
   .handler(async ({ data }) => {
     if (!data.email && !data.phone) {

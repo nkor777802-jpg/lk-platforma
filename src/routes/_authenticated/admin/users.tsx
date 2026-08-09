@@ -328,6 +328,7 @@ function AdminUsersPage() {
           </DialogHeader>
           <div className="space-y-4">
             {textField("fullName", "ФИО")}
+            {textField("email", "Email", "email")}
             {textField("personnelNumber", "Табельный номер")}
             {textField("grade", "Разряд")}
             {selectField("departmentId", "Подразделение", optionList(departments))}

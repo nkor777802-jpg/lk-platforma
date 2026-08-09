@@ -89,6 +89,7 @@ function AdminUsersPage() {
         data: {
           userId: editing?.["id"] as string,
           fullName: form["fullName"] || undefined,
+          email: form["email"] || undefined,
           departmentId: form["departmentId"] || null,
           positionId: form["positionId"] || null,
           professionId: form["professionId"] || null,

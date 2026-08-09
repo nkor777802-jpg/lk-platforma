@@ -63,6 +63,15 @@ function AdminUsersPage() {
   const [createRoles, setCreateRoles] = useState<AppRole[]>(["employee"]);
   const [editing, setEditing] = useState<UserRow | null>(null);
   const [form, setForm] = useState<Record<string, string>>({});
+  const [showCreatePassword, setShowCreatePassword] = useState(false);
+  const [showEditPassword, setShowEditPassword] = useState(false);
+  const [createdCredentials, setCreatedCredentials] = useState<{ email: string; password: string } | null>(null);
+
+  useEffect(() => {
+    if (createOpen && !form["password"]) {
+      setForm((f) => ({ ...f, password: generatePassword() }));
+    }
+  }, [createOpen]);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin"] });
 
@@ -81,12 +90,12 @@ function AdminUsersPage() {
         },
       }),
     onSuccess: () => {
-      toast.success("Пользователь создан", {
-        description: "Передайте сотруднику e-mail и пароль — письмо не отправляется.",
-      });
+      toast.success("Пользователь создан");
+      setCreatedCredentials({ email: form["email"] ?? "", password: form["password"] ?? "" });
       setCreateOpen(false);
       setForm({});
       setCreateRoles(["employee"]);
+      setShowCreatePassword(false);
       void invalidate();
     },
     onError: (e: Error) => toast.error(e.message),

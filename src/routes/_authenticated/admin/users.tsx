@@ -30,13 +30,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-function generatePassword(length = 10) {
-  const chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789";
+function generatePassword(length = 16) {
+  const lower = "abcdefghjkmnpqrstuvwxyz";
+  const upper = "ABCDEFGHJKMNPQRSTUVWXYZ";
+  const digits = "23456789";
+  const symbols = "!@#$%^&*-_=+?";
+  const all = lower + upper + digits + symbols;
   let pwd = "";
-  for (let i = 0; i < length; i++) {
-    pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+  pwd += lower.charAt(Math.floor(Math.random() * lower.length));
+  pwd += upper.charAt(Math.floor(Math.random() * upper.length));
+  pwd += digits.charAt(Math.floor(Math.random() * digits.length));
+  pwd += symbols.charAt(Math.floor(Math.random() * symbols.length));
+  for (let i = 4; i < length; i++) {
+    pwd += all.charAt(Math.floor(Math.random() * all.length));
   }
-  return pwd;
+  return pwd
+    .split("")
+    .sort(() => Math.random() - 0.5)
+    .join("");
 }
 
 export const Route = createFileRoute("/_authenticated/admin/users")({

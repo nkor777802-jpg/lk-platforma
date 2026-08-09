@@ -6,7 +6,10 @@ import { toast } from "sonner";
 import { UserPlus } from "lucide-react";
 import { adminTableQuery, adminUsersQuery } from "@/lib/admin-queries";
 import { createAdminUser, setUserRoles, updateAdminUser } from "@/lib/admin.functions";
+import { ROLE_LABEL, getAssignableRoles, primaryRole, type AppRole } from "@/lib/roles";
+import { useAuth } from "@/hooks/useAuth";
 import { AdminTable, type Column } from "@/components/admin/AdminTable";
+import { RoleMultiSelect } from "@/components/admin/RoleMultiSelect";
 import { ErrorState, InlineLoading } from "@/components/states";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,25 +34,13 @@ export const Route = createFileRoute("/_authenticated/admin/users")({
   component: AdminUsersPage,
 });
 
-const ROLE_LABEL: Record<string, string> = {
-  employee: "Сотрудник",
-  manager: "Руководитель",
-  teacher: "Преподаватель",
-  hr: "HR",
-  admin: "Администратор",
-};
-
 type UserRow = Record<string, unknown>;
-
-/** Порядок приоритета: в таблице показываем максимальную роль сотрудника. */
-const ROLE_PRIORITY = ["admin", "hr", "teacher", "manager", "employee"] as const;
-
-function primaryRole(list: string[]): string {
-  return ROLE_PRIORITY.find((r) => list.includes(r)) ?? "employee";
-}
 
 function AdminUsersPage() {
   const qc = useQueryClient();
+  const { roles: actorRoles, isStaff, loading: authLoading } = useAuth();
+  const assignableRoles = getAssignableRoles(actorRoles);
+
   const users = useQuery(adminUsersQuery);
   const departments = useQuery(adminTableQuery("departments", "id, name", "name"));
   const positions = useQuery(adminTableQuery("positions", "id, name", "name"));
@@ -60,6 +51,7 @@ function AdminUsersPage() {
   const rolesFn = useServerFn(setUserRoles);
 
   const [createOpen, setCreateOpen] = useState(false);
+  const [createRoles, setCreateRoles] = useState<AppRole[]>(["employee"]);
   const [editing, setEditing] = useState<UserRow | null>(null);
   const [form, setForm] = useState<Record<string, string>>({});
 
@@ -72,7 +64,7 @@ function AdminUsersPage() {
           email: form["email"] ?? "",
           password: form["password"] ?? "",
           fullName: form["fullName"] ?? "",
-          role: (form["role"] ?? "employee") as "employee",
+          roles: createRoles,
           departmentId: form["departmentId"] || null,
           positionId: form["positionId"] || null,
           professionId: form["professionId"] || null,
@@ -83,6 +75,7 @@ function AdminUsersPage() {
       toast.success("Пользователь создан");
       setCreateOpen(false);
       setForm({});
+      setCreateRoles(["employee"]);
       void invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -120,10 +113,10 @@ function AdminUsersPage() {
   });
 
   const roleMutation = useMutation({
-    mutationFn: (p: { userId: string; role: string }) =>
-      rolesFn({ data: { userId: p.userId, roles: [p.role as "employee"] } }),
+    mutationFn: (p: { userId: string; roles: AppRole[] }) =>
+      rolesFn({ data: { userId: p.userId, roles: p.roles } }),
     onSuccess: () => {
-      toast.success("Роль изменена");
+      toast.success("Роли обновлены");
       void invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -147,26 +140,23 @@ function AdminUsersPage() {
     },
     {
       key: "roles",
-      label: "Роль",
+      label: "Роли",
       render: (r) => {
-        const list = (r["roles"] as string[]) ?? [];
-        const value = primaryRole(list);
+        const currentRoles = (r["roles"] as AppRole[]) ?? [];
+        const lockedRoles = currentRoles.filter((r) => !assignableRoles.includes(r));
+        const editableRoles = currentRoles.filter((r) => assignableRoles.includes(r));
+        const main = primaryRole(currentRoles);
         return (
-          <Select
-            value={value}
-            onValueChange={(role) => roleMutation.mutate({ userId: r["id"] as string, role })}
-          >
-            <SelectTrigger className="w-44">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(ROLE_LABEL).map(([v, l]) => (
-                <SelectItem key={v} value={v}>
-                  {l}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex min-w-[16rem] flex-wrap items-center gap-2">
+            <Badge variant="secondary">{ROLE_LABEL[main]}</Badge>
+            <RoleMultiSelect
+              value={editableRoles}
+              options={assignableRoles}
+              disabledOptions={lockedRoles}
+              placeholder="Изменить роли"
+              onChange={(next) => roleMutation.mutate({ userId: r["id"] as string, roles: next })}
+            />
+          </div>
         );
       },
     },
@@ -256,6 +246,8 @@ function AdminUsersPage() {
     </div>
   );
 
+  if (authLoading) return <InlineLoading />;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -265,15 +257,18 @@ function AdminUsersPage() {
             Создание, роли, подразделения, профессии и доступ сотрудников.
           </p>
         </div>
-        <Button
-          onClick={() => {
-            setForm({ role: "employee" });
-            setCreateOpen(true);
-          }}
-        >
-          <UserPlus className="mr-1.5 h-4 w-4" />
-          Новый пользователь
-        </Button>
+        {isStaff && (
+          <Button
+            onClick={() => {
+              setForm({});
+              setCreateRoles(["employee"]);
+              setCreateOpen(true);
+            }}
+          >
+            <UserPlus className="mr-1.5 h-4 w-4" />
+            Новый пользователь
+          </Button>
+        )}
       </div>
 
       {users.isPending ? (
@@ -299,11 +294,14 @@ function AdminUsersPage() {
             {textField("email", "Email *", "email")}
             {textField("password", "Временный пароль * (мин. 8 символов)", "password")}
             {textField("personnelNumber", "Табельный номер")}
-            {selectField(
-              "role",
-              "Роль",
-              Object.entries(ROLE_LABEL).map(([v, l]) => ({ value: v, label: l })),
-            )}
+            <div className="space-y-1.5">
+              <Label>Роли</Label>
+              <RoleMultiSelect
+                value={createRoles}
+                options={assignableRoles}
+                onChange={setCreateRoles}
+              />
+            </div>
             {selectField("departmentId", "Подразделение", optionList(departments))}
             {selectField("positionId", "Должность", optionList(positions))}
             {selectField("professionId", "Профессия", optionList(professions))}

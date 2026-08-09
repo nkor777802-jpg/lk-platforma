@@ -1,8 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { type AppRole, canAssignRole, getAssignableRoles } from "@/lib/roles";
 
 const STAFF = ["admin", "hr"] as const;
+const ALL_ROLES = ["employee", "manager", "hr", "admin", "teacher"] as const satisfies AppRole[];
 
 export const adminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -105,12 +107,33 @@ export const listAdminUsers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { assertRole } = await import("./admin.server");
-    await assertRole(context.supabase, context.userId, [...STAFF, "manager"]);
+    const actorRoles = await assertRole(context.supabase, context.userId, [...STAFF, "manager"]);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: profiles } = await supabaseAdmin
+
+    let query = supabaseAdmin
       .from("profiles")
       .select("*, departments(name), professions(name), positions(name)")
       .order("full_name");
+
+    const isManagerOnly =
+      !actorRoles.includes("admin") &&
+      !actorRoles.includes("hr") &&
+      actorRoles.includes("manager");
+
+    if (isManagerOnly) {
+      const { data: me } = await supabaseAdmin
+        .from("profiles")
+        .select("department_id")
+        .eq("id", context.userId)
+        .maybeSingle();
+      if (me?.department_id) {
+        query = query.or(`department_id.eq.${me.department_id},manager_id.eq.${context.userId}`);
+      } else {
+        query = query.eq("manager_id", context.userId);
+      }
+    }
+
+    const { data: profiles } = await query;
     const { data: roles } = await supabaseAdmin.from("user_roles").select("user_id, role");
     return (profiles ?? []).map((p) => ({
       ...p,
@@ -126,7 +149,7 @@ export const createAdminUser = createServerFn({ method: "POST" })
         email: z.string().email(),
         password: z.string().min(8),
         fullName: z.string().min(2),
-        role: z.enum(["employee", "manager", "hr", "admin", "teacher"]),
+        roles: z.array(z.enum(ALL_ROLES)).min(1),
         departmentId: z.string().uuid().nullish(),
         positionId: z.string().uuid().nullish(),
         professionId: z.string().uuid().nullish(),
@@ -136,9 +159,11 @@ export const createAdminUser = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { assertRole, logAction } = await import("./admin.server");
-    const roles = await assertRole(context.supabase, context.userId, [...STAFF]);
-    if (data.role === "admin" && !roles.includes("admin"))
-      throw new Error("Права администратора выдаёт только администратор");
+    const actorRoles = await assertRole(context.supabase, context.userId, [...STAFF]);
+    const forbidden = data.roles.find((r) => !canAssignRole(actorRoles, r));
+    if (forbidden) {
+      throw new Error(`Роль «${forbidden}» не может быть назначена вашей ролью`);
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
@@ -160,15 +185,19 @@ export const createAdminUser = createServerFn({ method: "POST" })
       })
       .eq("id", created.user.id);
 
-    if (data.role !== "employee") {
-      await supabaseAdmin.from("user_roles").insert({ user_id: created.user.id, role: data.role });
+    const extraRoles = data.roles.filter((r) => r !== "employee");
+    if (extraRoles.length > 0) {
+      const { error: roleError } = await supabaseAdmin
+        .from("user_roles")
+        .insert(extraRoles.map((role) => ({ user_id: created.user.id, role })));
+      if (roleError) throw new Error(roleError.message);
     }
     await logAction({
       actorId: context.userId,
       action: "user.create",
       entity: "profiles",
       entityId: created.user.id,
-      details: { email: data.email, role: data.role },
+      details: { email: data.email, roles: data.roles },
     });
     return { id: created.user.id };
   });
@@ -222,21 +251,63 @@ export const setUserRoles = createServerFn({ method: "POST" })
     z
       .object({
         userId: z.string().uuid(),
-        roles: z.array(z.enum(["employee", "manager", "hr", "admin", "teacher"])),
+        roles: z.array(z.enum(ALL_ROLES)),
       })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { assertRole, logAction } = await import("./admin.server");
-    const actorRoles = await assertRole(context.supabase, context.userId, [...STAFF]);
-    if (data.roles.includes("admin") && !actorRoles.includes("admin"))
-      throw new Error("Права администратора выдаёт только администратор");
+    const actorRoles = await assertRole(context.supabase, context.userId, [...STAFF, "manager"]);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const forbidden = data.roles.find((r) => !canAssignRole(actorRoles, r));
+    if (forbidden) {
+      throw new Error(`Роль «${forbidden}» не может быть назначена вашей ролью`);
+    }
+
+    const isManagerOnly =
+      !actorRoles.includes("admin") &&
+      !actorRoles.includes("hr") &&
+      actorRoles.includes("manager");
+    if (isManagerOnly) {
+      const { data: allowed } = await context.supabase.rpc("manages_user", {
+        _manager: context.userId,
+        _target: data.userId,
+      });
+      if (!allowed) {
+        throw new Error("Вы можете изменять роли только своим подчинённым");
+      }
+    }
+
+    const { data: currentRows } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.userId);
+    const currentRoles = ((currentRows ?? []) as { role: AppRole }[]).map((r) => r.role);
+    const assignable = new Set(getAssignableRoles(actorRoles));
+    const protectedRoles = currentRoles.filter((r) => !assignable.has(r));
+
+    if (
+      data.userId === context.userId &&
+      currentRoles.includes("admin") &&
+      !data.roles.includes("admin")
+    ) {
+      const { count } = await supabaseAdmin
+        .from("user_roles")
+        .select("user_id", { count: "exact", head: true })
+        .eq("role", "admin")
+        .neq("user_id", data.userId);
+      if (!count || count === 0) {
+        throw new Error("Нельзя снять с себя права администратора, если вы единственный администратор");
+      }
+    }
+
+    const finalRoles = Array.from(new Set([...protectedRoles, ...data.roles]));
     await supabaseAdmin.from("user_roles").delete().eq("user_id", data.userId);
-    if (data.roles.length > 0) {
+    if (finalRoles.length > 0) {
       const { error } = await supabaseAdmin
         .from("user_roles")
-        .insert(data.roles.map((role) => ({ user_id: data.userId, role })));
+        .insert(finalRoles.map((role) => ({ user_id: data.userId, role })));
       if (error) throw new Error(error.message);
     }
     await logAction({
@@ -244,7 +315,7 @@ export const setUserRoles = createServerFn({ method: "POST" })
       action: "user.roles",
       entity: "user_roles",
       entityId: data.userId,
-      details: { roles: data.roles },
+      details: { roles: finalRoles },
     });
     return { ok: true };
   });

@@ -545,7 +545,7 @@ async function importEmployees(
     }
     report.created += 1;
     if (dryRun) continue;
-    const password = `Lk-${crypto.randomUUID().slice(0, 12)}`;
+    const password = `Lk${crypto.randomUUID().replace(/-/g, "").slice(0, 10)}!7`;
     const { data: created, error } = await admin.auth.admin.createUser({
       email,
       password,

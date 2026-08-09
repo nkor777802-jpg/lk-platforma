@@ -604,6 +604,7 @@ export async function runImport(input: {
     preview: [],
     committed: !input.dryRun,
     status: "success",
+    credentials: [],
   };
 
   const available = Object.keys(sheets);

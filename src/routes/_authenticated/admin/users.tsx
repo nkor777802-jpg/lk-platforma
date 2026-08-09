@@ -467,6 +467,13 @@ function AdminUsersPage() {
           <div className="space-y-4">
             {textField("fullName", "ФИО")}
             {textField("email", "Email", "email")}
+            {passwordField(
+              "editPassword",
+              "Новый пароль (мин. 8 символов, оставьте пустым, чтобы не менять)",
+              showEditPassword,
+              setShowEditPassword,
+              true,
+            )}
             {textField("personnelNumber", "Табельный номер")}
             {textField("grade", "Разряд")}
             {selectField("departmentId", "Подразделение", optionList(departments))}

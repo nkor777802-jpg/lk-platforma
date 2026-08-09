@@ -1,7 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { brandLogos } from "@/lib/brand";
@@ -9,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -27,17 +25,9 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const signUpSchema = z.object({
-  fullName: z.string().trim().min(3, "Укажите ФИО полностью").max(120),
-  personnelNumber: z.string().trim().max(30).optional(),
-  email: z.string().trim().email("Некорректный e-mail").max(255),
-  password: z.string().min(8, "Минимум 8 символов").max(72),
-});
-
 function AuthPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -64,44 +54,6 @@ function AuthPage() {
     });
     setLoading(false);
     if (error) toast.error("Не удалось войти", { description: error.message });
-  };
-
-  const signUp = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = new FormData(e.currentTarget);
-    const parsed = signUpSchema.safeParse({
-      fullName: form.get("fullName"),
-      personnelNumber: form.get("personnelNumber") || undefined,
-      email: form.get("email"),
-      password: form.get("password"),
-    });
-    if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? "Проверьте поля формы");
-      return;
-    }
-    setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email: parsed.data.email,
-      password: parsed.data.password,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: {
-          full_name: parsed.data.fullName,
-          personnel_number: parsed.data.personnelNumber ?? null,
-        },
-      },
-    });
-    setLoading(false);
-    if (error) {
-      toast.error("Не удалось зарегистрироваться", { description: error.message });
-      return;
-    }
-    if (!data.session) {
-      setEmailSent(true);
-      toast.success("Подтвердите e-mail", {
-        description: "Мы отправили письмо со ссылкой подтверждения.",
-      });
-    }
   };
 
   const google = async () => {
@@ -136,57 +88,19 @@ function AuthPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {emailSent ? (
-              <p className="rounded-md bg-accent/10 p-4 text-sm text-foreground">
-                Проверьте почту и перейдите по ссылке подтверждения, затем войдите в систему.
-              </p>
-            ) : null}
-            <Tabs defaultValue="signin" className="mt-2">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Вход</TabsTrigger>
-                <TabsTrigger value="signup">Регистрация</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="signin">
-                <form onSubmit={signIn} className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="si-email">Рабочий e-mail</Label>
-                    <Input id="si-email" name="email" type="email" required maxLength={255} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="si-password">Пароль</Label>
-                    <Input id="si-password" name="password" type="password" required />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    Войти
-                  </Button>
-                </form>
-              </TabsContent>
-
-              <TabsContent value="signup">
-                <form onSubmit={signUp} className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="su-name">ФИО</Label>
-                    <Input id="su-name" name="fullName" required maxLength={120} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="su-pn">Табельный номер</Label>
-                    <Input id="su-pn" name="personnelNumber" maxLength={30} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="su-email">Рабочий e-mail</Label>
-                    <Input id="su-email" name="email" type="email" required maxLength={255} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="su-password">Пароль</Label>
-                    <Input id="su-password" name="password" type="password" required minLength={8} />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    Зарегистрироваться
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
+            <form onSubmit={signIn} className="space-y-4 pt-2">
+              <div className="space-y-2">
+                <Label htmlFor="si-email">Рабочий e-mail</Label>
+                <Input id="si-email" name="email" type="email" required maxLength={255} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="si-password">Пароль</Label>
+                <Input id="si-password" name="password" type="password" required />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                Войти
+              </Button>
+            </form>
 
             <div className="my-5 flex items-center gap-3 text-xs uppercase text-muted-foreground">
               <span className="h-px flex-1 bg-border" />
@@ -196,6 +110,9 @@ function AuthPage() {
             <Button variant="outline" className="w-full" onClick={google}>
               Войти через Google
             </Button>
+            <p className="mt-5 text-center text-sm text-muted-foreground">
+              Учётную запись создаёт отдел персонала. Обратитесь к администратору.
+            </p>
           </CardContent>
         </Card>
       </div>

@@ -19,7 +19,7 @@ export function ManagementCard({
   return (
     <Card
       tabIndex={0}
-      style={{ animationDelay: `${index * 300}ms`, animationFillMode: "backwards" }}
+      style={{ animationDelay: `${index * 2000}ms`, animationFillMode: "backwards" }}
       className="group flex h-full animate-fade-in flex-col overflow-hidden p-0 transition-all duration-300 hover:-translate-y-1 hover:border-secondary hover:shadow-[0_12px_30px_-12px_color-mix(in_oklab,var(--secondary)_55%,transparent)] focus:-translate-y-1 focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:ring-offset-2 focus:ring-offset-background focus-visible:-translate-y-1 focus-visible:border-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-secondary/10">

@@ -231,3 +231,27 @@
   background-size: 320px 320px;
   color: var(--secondary-foreground);
 }
+
+/* Анимация плавного появления */
+@utility animate-fade-in {
+  animation: fade-in 0.5s ease-out both;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

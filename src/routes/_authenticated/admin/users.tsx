@@ -50,6 +50,13 @@ function generatePassword(length = 16) {
     .join("");
 }
 
+function normalizePasswordError(message: string) {
+  if (message.toLowerCase().includes("weak") || message.toLowerCase().includes("pwned")) {
+    return "Пароль слишком простой или скомпрометирован. Сгенерируйте другой.";
+  }
+  return message;
+}
+
 export const Route = createFileRoute("/_authenticated/admin/users")({
   component: AdminUsersPage,
 });

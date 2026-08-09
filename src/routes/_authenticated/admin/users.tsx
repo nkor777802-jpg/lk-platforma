@@ -140,7 +140,7 @@ function AdminUsersPage() {
       setShowEditPassword(false);
       void invalidate();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(normalizePasswordError(e.message)),
   });
 
   const blockMutation = useMutation({

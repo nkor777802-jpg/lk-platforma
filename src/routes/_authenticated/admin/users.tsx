@@ -246,6 +246,8 @@ function AdminUsersPage() {
     </div>
   );
 
+  if (authLoading) return <InlineLoading />;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">

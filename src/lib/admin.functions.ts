@@ -107,12 +107,33 @@ export const listAdminUsers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { assertRole } = await import("./admin.server");
-    await assertRole(context.supabase, context.userId, [...STAFF, "manager"]);
+    const actorRoles = await assertRole(context.supabase, context.userId, [...STAFF, "manager"]);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: profiles } = await supabaseAdmin
+
+    let query = supabaseAdmin
       .from("profiles")
       .select("*, departments(name), professions(name), positions(name)")
       .order("full_name");
+
+    const isManagerOnly =
+      !actorRoles.includes("admin") &&
+      !actorRoles.includes("hr") &&
+      actorRoles.includes("manager");
+
+    if (isManagerOnly) {
+      const { data: me } = await supabaseAdmin
+        .from("profiles")
+        .select("department_id")
+        .eq("id", context.userId)
+        .maybeSingle();
+      if (me?.department_id) {
+        query = query.or(`department_id.eq.${me.department_id},manager_id.eq.${context.userId}`);
+      } else {
+        query = query.eq("manager_id", context.userId);
+      }
+    }
+
+    const { data: profiles } = await query;
     const { data: roles } = await supabaseAdmin.from("user_roles").select("user_id, role");
     return (profiles ?? []).map((p) => ({
       ...p,

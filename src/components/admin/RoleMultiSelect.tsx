@@ -12,6 +12,7 @@ interface RoleMultiSelectProps {
   onChange: (value: AppRole[]) => void;
   placeholder?: string;
   disabled?: boolean;
+  disabledOptions?: AppRole[];
 }
 
 export function RoleMultiSelect({
@@ -20,10 +21,13 @@ export function RoleMultiSelect({
   onChange,
   placeholder = "Выберите роли",
   disabled,
+  disabledOptions = [],
 }: RoleMultiSelectProps) {
   const [open, setOpen] = useState(false);
+  const locked = new Set(disabledOptions);
 
   const toggle = (role: AppRole) => {
+    if (locked.has(role)) return;
     if (value.includes(role)) {
       onChange(value.filter((r) => r !== role));
     } else {
@@ -60,15 +64,20 @@ export function RoleMultiSelect({
         <div className="flex flex-col gap-1">
           {options.map((role) => {
             const checked = value.includes(role);
+            const isLocked = locked.has(role);
             return (
               <label
                 key={role}
                 className={cn(
-                  "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted",
+                  "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
+                  isLocked
+                    ? "cursor-not-allowed text-muted-foreground"
+                    : "cursor-pointer hover:bg-muted",
                 )}
               >
                 <Checkbox
                   checked={checked}
+                  disabled={isLocked}
                   onCheckedChange={() => toggle(role)}
                 />
                 <span className="flex-1">{ROLE_LABEL[role]}</span>

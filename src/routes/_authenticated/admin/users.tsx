@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { UserPlus } from "lucide-react";
+import { Copy, Eye, EyeOff, RefreshCw, UserPlus } from "lucide-react";
 import { adminTableQuery, adminUsersQuery } from "@/lib/admin-queries";
 import { createAdminUser, setUserRoles, updateAdminUser } from "@/lib/admin.functions";
 import { ROLE_LABEL, getAssignableRoles, primaryRole, type AppRole } from "@/lib/roles";
@@ -29,6 +29,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+function generatePassword(length = 10) {
+  const chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  let pwd = "";
+  for (let i = 0; i < length; i++) {
+    pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return pwd;
+}
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
   component: AdminUsersPage,

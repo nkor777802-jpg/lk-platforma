@@ -23,6 +23,7 @@ export interface ImportReport {
   preview: { sheet: string; rows: Record<string, string>[] }[];
   committed: boolean;
   status: "success" | "warning" | "error";
+  credentials?: { fullName: string; email: string; password: string }[];
 }
 
 type Row = Record<string, string>;

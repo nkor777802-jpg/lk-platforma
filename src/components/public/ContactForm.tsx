@@ -65,7 +65,7 @@ export function ContactForm() {
       <div className="rounded-lg border border-border bg-card p-6">
         <h3 className="text-lg font-semibold text-foreground">Обращение принято</h3>
         <p className="mt-2 text-sm text-muted-foreground">
-          Отдел подготовки и развития персонала свяжется с вами в рабочее время.
+          Отдел персонала свяжется с вами в рабочее время.
         </p>
         <Button variant="outline" className="mt-4" onClick={() => setSent(false)}>
           Отправить ещё одно

@@ -99,7 +99,7 @@ function ProfilePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Кадровые данные (подразделение, должность, профессия, разряд) изменяет отдел кадров.
+            Кадровые данные (подразделение, должность, профессия, разряд) изменяет отдел персонала.
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">

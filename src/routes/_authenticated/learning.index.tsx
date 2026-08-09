@@ -59,7 +59,7 @@ function LearningPage() {
       <div>
         <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Мое обучение</h1>
         <p className="mt-2 text-muted-foreground">
-          Программы, назначенные вам руководителем или отделом кадров.
+          Программы, назначенные вам руководителем или отделом персонала.
         </p>
       </div>
 

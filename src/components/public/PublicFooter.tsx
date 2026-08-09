@@ -32,6 +32,7 @@ export function PublicFooter() {
             <p>
               Телефон: <a className="underline underline-offset-4" href={`tel:${company.phone.replace(/[^+\d]/g, "")}`}>{company.phone}</a>
             </p>
+            <p>Внутренние телефоны отдела персонала: {company.internalPhones}</p>
             <p>
               E-mail: <a className="underline underline-offset-4" href={`mailto:${company.email}`}>{company.email}</a>
             </p>

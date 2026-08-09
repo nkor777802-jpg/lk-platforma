@@ -447,7 +447,9 @@ function AdminUsersPage() {
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Передайте сотруднику логин и пароль — письмо не отправляется.
+              Файл с логином и паролем выгружен автоматически. Передайте данные сотруднику — письмо
+              не отправляется. Роль по умолчанию: «Сотрудник», изменить можно в таблице
+              пользователей.
             </p>
             <div className="space-y-1.5">
               <Label>Логин (email)</Label>
@@ -498,6 +500,13 @@ function AdminUsersPage() {
             </div>
           </div>
           <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => createdCredentials && downloadCredentialsCsv([createdCredentials])}
+            >
+              <Download className="mr-1.5 h-4 w-4" />
+              Скачать файл
+            </Button>
             <Button onClick={() => setCreatedCredentials(null)}>Закрыть</Button>
           </DialogFooter>
         </DialogContent>

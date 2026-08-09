@@ -19,7 +19,7 @@ export function PublicHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4">
-        <Link to="/" className="shrink-0" aria-label="На главную">
+        <Link to="/" className="notranslate shrink-0" translate="no" aria-label="На главную">
           <img
             src={brandLogos.fullCompactColor}
             alt={brandLogos.alt}
@@ -36,7 +36,11 @@ export function PublicHeader() {
           />
         </Link>
 
-        <nav aria-label="Основная навигация" className="hidden flex-1 items-center gap-1 lg:flex">
+        <nav
+          aria-label="Основная навигация"
+          translate="no"
+          className="notranslate hidden flex-1 items-center gap-1 lg:flex"
+        >
           {NAV.map((item) => (
             <Link
               key={item.to}
@@ -79,7 +83,11 @@ export function PublicHeader() {
       </div>
 
       {open ? (
-        <nav aria-label="Мобильная навигация" className="border-t border-border bg-card lg:hidden">
+        <nav
+          aria-label="Мобильная навигация"
+          translate="no"
+          className="notranslate border-t border-border bg-card lg:hidden"
+        >
           <div className="mx-auto flex max-w-7xl flex-col p-2">
             {NAV.map((item) => (
               <Link

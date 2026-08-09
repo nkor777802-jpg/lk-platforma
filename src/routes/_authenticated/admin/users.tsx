@@ -185,6 +185,7 @@ function AdminUsersPage() {
               setEditing(r);
               setForm({
                 fullName: String(r["full_name"] ?? ""),
+                email: String(r["email"] ?? ""),
                 departmentId: String(r["department_id"] ?? ""),
                 positionId: String(r["position_id"] ?? ""),
                 professionId: String(r["profession_id"] ?? ""),

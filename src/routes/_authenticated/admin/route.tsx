@@ -8,6 +8,7 @@ import {
   Factory,
   FileText,
   FolderTree,
+  Inbox,
   ListChecks,
   Menu,
   PenLine,
@@ -18,6 +19,7 @@ import {
   Upload,
   Users,
 } from "lucide-react";
+
 import { useAuth } from "@/hooks/useAuth";
 import { EmptyState, InlineLoading } from "@/components/states";
 import { Button } from "@/components/ui/button";

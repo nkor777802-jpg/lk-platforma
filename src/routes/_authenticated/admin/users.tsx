@@ -30,6 +30,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+function downloadCredentialsCsv(rows: { fullName: string; email: string; password: string }[]) {
+  const csv = [
+    ["ФИО", "Логин (email)", "Пароль", "Роль"],
+    ...rows.map((r) => [r.fullName, r.email, r.password, "Сотрудник"]),
+  ]
+    .map((line) => line.map((c) => `"${String(c ?? "").replace(/"/g, '""')}"`).join(";"))
+    .join("\r\n");
+  const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Учетные_данные_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function generatePassword(length = 16) {
   const lower = "abcdefghjkmnpqrstuvwxyz";
   const upper = "ABCDEFGHJKMNPQRSTUVWXYZ";

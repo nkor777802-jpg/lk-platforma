@@ -10,6 +10,8 @@ import {
   professionsQuery,
 } from "@/lib/lms-queries";
 import { myAssignmentsQuery, myNotificationsQuery } from "@/lib/account-queries";
+import { TodayTasks } from "@/components/account/TodayTasks";
+import { trainingTypeLabel } from "@/lib/training-types";
 import { EmptyState, InlineLoading } from "@/components/states";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -65,6 +67,8 @@ function DashboardPage() {
         </p>
       </div>
 
+      <TodayTasks />
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard icon={BookOpen} label="Изучено материалов" value={String(completed)} />
         <StatCard icon={ClipboardCheck} label="Попыток тестирования" value={String(attempts.data?.length ?? 0)} />
@@ -113,6 +117,7 @@ function DashboardPage() {
                   <span className="font-medium">
                     {a.courses?.title ?? a.professions?.name ?? "Программа обучения"}
                   </span>
+                  <Badge variant="secondary">{trainingTypeLabel(a.training_type)}</Badge>
                   {a.due_date ? (
                     <Badge
                       variant={new Date(a.due_date) < today ? "destructive" : "secondary"}

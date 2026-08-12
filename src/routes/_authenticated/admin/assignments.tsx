@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { adminTableQuery, adminUsersQuery } from "@/lib/admin-queries";
 import { EntityManager } from "@/components/admin/EntityManager";
+import { TRAINING_TYPE_OPTIONS, trainingTypeLabel } from "@/lib/training-types";
 
 export const Route = createFileRoute("/_authenticated/admin/assignments")({
   component: AssignmentsPage,
@@ -46,7 +47,22 @@ function AssignmentsPage() {
               label: String(u["full_name"] ?? u["email"] ?? ""),
             })),
           },
+          {
+            name: "training_type",
+            label: "Тип обучения",
+            type: "select",
+            required: true,
+            options: TRAINING_TYPE_OPTIONS,
+          },
           { name: "profession_id", label: "Профессия", type: "select", options: opt(professions.data, "name") },
+          {
+            name: "target_profession_id",
+            label: "Целевая профессия (для новой профессии)",
+            type: "select",
+            options: opt(professions.data, "name"),
+          },
+          { name: "current_grade", label: "Текущий разряд" },
+          { name: "target_grade", label: "Целевой разряд" },
           { name: "course_id", label: "Курс", type: "select", options: opt(courses.data, "title") },
           { name: "group_id", label: "Группа", type: "select", options: opt(groups.data, "name") },
           { name: "department_id", label: "Подразделение", type: "select", options: opt(departments.data, "name") },
@@ -80,6 +96,11 @@ function AssignmentsPage() {
               (r["courses"] as { title?: string } | null)?.title ??
               (r["professions"] as { name?: string } | null)?.name ??
               "—",
+          },
+          {
+            key: "training_type",
+            label: "Тип обучения",
+            render: (r) => trainingTypeLabel(r["training_type"] as string | null),
           },
           { key: "assigned_at", label: "Назначено" },
           { key: "due_date", label: "Срок" },

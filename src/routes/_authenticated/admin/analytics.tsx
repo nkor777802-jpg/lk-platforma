@@ -18,6 +18,7 @@ import {
 import { Download, RefreshCw } from "lucide-react";
 import { analyticsDashboardQuery, analyticsFiltersQuery } from "@/lib/analytics-queries";
 import { exportCsv } from "@/lib/admin.functions";
+import { TRAINING_TYPE_OPTIONS } from "@/lib/training-types";
 import { AdminTable } from "@/components/admin/AdminTable";
 import { EmptyState, ErrorState, InlineLoading } from "@/components/states";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,7 @@ function AnalyticsPage() {
   const [departmentId, setDepartmentId] = useState(ALL);
   const [professionId, setProfessionId] = useState(ALL);
   const [courseId, setCourseId] = useState(ALL);
+  const [trainingType, setTrainingType] = useState(ALL);
   const [granularity, setGranularity] = useState<"month" | "quarter" | "year">("month");
 
   const options = useQuery(analyticsFiltersQuery);
@@ -67,6 +69,7 @@ function AnalyticsPage() {
     departmentId: departmentId === ALL ? null : departmentId,
     professionId: professionId === ALL ? null : professionId,
     courseId: courseId === ALL ? null : courseId,
+    trainingType: trainingType === ALL ? null : trainingType,
     granularity,
   };
   const dash = useQuery(analyticsDashboardQuery(input));
@@ -166,6 +169,22 @@ function AnalyticsPage() {
                 {(options.data?.courses ?? []).map((c) => (
                   <SelectItem key={c.id} value={c.id}>
                     {c.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label>Тип обучения</Label>
+            <Select value={trainingType} onValueChange={setTrainingType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Все" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL}>Все</SelectItem>
+                {TRAINING_TYPE_OPTIONS.map((t) => (
+                  <SelectItem key={t.value} value={t.value}>
+                    {t.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -275,6 +294,7 @@ function AnalyticsPage() {
               <TabsTrigger value="professions">Профессии</TabsTrigger>
               <TabsTrigger value="employees">Сотрудники</TabsTrigger>
               <TabsTrigger value="courses">Курсы</TabsTrigger>
+              <TabsTrigger value="training">Типы обучения</TabsTrigger>
               <TabsTrigger value="topics">Проблемные темы</TabsTrigger>
             </TabsList>
 
@@ -336,6 +356,26 @@ function AnalyticsPage() {
                 }
                 columns={[
                   { key: "name", label: "Курс" },
+                  { key: "assigned", label: "Назначено" },
+                  { key: "completed", label: "Завершено" },
+                  { key: "completionRate", label: "Завершение, %" },
+                  { key: "overdue", label: "Просрочено" },
+                ]}
+              />
+            </TabsContent>
+
+            <TabsContent value="training" className="space-y-4 pt-6">
+              <div className="rounded-lg border border-border bg-card p-4 text-sm">
+                Адаптация: активных программ {dash.data.onboarding.active}, завершено{" "}
+                {dash.data.onboarding.completed} из {dash.data.onboarding.total} (
+                {dash.data.onboarding.completionRate}%)
+              </div>
+              <AdminTable
+                rows={dash.data.byTrainingType as unknown as Record<string, unknown>[]}
+                searchKeys={["name"]}
+                emptyTitle="Назначений нет"
+                columns={[
+                  { key: "name", label: "Тип обучения" },
                   { key: "assigned", label: "Назначено" },
                   { key: "completed", label: "Завершено" },
                   { key: "completionRate", label: "Завершение, %" },

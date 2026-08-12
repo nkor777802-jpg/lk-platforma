@@ -20,6 +20,7 @@ import {
   TrendingUp,
   Upload,
   Users,
+  Sparkles,
 } from "lucide-react";
 
 import { useAuth } from "@/hooks/useAuth";
@@ -57,6 +58,7 @@ export const ADMIN_NAV = [
   { to: "/admin/org", label: "Оргструктура", icon: FolderTree, roles: STAFF },
   { to: "/admin/courses", label: "Курсы", icon: BookOpen, roles: ["admin", "hr", "teacher"] },
   { to: "/admin/materials", label: "Материалы", icon: FileText, roles: ["admin", "hr", "teacher"] },
+  { to: "/admin/onboarding", label: "Адаптация", icon: Sparkles, roles: ["admin", "hr", "manager"] },
   { to: "/admin/assignments", label: "Назначения", icon: ClipboardList, roles: ["admin", "hr", "manager"] },
   { to: "/admin/requests", label: "Заявки", icon: Inbox, roles: STAFF },
   { to: "/admin/development", label: "Развитие", icon: TrendingUp, roles: STAFF },

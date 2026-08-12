@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { adminTableQuery } from "@/lib/admin-queries";
 import { EntityManager } from "@/components/admin/EntityManager";
+import { TEST_SCOPE_OPTIONS } from "@/lib/training-types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -152,6 +153,7 @@ function TestsPage() {
             searchKeys={[]}
             fields={[
               { name: "profession_id", label: "Профессия (пусто — по умолчанию)", type: "select", options: profOptions },
+              { name: "test_scope", label: "Тип теста", type: "select", options: TEST_SCOPE_OPTIONS },
               { name: "total_questions", label: "Всего вопросов", type: "number", required: true },
               { name: "common_questions", label: "Общих вопросов", type: "number" },
               { name: "professional_questions", label: "Профессиональных вопросов", type: "number" },

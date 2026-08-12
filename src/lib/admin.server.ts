@@ -88,6 +88,11 @@ export const MANAGED_TABLES_V2 = {
   defects: { soft: "is_active" },
   model_assets: { soft: "is_active" },
   product_categories: { soft: "is_active" },
+  onboarding_templates: { soft: "is_active" },
+  onboarding_template_items: { soft: "none" },
+  onboarding_programs: { soft: "none" },
+  onboarding_program_items: { soft: "none" },
+  employee_competencies: { soft: "none" },
 } as const;
 
 export type ManagedTable = keyof typeof MANAGED_TABLES;

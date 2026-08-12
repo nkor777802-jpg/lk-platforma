@@ -20,6 +20,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDevelopmentRouteImport } from './routes/_authenticated/development'
 import { Route as AuthenticatedGamificationRouteImport } from './routes/_authenticated/gamification'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedTestsRouteImport } from './routes/_authenticated/tests'
@@ -42,6 +43,7 @@ import { Route as AuthenticatedAdminExportRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminGamificationRouteImport } from './routes/_authenticated/admin/gamification'
 import { Route as AuthenticatedAdminImportRouteImport } from './routes/_authenticated/admin/import'
 import { Route as AuthenticatedAdminMaterialsRouteImport } from './routes/_authenticated/admin/materials'
+import { Route as AuthenticatedAdminOnboardingRouteImport } from './routes/_authenticated/admin/onboarding'
 import { Route as AuthenticatedAdminOrgRouteImport } from './routes/_authenticated/admin/org'
 import { Route as AuthenticatedAdminProductionRouteImport } from './routes/_authenticated/admin/production'
 import { Route as AuthenticatedAdminRequestsRouteImport } from './routes/_authenticated/admin/requests'
@@ -113,6 +115,11 @@ const AuthenticatedGamificationRoute =
 const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   id: '/library',
   path: '/library',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProductsRoute = AuthenticatedProductsRouteImport.update({
@@ -234,6 +241,12 @@ const AuthenticatedAdminMaterialsRoute =
     path: '/materials',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminOnboardingRoute =
+  AuthenticatedAdminOnboardingRouteImport.update({
+    id: '/onboarding',
+    path: '/onboarding',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminOrgRoute = AuthenticatedAdminOrgRouteImport.update({
   id: '/org',
   path: '/org',
@@ -338,6 +351,7 @@ export interface FileRoutesByFullPath {
   '/development': typeof AuthenticatedDevelopmentRoute
   '/gamification': typeof AuthenticatedGamificationRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/tests': typeof AuthenticatedTestsRoute
@@ -358,6 +372,7 @@ export interface FileRoutesByFullPath {
   '/admin/gamification': typeof AuthenticatedAdminGamificationRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/materials': typeof AuthenticatedAdminMaterialsRoute
+  '/admin/onboarding': typeof AuthenticatedAdminOnboardingRoute
   '/admin/org': typeof AuthenticatedAdminOrgRoute
   '/admin/production': typeof AuthenticatedAdminProductionRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
@@ -386,6 +401,7 @@ export interface FileRoutesByTo {
   '/development': typeof AuthenticatedDevelopmentRoute
   '/gamification': typeof AuthenticatedGamificationRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/tests': typeof AuthenticatedTestsRoute
@@ -406,6 +422,7 @@ export interface FileRoutesByTo {
   '/admin/gamification': typeof AuthenticatedAdminGamificationRoute
   '/admin/import': typeof AuthenticatedAdminImportRoute
   '/admin/materials': typeof AuthenticatedAdminMaterialsRoute
+  '/admin/onboarding': typeof AuthenticatedAdminOnboardingRoute
   '/admin/org': typeof AuthenticatedAdminOrgRoute
   '/admin/production': typeof AuthenticatedAdminProductionRoute
   '/admin/requests': typeof AuthenticatedAdminRequestsRoute
@@ -437,6 +454,7 @@ export interface FileRoutesById {
   '/_authenticated/development': typeof AuthenticatedDevelopmentRoute
   '/_authenticated/gamification': typeof AuthenticatedGamificationRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
+  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/tests': typeof AuthenticatedTestsRoute
@@ -458,6 +476,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/gamification': typeof AuthenticatedAdminGamificationRoute
   '/_authenticated/admin/import': typeof AuthenticatedAdminImportRoute
   '/_authenticated/admin/materials': typeof AuthenticatedAdminMaterialsRoute
+  '/_authenticated/admin/onboarding': typeof AuthenticatedAdminOnboardingRoute
   '/_authenticated/admin/org': typeof AuthenticatedAdminOrgRoute
   '/_authenticated/admin/production': typeof AuthenticatedAdminProductionRoute
   '/_authenticated/admin/requests': typeof AuthenticatedAdminRequestsRoute
@@ -489,6 +508,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/gamification'
     | '/library'
+    | '/onboarding'
     | '/products'
     | '/profile'
     | '/tests'
@@ -509,6 +529,7 @@ export interface FileRouteTypes {
     | '/admin/gamification'
     | '/admin/import'
     | '/admin/materials'
+    | '/admin/onboarding'
     | '/admin/org'
     | '/admin/production'
     | '/admin/requests'
@@ -537,6 +558,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/gamification'
     | '/library'
+    | '/onboarding'
     | '/products'
     | '/profile'
     | '/tests'
@@ -557,6 +579,7 @@ export interface FileRouteTypes {
     | '/admin/gamification'
     | '/admin/import'
     | '/admin/materials'
+    | '/admin/onboarding'
     | '/admin/org'
     | '/admin/production'
     | '/admin/requests'
@@ -587,6 +610,7 @@ export interface FileRouteTypes {
     | '/_authenticated/development'
     | '/_authenticated/gamification'
     | '/_authenticated/library'
+    | '/_authenticated/onboarding'
     | '/_authenticated/products'
     | '/_authenticated/profile'
     | '/_authenticated/tests'
@@ -608,6 +632,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/gamification'
     | '/_authenticated/admin/import'
     | '/_authenticated/admin/materials'
+    | '/_authenticated/admin/onboarding'
     | '/_authenticated/admin/org'
     | '/_authenticated/admin/production'
     | '/_authenticated/admin/requests'
@@ -711,6 +736,13 @@ declare module '@tanstack/react-router' {
       path: '/library'
       fullPath: '/library'
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/products': {
@@ -867,6 +899,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminMaterialsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/onboarding': {
+      id: '/_authenticated/admin/onboarding'
+      path: '/onboarding'
+      fullPath: '/admin/onboarding'
+      preLoaderRoute: typeof AuthenticatedAdminOnboardingRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/org': {
       id: '/_authenticated/admin/org'
       path: '/org'
@@ -993,6 +1032,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminGamificationRoute: typeof AuthenticatedAdminGamificationRoute
   AuthenticatedAdminImportRoute: typeof AuthenticatedAdminImportRoute
   AuthenticatedAdminMaterialsRoute: typeof AuthenticatedAdminMaterialsRoute
+  AuthenticatedAdminOnboardingRoute: typeof AuthenticatedAdminOnboardingRoute
   AuthenticatedAdminOrgRoute: typeof AuthenticatedAdminOrgRoute
   AuthenticatedAdminProductionRoute: typeof AuthenticatedAdminProductionRoute
   AuthenticatedAdminRequestsRoute: typeof AuthenticatedAdminRequestsRoute
@@ -1015,6 +1055,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminGamificationRoute: AuthenticatedAdminGamificationRoute,
     AuthenticatedAdminImportRoute: AuthenticatedAdminImportRoute,
     AuthenticatedAdminMaterialsRoute: AuthenticatedAdminMaterialsRoute,
+    AuthenticatedAdminOnboardingRoute: AuthenticatedAdminOnboardingRoute,
     AuthenticatedAdminOrgRoute: AuthenticatedAdminOrgRoute,
     AuthenticatedAdminProductionRoute: AuthenticatedAdminProductionRoute,
     AuthenticatedAdminRequestsRoute: AuthenticatedAdminRequestsRoute,
@@ -1038,6 +1079,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDevelopmentRoute: typeof AuthenticatedDevelopmentRoute
   AuthenticatedGamificationRoute: typeof AuthenticatedGamificationRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedTestsRoute: typeof AuthenticatedTestsRoute
@@ -1059,6 +1101,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDevelopmentRoute: AuthenticatedDevelopmentRoute,
   AuthenticatedGamificationRoute: AuthenticatedGamificationRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedTestsRoute: AuthenticatedTestsRoute,

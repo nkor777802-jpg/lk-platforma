@@ -212,7 +212,6 @@ export const listOnboardingFeedback = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
-/** Профессиональный паспорт: компетенции сотрудника со статусами. */
 /** Данные адаптационного плана для печатной формы (PDF). */
 export const onboardingPlanForPrint = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -308,6 +307,7 @@ export const onboardingPlanForPrint = createServerFn({ method: "GET" })
     };
   });
 
+/** Профессиональный паспорт: компетенции сотрудника со статусами. */
 export const myCompetencyPassport = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

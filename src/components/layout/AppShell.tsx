@@ -6,6 +6,7 @@ import { brandLogos } from "@/lib/brand";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/layout/NotificationBell";
+import { clearAdminUnlock } from "@/lib/admin-unlock";
 
 const NAV = [
   { to: "/dashboard", label: "Главная" },
@@ -36,6 +37,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const handleSignOut = async () => {
     await queryClient.cancelQueries();
     queryClient.clear();
+    clearAdminUnlock();
     await signOut();
     void router.navigate({ to: "/auth", replace: true });
   };

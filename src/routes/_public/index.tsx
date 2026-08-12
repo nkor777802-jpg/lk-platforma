@@ -3,7 +3,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { about, advantages, company, faq, platform, stages } from "@/content/site";
 import { useCompany } from "@/hooks/useCompany";
 import { publicProfessionsQuery } from "@/lib/public-queries";
-import { Section, InfoCard, StageList } from "@/components/public/sections";
+import { Section, InfoCard } from "@/components/public/sections";
+import { AnimatedStageList } from "@/components/public/animated-stage-list";
 import { ProfessionGrid } from "@/components/public/ProfessionGrid";
 import { Button } from "@/components/ui/button";
 import {
@@ -130,7 +131,7 @@ function HomePage() {
       </Section>
 
       <Section title="Этапы обучения">
-        <StageList items={stages} />
+        <AnimatedStageList items={stages} />
       </Section>
 
       <Section title="Частые вопросы" tone="muted">

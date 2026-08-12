@@ -20,7 +20,6 @@ import {
   TrendingUp,
   Upload,
   Users,
-,
   Sparkles,
 } from "lucide-react";
 

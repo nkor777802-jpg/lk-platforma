@@ -8,6 +8,7 @@ const filterSchema = z.object({
   departmentId: z.string().uuid().nullish(),
   professionId: z.string().uuid().nullish(),
   courseId: z.string().uuid().nullish(),
+  trainingType: z.string().nullish(),
   granularity: z.enum(["month", "quarter", "year"]).default("month"),
 });
 
@@ -52,6 +53,8 @@ export const analyticsDashboard = createServerFn({ method: "POST" })
         byProfession: [] as any[],
         byEmployee: [] as any[],
         byCourse: [] as any[],
+        byTrainingType: [] as any[],
+        onboarding: { total: 0, active: 0, completed: 0, completionRate: 0 },
         problemTopics: [] as any[],
       };
     }
@@ -79,8 +82,11 @@ export const analyticsDashboard = createServerFn({ method: "POST" })
     // --- Назначения
     let assignQ = supabaseAdmin
       .from("assignments")
-      .select("id, user_id, course_id, profession_id, status, due_date, assigned_at, courses(title)");
+      .select(
+        "id, user_id, course_id, profession_id, status, due_date, assigned_at, training_type, courses(title)",
+      );
     if (ids) assignQ = assignQ.in("user_id", ids);
+    if (data.trainingType) assignQ = assignQ.eq("training_type", data.trainingType);
     if (data.courseId) assignQ = assignQ.eq("course_id", data.courseId);
     if (data.professionId) assignQ = assignQ.eq("profession_id", data.professionId);
     const { data: assignRaw } = await assignQ;
@@ -189,6 +195,39 @@ export const analyticsDashboard = createServerFn({ method: "POST" })
       };
     });
 
+    // --- Срез по типам обучения
+    const { trainingTypeLabel } = await import("./training-types");
+    const byTrainingType = group<any>(
+      assignments,
+      (a) => a.training_type ?? "initial_profession",
+      (a) => trainingTypeLabel(a.training_type),
+    ).map((g: any) => {
+      const total = g.items.length;
+      const completed = g.items.filter((i: any) => i.status === "completed").length;
+      return {
+        id: g.key,
+        name: g.name,
+        assigned: total,
+        completed,
+        completionRate: pct(completed, total),
+        overdue: g.items.filter(
+          (i: any) => i.due_date && i.due_date < today && i.status !== "completed",
+        ).length,
+      };
+    });
+
+    // --- Адаптация новичков
+    let onbQ = supabaseAdmin.from("onboarding_programs").select("id, user_id, status");
+    if (ids) onbQ = onbQ.in("user_id", ids);
+    const { data: onbRaw } = await onbQ;
+    const onbList = (onbRaw ?? []) as any[];
+    const onboarding = {
+      total: onbList.length,
+      active: onbList.filter((o) => o.status === "active").length,
+      completed: onbList.filter((o) => o.status === "completed").length,
+      completionRate: pct(onbList.filter((o) => o.status === "completed").length, onbList.length),
+    };
+
     // --- Проблемные темы (по ответам в рамках выбранных попыток)
     let problemTopics: { topic: string; total: number; errors: number; errorRate: number }[] = [];
     const attemptIds = attempts.map((a) => a.id).slice(0, 500);
@@ -221,6 +260,8 @@ export const analyticsDashboard = createServerFn({ method: "POST" })
       byProfession,
       byEmployee,
       byCourse,
+      byTrainingType,
+      onboarding,
       problemTopics,
     };
   });

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { adminTableQuery } from "@/lib/admin-queries";
 import { EntityManager } from "@/components/admin/EntityManager";
+import { MATERIAL_SCOPE_OPTIONS } from "@/lib/training-types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/_authenticated/admin/materials")({
@@ -57,6 +58,12 @@ function MaterialsPage() {
               { name: "material_type", label: "Тип", type: "select", required: true, options: MATERIAL_TYPES },
               { name: "description", label: "Описание", type: "textarea" },
               { name: "category_id", label: "Категория", type: "select", options: catOptions },
+              {
+                name: "material_scope",
+                label: "Область применения",
+                type: "select",
+                options: MATERIAL_SCOPE_OPTIONS,
+              },
               { name: "profession_id", label: "Профессия", type: "select", options: profOptions },
               { name: "external_url", label: "Внешняя ссылка" },
               { name: "file_url", label: "Файл в хранилище (путь)" },
@@ -66,6 +73,7 @@ function MaterialsPage() {
             columns={[
               { key: "title", label: "Название" },
               { key: "material_type", label: "Тип" },
+              { key: "material_scope", label: "Область" },
               {
                 key: "created_at",
                 label: "Опубликован",

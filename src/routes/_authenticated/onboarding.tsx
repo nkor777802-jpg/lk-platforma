@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { CheckCircle2, Clock, MessageSquare } from "lucide-react";
+import { CheckCircle2, Clock, FileDown, MessageSquare } from "lucide-react";
 import { myOnboardingQuery } from "@/lib/onboarding-queries";
 import { completeOnboardingItem, submitOnboardingFeedback } from "@/lib/onboarding.functions";
 import { itemTypeLabel, sectionLabel } from "@/lib/training-types";
@@ -84,12 +84,20 @@ function OnboardingPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Я Новичок</h1>
-        <p className="mt-2 text-muted-foreground">
-          {program.template_name} · дата приёма{" "}
-          {new Date(program.hire_date).toLocaleDateString("ru-RU")}
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Я Новичок</h1>
+          <p className="mt-2 text-muted-foreground">
+            {program.template_name} · дата приёма{" "}
+            {new Date(program.hire_date).toLocaleDateString("ru-RU")}
+          </p>
+        </div>
+        <Button asChild variant="outline">
+          <Link to="/onboarding/print" target="_blank" rel="noreferrer">
+            <FileDown className="mr-2 h-4 w-4" />
+            Скачать план (PDF)
+          </Link>
+        </Button>
       </div>
 
       <Card>

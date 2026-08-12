@@ -212,6 +212,101 @@ export const listOnboardingFeedback = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
+/** Данные адаптационного плана для печатной формы (PDF). */
+export const onboardingPlanForPrint = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({ programId: z.string().uuid().nullish() })
+      .nullish()
+      .transform((v) => v ?? {})
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    let programId = data.programId ?? null;
+    if (programId) {
+      const { assertRole } = await import("./admin.server");
+      const { data: target } = await supabaseAdmin
+        .from("onboarding_programs")
+        .select("user_id, mentor_id")
+        .eq("id", programId)
+        .maybeSingle();
+      if (!target) throw new Error("Программа адаптации не найдена");
+      const isOwner = target.user_id === context.userId;
+      const isMentor = target.mentor_id === context.userId;
+      if (!isOwner && !isMentor) {
+        await assertRole(context.supabase, context.userId, [...STAFF]);
+      }
+    } else {
+      const { data: own } = await supabaseAdmin
+        .from("onboarding_programs")
+        .select("id")
+        .eq("user_id", context.userId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      programId = own?.id ?? null;
+    }
+    if (!programId) return { program: null, items: [] };
+
+    const { data: program } = await supabaseAdmin
+      .from("onboarding_programs")
+      .select("*")
+      .eq("id", programId)
+      .maybeSingle();
+    if (!program) return { program: null, items: [] };
+
+    const { data: items } = await supabaseAdmin
+      .from("onboarding_program_items")
+      .select("*")
+      .eq("program_id", programId)
+      .order("offset_days")
+      .order("sort_order");
+
+    const ids = [program.user_id, program.mentor_id].filter(Boolean) as string[];
+    const { data: people } = await supabaseAdmin
+      .from("profiles")
+      .select("id, full_name, position, grade, personnel_number, profession_id, department_id")
+      .in("id", ids);
+    const employee = (people ?? []).find((p) => p.id === program.user_id) ?? null;
+    const mentor = (people ?? []).find((p) => p.id === program.mentor_id) ?? null;
+
+    let professionName: string | null = null;
+    let departmentName: string | null = null;
+    if (employee?.profession_id) {
+      const { data: prof } = await supabaseAdmin
+        .from("professions")
+        .select("name")
+        .eq("id", employee.profession_id)
+        .maybeSingle();
+      professionName = prof?.name ?? null;
+    }
+    if (employee?.department_id) {
+      const { data: dep } = await supabaseAdmin
+        .from("departments")
+        .select("name")
+        .eq("id", employee.department_id)
+        .maybeSingle();
+      departmentName = dep?.name ?? null;
+    }
+
+    return {
+      program: {
+        ...program,
+        employee_name: employee?.full_name ?? "—",
+        employee_position: employee?.position ?? null,
+        employee_grade: employee?.grade ?? null,
+        personnel_number: employee?.personnel_number ?? null,
+        profession_name: professionName,
+        department_name: departmentName,
+        mentor_name: mentor?.full_name ?? null,
+      },
+      items: items ?? [],
+    };
+  });
+
 /** Профессиональный паспорт: компетенции сотрудника со статусами. */
 export const myCompetencyPassport = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

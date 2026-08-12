@@ -1,9 +1,10 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { LogOut, Shield, User as UserIcon, X } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { LogOut, Shield, X } from "lucide-react";
 import { brandLogos } from "@/lib/brand";
 import { useAuth } from "@/hooks/useAuth";
+import { myProfileQuery } from "@/lib/lms-queries";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { clearAdminUnlock } from "@/lib/admin-unlock";
@@ -33,6 +34,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const profile = useQuery(myProfileQuery(user?.id));
+  const fullName = (profile.data as { full_name?: string | null } | null | undefined)?.full_name;
+  const parts = (fullName ?? "").trim().split(/\s+/).filter(Boolean);
+  const firstName = parts.length > 1 ? parts[1] : (parts[0] ?? user?.email ?? "");
 
   const handleSignOut = async () => {
     await queryClient.cancelQueries();
@@ -122,12 +127,34 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Button
               asChild
               variant="ghost"
-              size="icon"
-              aria-label="Личный кабинет"
-              className="hidden sm:inline-flex"
+              size="sm"
+              className="hidden max-w-[220px] gap-2 border border-border text-secondary transition-colors hover:bg-secondary/10 hover:text-secondary active:bg-secondary active:text-secondary-foreground sm:inline-flex"
             >
-              <Link to="/profile">
-                <UserIcon className="h-5 w-5" />
+              <Link
+                to="/profile"
+                activeProps={{
+                  className: "bg-secondary text-secondary-foreground hover:bg-secondary/90 group is-active",
+                }}
+              >
+                <img
+                  src={brandLogos.markBlue}
+                  alt=""
+                  aria-hidden="true"
+                  className="h-5 w-auto object-contain group-[.is-active]:hidden"
+                  width={20}
+                  height={20}
+                />
+                <img
+                  src={brandLogos.markWhite}
+                  alt=""
+                  aria-hidden="true"
+                  className="hidden h-5 w-auto object-contain group-[.is-active]:block"
+                  width={20}
+                  height={20}
+                />
+                <span className="truncate">
+                  Личный кабинет{firstName ? ` · ${firstName}` : ""}
+                </span>
               </Link>
             </Button>
             <Button

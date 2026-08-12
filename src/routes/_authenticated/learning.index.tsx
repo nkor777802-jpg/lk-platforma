@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { myAssignmentsQuery, type AssignmentRow } from "@/lib/account-queries";
+import { TRAINING_TYPE_OPTIONS, trainingTypeLabel } from "@/lib/training-types";
 import { EmptyState, ErrorState, InlineLoading } from "@/components/states";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,11 +44,13 @@ const LABELS: Record<string, string> = {
 function LearningPage() {
   const { user } = useAuth();
   const assignments = useQuery(myAssignmentsQuery(user?.id));
+  const [typeFilter, setTypeFilter] = useState("all");
 
   if (assignments.isLoading) return <InlineLoading />;
   if (assignments.error) return <ErrorState message={(assignments.error as Error).message} />;
 
-  const items = assignments.data ?? [];
+  const all = assignments.data ?? [];
+  const items = typeFilter === "all" ? all : all.filter((a) => a.training_type === typeFilter);
   const groups = {
     assigned: items.filter((a) => assignmentBucket(a) === "assigned"),
     in_progress: items.filter((a) => assignmentBucket(a) === "in_progress"),
@@ -61,6 +65,26 @@ function LearningPage() {
         <p className="mt-2 text-muted-foreground">
           Программы, назначенные вам руководителем или отделом персонала.
         </p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          variant={typeFilter === "all" ? "default" : "outline"}
+          onClick={() => setTypeFilter("all")}
+        >
+          Все типы
+        </Button>
+        {TRAINING_TYPE_OPTIONS.map((t) => (
+          <Button
+            key={t.value}
+            size="sm"
+            variant={typeFilter === t.value ? "default" : "outline"}
+            onClick={() => setTypeFilter(t.value)}
+          >
+            {t.label}
+          </Button>
+        ))}
       </div>
 
       <Tabs defaultValue="assigned">
@@ -97,7 +121,11 @@ function AssignmentCard({ item, bucket }: { item: AssignmentRow; bucket: string 
       <CardHeader className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={bucket === "overdue" ? "destructive" : "secondary"}>{LABELS[bucket]}</Badge>
+          <Badge variant="outline">{trainingTypeLabel(item.training_type)}</Badge>
           {item.is_mandatory ? <Badge variant="outline">Обязательно</Badge> : null}
+          {item.target_grade ? (
+            <Badge variant="outline">до разряда {item.target_grade}</Badge>
+          ) : null}
         </div>
         <CardTitle className="text-lg leading-snug">{title}</CardTitle>
       </CardHeader>

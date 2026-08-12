@@ -79,7 +79,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Button
               asChild
               size="sm"
-              className="hidden bg-secondary text-secondary-foreground hover:bg-secondary/90 lg:inline-flex"
+              className="hidden bg-secondary text-secondary-foreground hover:bg-secondary/90 sm:inline-flex"
             >
               <Link to="/">
                 <img
@@ -90,24 +90,25 @@ export function AppShell({ children }: { children: ReactNode }) {
                   width={20}
                   height={20}
                 />
-                Вернуться на главную страницу
+                <span className="lg:hidden">На главную</span>
+                <span className="hidden lg:inline">Вернуться на главную страницу</span>
               </Link>
             </Button>
             <Button
               asChild
-              size="icon"
-              aria-label="Вернуться на главную страницу"
-              className="bg-secondary text-secondary-foreground hover:bg-secondary/90 lg:hidden"
+              size="sm"
+              className="gap-1.5 bg-secondary px-2 text-xs text-secondary-foreground hover:bg-secondary/90 sm:hidden"
             >
               <Link to="/">
                 <img
                   src={brandLogos.markWhite}
                   alt=""
                   aria-hidden="true"
-                  className="h-5 w-auto object-contain"
+                  className="h-4 w-auto object-contain"
                   width={20}
                   height={20}
                 />
+                На главную
               </Link>
             </Button>
             {canAccessAdmin ? (

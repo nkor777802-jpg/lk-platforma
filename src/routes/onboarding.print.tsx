@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
@@ -10,6 +10,13 @@ import { company, stages } from "@/content/site";
 import { StageList } from "@/components/StageList";
 import { InlineLoading } from "@/components/states";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/onboarding/print")({
   ssr: false,
@@ -43,7 +50,6 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const PRINT_CSS = `
-@page { size: A4 portrait; margin: 12mm; }
 .print-doc { hyphens: auto; overflow-wrap: anywhere; }
 @media print {
   .no-print { display: none !important; }
@@ -54,12 +60,44 @@ const PRINT_CSS = `
 }
 `;
 
+const SETTINGS_KEY = "onboarding-print-settings";
+type Orientation = "portrait" | "landscape";
+
 function fmt(d: string | null | undefined) {
   return d ? new Date(d).toLocaleDateString("ru-RU") : "—";
 }
 
 function OnboardingPrintPage() {
   const { programId } = Route.useSearch();
+  const [orientation, setOrientation] = useState<Orientation>("portrait");
+  const [margin, setMargin] = useState("12");
+  const [settingsReady, setSettingsReady] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as { orientation?: Orientation; margin?: string };
+        if (saved.orientation === "portrait" || saved.orientation === "landscape") {
+          setOrientation(saved.orientation);
+        }
+        if (saved.margin) setMargin(saved.margin);
+      }
+    } catch {
+      /* ignore */
+    }
+    setSettingsReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!settingsReady) return;
+    try {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify({ orientation, margin }));
+    } catch {
+      /* ignore */
+    }
+  }, [settingsReady, orientation, margin]);
+
   const plan = useQuery({
     queryKey: ["onboarding", "print", programId ?? "me"],
     queryFn: () => onboardingPlanForPrint({ data: { programId: programId ?? null } }),
@@ -67,10 +105,10 @@ function OnboardingPrintPage() {
 
   const ready = plan.isSuccess && !!plan.data?.program;
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !settingsReady) return;
     const t = setTimeout(() => window.print(), 600);
     return () => clearTimeout(t);
-  }, [ready]);
+  }, [ready, settingsReady]);
 
   if (plan.isLoading) return <InlineLoading />;
 
@@ -89,21 +127,61 @@ function OnboardingPrintPage() {
   const percent = items.length ? Math.round((done / items.length) * 100) : 0;
   const sections = Array.from(new Set(items.map((i) => i.section)));
   let counter = 0;
+  const sheetWidth = orientation === "landscape" ? "297mm" : "210mm";
 
   return (
     <div lang="ru" className="print-doc min-h-screen bg-muted/40 py-4 print:bg-background print:py-0 sm:py-6">
-      <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `@page { size: A4 ${orientation}; margin: ${margin}mm; }` + PRINT_CSS,
+        }}
+      />
 
-      <div className="no-print mx-auto mb-4 flex max-w-[210mm] flex-col items-start justify-between gap-3 px-4 sm:flex-row sm:items-center">
-        <p className="text-xs text-muted-foreground sm:text-sm">
-          В диалоге печати выберите «Сохранить в PDF».
-        </p>
-        <Button className="w-full sm:w-auto" onClick={() => window.print()}>
-          Печать / PDF
-        </Button>
+      <div
+        className="no-print mx-auto mb-4 flex w-full flex-col gap-3 px-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between"
+        style={{ maxWidth: sheetWidth }}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            Ориентация
+            <Select value={orientation} onValueChange={(v) => setOrientation(v as Orientation)}>
+              <SelectTrigger className="w-full sm:w-44">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="portrait">Книжная (A4)</SelectItem>
+                <SelectItem value="landscape">Альбомная (A4)</SelectItem>
+              </SelectContent>
+            </Select>
+          </label>
+          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            Поля
+            <Select value={margin} onValueChange={setMargin}>
+              <SelectTrigger className="w-full sm:w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="8">Узкие (8 мм)</SelectItem>
+                <SelectItem value="12">Обычные (12 мм)</SelectItem>
+                <SelectItem value="20">Широкие (20 мм)</SelectItem>
+              </SelectContent>
+            </Select>
+          </label>
+        </div>
+        <div className="flex flex-col gap-2 sm:items-end">
+          <p className="text-xs text-muted-foreground sm:text-sm">
+            В диалоге печати выберите «Сохранить в PDF».
+          </p>
+          <Button className="w-full sm:w-auto" onClick={() => window.print()}>
+            Печать / PDF
+          </Button>
+        </div>
       </div>
 
-      <div className="print-sheet mx-auto max-w-[210mm] rounded-lg border border-border bg-background p-4 shadow-sm sm:p-8">
+      <div
+        className="print-sheet mx-auto w-full rounded-lg border border-border bg-background shadow-sm"
+        style={{ maxWidth: sheetWidth, padding: `${margin}mm` }}
+      >
         <header className="flex flex-col items-start justify-between gap-3 border-b border-border pb-4 sm:flex-row sm:items-start sm:gap-6">
           <div className="flex items-center gap-3 sm:gap-4">
             <img

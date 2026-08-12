@@ -12,6 +12,9 @@ import {
 } from "@/lib/training-types";
 import { EntityManager } from "@/components/admin/EntityManager";
 import { EmptyState, InlineLoading } from "@/components/states";
+import { StageList } from "@/components/StageList";
+import { stages } from "@/content/site";
+import { itemTypeLabel, sectionLabel } from "@/lib/training-types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,10 +58,11 @@ function OnboardingAdminPage() {
       </div>
 
       <Tabs defaultValue="programs">
-        <TabsList className="flex w-full flex-wrap justify-start">
+        <TabsList className="flex w-full flex-wrap justify-start gap-1">
           <TabsTrigger value="programs">Программы новичков</TabsTrigger>
           <TabsTrigger value="templates">Шаблоны</TabsTrigger>
           <TabsTrigger value="items">Пункты шаблонов</TabsTrigger>
+          <TabsTrigger value="preview">Предпросмотр</TabsTrigger>
           <TabsTrigger value="feedback">Обратная связь</TabsTrigger>
         </TabsList>
 
@@ -165,10 +169,104 @@ function OnboardingAdminPage() {
           />
         </TabsContent>
 
+        <TabsContent value="preview" className="space-y-6 pt-6">
+          <StagesPreview templateOptions={opt(templates.data, "name")} />
+        </TabsContent>
+
         <TabsContent value="feedback" className="pt-6">
           <FeedbackList />
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function StagesPreview({
+  templateOptions,
+}: {
+  templateOptions: { value: string; label: string }[];
+}) {
+  const [templateId, setTemplateId] = useState("");
+  const items = useQuery(
+    adminTableQuery("onboarding_template_items", "*, onboarding_templates(name)", "sort_order"),
+  );
+  const rows = ((items.data ?? []) as Record<string, unknown>[]).filter((r) =>
+    templateId ? r["template_id"] === templateId : true,
+  );
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Этапы «Я Новичок» — как увидит сотрудник</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="max-w-sm space-y-2">
+            <Label>Шаблон адаптации</Label>
+            <Select value={templateId} onValueChange={setTemplateId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Все шаблоны" />
+              </SelectTrigger>
+              <SelectContent>
+                {templateOptions.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {items.isLoading ? (
+            <InlineLoading />
+          ) : rows.length === 0 ? (
+            <EmptyState title="Пунктов шаблона нет" />
+          ) : (
+            <ol className="space-y-2">
+              {rows.map((r, i) => (
+                <li
+                  key={String(r["id"])}
+                  className="rounded-lg border border-border bg-card p-3 text-sm"
+                >
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                      {i + 1}
+                    </span>
+                    <span className="min-w-0 break-words font-medium text-foreground">
+                      {String(r["title"] ?? "")}
+                    </span>
+                    <Badge variant="secondary">
+                      {Number(r["offset_days"] ?? 0) > 0
+                        ? `День +${r["offset_days"]}`
+                        : "День 0"}
+                    </Badge>
+                  </div>
+                  {r["description"] ? (
+                    <p className="mt-1 break-words hyphens-auto text-xs text-muted-foreground">
+                      {String(r["description"])}
+                    </p>
+                  ) : null}
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {sectionLabel(String(r["section"] ?? ""))} ·{" "}
+                    {itemTypeLabel(String(r["item_type"] ?? ""))} ·{" "}
+                    {r["is_required"] ? "обязательный" : "необязательный"}
+                    {r["requires_mentor"] ? " · подтверждает наставник" : ""}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Этапы обучения (публичная версия сайта)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <StageList items={stages} compact />
+        </CardContent>
+      </Card>
     </div>
   );
 }

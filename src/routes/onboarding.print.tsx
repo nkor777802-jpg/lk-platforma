@@ -6,7 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { onboardingPlanForPrint } from "@/lib/onboarding.functions";
 import { dueFromOffset, itemTypeLabel, sectionLabel } from "@/lib/training-types";
 import { brandLogos } from "@/lib/brand";
-import { company } from "@/content/site";
+import { company, stages } from "@/content/site";
+import { StageList } from "@/components/StageList";
 import { InlineLoading } from "@/components/states";
 import { Button } from "@/components/ui/button";
 
@@ -43,6 +44,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 const PRINT_CSS = `
 @page { size: A4 portrait; margin: 12mm; }
+.print-doc { hyphens: auto; overflow-wrap: anywhere; }
 @media print {
   .no-print { display: none !important; }
   .print-sheet { box-shadow: none !important; border: 0 !important; padding: 0 !important; }
@@ -89,25 +91,27 @@ function OnboardingPrintPage() {
   let counter = 0;
 
   return (
-    <div className="min-h-screen bg-muted/40 py-6 print:bg-background print:py-0">
+    <div lang="ru" className="print-doc min-h-screen bg-muted/40 py-4 print:bg-background print:py-0 sm:py-6">
       <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
 
-      <div className="no-print mx-auto mb-4 flex max-w-[210mm] items-center justify-between gap-3 px-4">
-        <p className="text-sm text-muted-foreground">
+      <div className="no-print mx-auto mb-4 flex max-w-[210mm] flex-col items-start justify-between gap-3 px-4 sm:flex-row sm:items-center">
+        <p className="text-xs text-muted-foreground sm:text-sm">
           В диалоге печати выберите «Сохранить в PDF».
         </p>
-        <Button onClick={() => window.print()}>Печать / PDF</Button>
+        <Button className="w-full sm:w-auto" onClick={() => window.print()}>
+          Печать / PDF
+        </Button>
       </div>
 
-      <div className="print-sheet mx-auto max-w-[210mm] rounded-lg border border-border bg-background p-8 shadow-sm">
-        <header className="flex items-start justify-between gap-6 border-b border-border pb-4">
-          <div className="flex items-center gap-4">
+      <div className="print-sheet mx-auto max-w-[210mm] rounded-lg border border-border bg-background p-4 shadow-sm sm:p-8">
+        <header className="flex flex-col items-start justify-between gap-3 border-b border-border pb-4 sm:flex-row sm:items-start sm:gap-6">
+          <div className="flex items-center gap-3 sm:gap-4">
             <img
               src={brandLogos.fullColor}
               alt={brandLogos.alt}
-              className="h-12 w-auto object-contain"
+              className="h-10 w-auto shrink-0 object-contain sm:h-12"
             />
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-semibold text-secondary">{company.legalName}</p>
               <p className="text-xs text-muted-foreground">{company.address}</p>
             </div>
@@ -117,11 +121,11 @@ function OnboardingPrintPage() {
           </p>
         </header>
 
-        <h1 className="mt-6 text-xl font-bold text-secondary">
+        <h1 className="mt-5 text-lg font-bold text-secondary sm:mt-6 sm:text-xl">
           Программа адаптации сотрудника «Я Новичок»
         </h1>
 
-        <dl className="mt-4 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+        <dl className="mt-4 grid grid-cols-1 gap-x-8 gap-y-2 text-xs sm:grid-cols-2 sm:text-sm print:grid-cols-2">
           <Row label="Сотрудник" value={program.employee_name} />
           <Row label="Табельный номер" value={program.personnel_number ?? "—"} />
           <Row label="Должность" value={program.employee_position ?? "—"} />
@@ -146,7 +150,7 @@ function OnboardingPrintPage() {
             <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-secondary">
               {sectionLabel(section)}
             </h2>
-            <table className="w-full border-collapse text-xs">
+            <table className="hidden w-full table-fixed border-collapse text-xs sm:table print:table">
               <thead>
                 <tr className="bg-muted/60 text-left">
                   <Th className="w-8">№</Th>
@@ -188,10 +192,42 @@ function OnboardingPrintPage() {
                   })}
               </tbody>
             </table>
+
+            <ul className="space-y-2 sm:hidden print:hidden">
+              {items
+                .filter((i) => i.section === section)
+                .map((item) => {
+                  const planned =
+                    item.due_date ?? dueFromOffset(program.hire_date, item.offset_days ?? 0);
+                  return (
+                    <li key={item.id} className="rounded-md border border-border p-3 text-xs">
+                      <p className="font-medium text-foreground">{item.title}</p>
+                      {item.description ? (
+                        <p className="mt-1 text-muted-foreground">{item.description}</p>
+                      ) : null}
+                      <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-muted-foreground">
+                        <span>{item.offset_days ? `День +${item.offset_days}` : "День 0"}</span>
+                        <span>План: {fmt(planned)}</span>
+                        <span>{itemTypeLabel(item.item_type)}</span>
+                        <span>{item.is_required ? "Обязательно" : "По желанию"}</span>
+                        <span>{STATUS_LABELS[item.status] ?? item.status}</span>
+                        <span>Вып.: {fmt(item.completed_at)}</span>
+                      </dl>
+                    </li>
+                  );
+                })}
+            </ul>
           </section>
         ))}
 
-        <footer className="mt-10 grid grid-cols-2 gap-10 text-xs text-muted-foreground avoid-break">
+        <section className="mt-8 avoid-break">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-secondary">
+            Этапы обучения на платформе
+          </h2>
+          <StageList items={stages} />
+        </section>
+
+        <footer className="mt-10 grid grid-cols-1 gap-6 text-xs text-muted-foreground avoid-break sm:grid-cols-2 sm:gap-10 print:grid-cols-2">
           <div>
             <div className="h-8 border-b border-border" />
             <p className="mt-1">Сотрудник — {program.employee_name}</p>
@@ -220,5 +256,5 @@ function Th({ children, className }: { children: React.ReactNode; className?: st
 }
 
 function Td({ children }: { children: React.ReactNode }) {
-  return <td className="px-2 py-1">{children}</td>;
+  return <td className="break-words px-2 py-1 align-top">{children}</td>;
 }

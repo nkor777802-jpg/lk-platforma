@@ -96,8 +96,10 @@ export type Database = {
           assigned_at: string
           assigned_by: string | null
           comment: string | null
+          competency_id: string | null
           course_id: string | null
           created_at: string
+          current_grade: string | null
           department_id: string | null
           due_date: string | null
           group_id: string | null
@@ -106,15 +108,21 @@ export type Database = {
           is_repeat: boolean
           profession_id: string | null
           status: string
+          target_grade: string | null
+          target_profession_id: string | null
+          training_type: string
           updated_at: string
           user_id: string
+          work_center_id: string | null
         }
         Insert: {
           assigned_at?: string
           assigned_by?: string | null
           comment?: string | null
+          competency_id?: string | null
           course_id?: string | null
           created_at?: string
+          current_grade?: string | null
           department_id?: string | null
           due_date?: string | null
           group_id?: string | null
@@ -123,15 +131,21 @@ export type Database = {
           is_repeat?: boolean
           profession_id?: string | null
           status?: string
+          target_grade?: string | null
+          target_profession_id?: string | null
+          training_type?: string
           updated_at?: string
           user_id: string
+          work_center_id?: string | null
         }
         Update: {
           assigned_at?: string
           assigned_by?: string | null
           comment?: string | null
+          competency_id?: string | null
           course_id?: string | null
           created_at?: string
+          current_grade?: string | null
           department_id?: string | null
           due_date?: string | null
           group_id?: string | null
@@ -140,10 +154,21 @@ export type Database = {
           is_repeat?: boolean
           profession_id?: string | null
           status?: string
+          target_grade?: string | null
+          target_profession_id?: string | null
+          training_type?: string
           updated_at?: string
           user_id?: string
+          work_center_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "assignments_competency_id_fkey"
+            columns: ["competency_id"]
+            isOneToOne: false
+            referencedRelation: "competencies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "assignments_course_id_fkey"
             columns: ["course_id"]
@@ -170,6 +195,20 @@ export type Database = {
             columns: ["profession_id"]
             isOneToOne: false
             referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignments_target_profession_id_fkey"
+            columns: ["target_profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignments_work_center_id_fkey"
+            columns: ["work_center_id"]
+            isOneToOne: false
+            referencedRelation: "work_centers"
             referencedColumns: ["id"]
           },
         ]
@@ -918,6 +957,66 @@ export type Database = {
           },
         ]
       }
+      employee_competencies: {
+        Row: {
+          comment: string | null
+          competency_id: string | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          id: string
+          profession_id: string | null
+          source: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          competency_id?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          id?: string
+          profession_id?: string | null
+          source?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          competency_id?: string | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          id?: string
+          profession_id?: string | null
+          source?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_competencies_competency_id_fkey"
+            columns: ["competency_id"]
+            isOneToOne: false
+            referencedRelation: "competencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_competencies_profession_id_fkey"
+            columns: ["profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_factory_zones: {
         Row: {
           id: string
@@ -1300,6 +1399,7 @@ export type Database = {
           is_active: boolean
           is_mandatory_for_all: boolean
           lesson_id: string | null
+          material_scope: string
           material_type: string
           mime_type: string | null
           module_id: string | null
@@ -1327,6 +1427,7 @@ export type Database = {
           is_active?: boolean
           is_mandatory_for_all?: boolean
           lesson_id?: string | null
+          material_scope?: string
           material_type?: string
           mime_type?: string | null
           module_id?: string | null
@@ -1354,6 +1455,7 @@ export type Database = {
           is_active?: boolean
           is_mandatory_for_all?: boolean
           lesson_id?: string | null
+          material_scope?: string
           material_type?: string
           mime_type?: string | null
           module_id?: string | null
@@ -1483,6 +1585,384 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      onboarding_feedback: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string | null
+          message: string
+          program_id: string | null
+          rating: number | null
+          response: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          message: string
+          program_id?: string | null
+          rating?: number | null
+          response?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          message?: string
+          program_id?: string | null
+          rating?: number | null
+          response?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_feedback_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_program_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_feedback_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_program_items: {
+        Row: {
+          completed_at: string | null
+          course_id: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          is_required: boolean
+          item_type: string
+          link_url: string | null
+          material_id: string | null
+          mentor_confirmed_at: string | null
+          mentor_confirmed_by: string | null
+          offset_days: number
+          program_id: string
+          requires_mentor: boolean
+          section: string
+          sort_order: number
+          status: string
+          test_settings_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          video_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          course_id?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_required?: boolean
+          item_type?: string
+          link_url?: string | null
+          material_id?: string | null
+          mentor_confirmed_at?: string | null
+          mentor_confirmed_by?: string | null
+          offset_days?: number
+          program_id: string
+          requires_mentor?: boolean
+          section?: string
+          sort_order?: number
+          status?: string
+          test_settings_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          video_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          course_id?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_required?: boolean
+          item_type?: string
+          link_url?: string | null
+          material_id?: string | null
+          mentor_confirmed_at?: string | null
+          mentor_confirmed_by?: string | null
+          offset_days?: number
+          program_id?: string
+          requires_mentor?: boolean
+          section?: string
+          sort_order?: number
+          status?: string
+          test_settings_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_program_items_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_program_items_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_program_items_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_program_items_test_settings_id_fkey"
+            columns: ["test_settings_id"]
+            isOneToOne: false
+            referencedRelation: "test_settings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_program_items_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_programs: {
+        Row: {
+          comment: string | null
+          completed_at: string | null
+          created_at: string
+          hire_date: string
+          id: string
+          mentor_id: string | null
+          status: string
+          template_id: string | null
+          template_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          completed_at?: string | null
+          created_at?: string
+          hire_date: string
+          id?: string
+          mentor_id?: string | null
+          status?: string
+          template_id?: string | null
+          template_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          completed_at?: string | null
+          created_at?: string
+          hire_date?: string
+          id?: string
+          mentor_id?: string | null
+          status?: string
+          template_id?: string | null
+          template_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_programs_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_programs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_template_items: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_required: boolean
+          item_type: string
+          link_url: string | null
+          material_id: string | null
+          offset_days: number
+          requires_mentor: boolean
+          section: string
+          sort_order: number
+          template_id: string
+          test_settings_id: string | null
+          title: string
+          updated_at: string
+          video_id: string | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_required?: boolean
+          item_type?: string
+          link_url?: string | null
+          material_id?: string | null
+          offset_days?: number
+          requires_mentor?: boolean
+          section?: string
+          sort_order?: number
+          template_id: string
+          test_settings_id?: string | null
+          title: string
+          updated_at?: string
+          video_id?: string | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_required?: boolean
+          item_type?: string
+          link_url?: string | null
+          material_id?: string | null
+          offset_days?: number
+          requires_mentor?: boolean
+          section?: string
+          sort_order?: number
+          template_id?: string
+          test_settings_id?: string | null
+          title?: string
+          updated_at?: string
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_template_items_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_template_items_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_template_items_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "onboarding_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_template_items_test_settings_id_fkey"
+            columns: ["test_settings_id"]
+            isOneToOne: false
+            referencedRelation: "test_settings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_template_items_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      onboarding_templates: {
+        Row: {
+          code: string | null
+          created_at: string
+          department_id: string | null
+          description: string | null
+          duration_days: number
+          id: string
+          is_active: boolean
+          is_default: boolean
+          name: string
+          profession_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          department_id?: string | null
+          description?: string | null
+          duration_days?: number
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name: string
+          profession_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          department_id?: string | null
+          description?: string | null
+          duration_days?: number
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name?: string
+          profession_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_templates_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_templates_profession_id_fkey"
+            columns: ["profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       platform_settings: {
         Row: {
@@ -1972,9 +2452,12 @@ export type Database = {
           email: string | null
           full_name: string
           grade: string | null
+          hire_date: string | null
           id: string
           is_active: boolean
           manager_id: string | null
+          mentor_id: string | null
+          onboarding_status: string
           personnel_number: string | null
           phone: string | null
           position: string | null
@@ -1991,9 +2474,12 @@ export type Database = {
           email?: string | null
           full_name?: string
           grade?: string | null
+          hire_date?: string | null
           id: string
           is_active?: boolean
           manager_id?: string | null
+          mentor_id?: string | null
+          onboarding_status?: string
           personnel_number?: string | null
           phone?: string | null
           position?: string | null
@@ -2010,9 +2496,12 @@ export type Database = {
           email?: string | null
           full_name?: string
           grade?: string | null
+          hire_date?: string | null
           id?: string
           is_active?: boolean
           manager_id?: string | null
+          mentor_id?: string | null
+          onboarding_status?: string
           personnel_number?: string | null
           phone?: string | null
           position?: string | null
@@ -2032,6 +2521,13 @@ export type Database = {
           {
             foreignKeyName: "profiles_manager_id_fkey"
             columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_mentor_id_fkey"
+            columns: ["mentor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -2284,6 +2780,7 @@ export type Database = {
       }
       simulator_runs: {
         Row: {
+          competency_id: string | null
           correct_steps: number
           created_at: string
           current_step: number
@@ -2294,15 +2791,19 @@ export type Database = {
           max_score: number
           product_code: string
           product_name: string
+          profession_id: string | null
+          scenario: string
           score: number
           started_at: string
           status: string
           total_steps: number
           updated_at: string
           user_id: string
+          work_center_code: string | null
           xp: number
         }
         Insert: {
+          competency_id?: string | null
           correct_steps?: number
           created_at?: string
           current_step?: number
@@ -2313,15 +2814,19 @@ export type Database = {
           max_score?: number
           product_code: string
           product_name: string
+          profession_id?: string | null
+          scenario?: string
           score?: number
           started_at?: string
           status?: string
           total_steps?: number
           updated_at?: string
           user_id: string
+          work_center_code?: string | null
           xp?: number
         }
         Update: {
+          competency_id?: string | null
           correct_steps?: number
           created_at?: string
           current_step?: number
@@ -2332,15 +2837,33 @@ export type Database = {
           max_score?: number
           product_code?: string
           product_name?: string
+          profession_id?: string | null
+          scenario?: string
           score?: number
           started_at?: string
           status?: string
           total_steps?: number
           updated_at?: string
           user_id?: string
+          work_center_code?: string | null
           xp?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "simulator_runs_competency_id_fkey"
+            columns: ["competency_id"]
+            isOneToOne: false
+            referencedRelation: "competencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "simulator_runs_profession_id_fkey"
+            columns: ["profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       simulator_steps: {
         Row: {
@@ -2611,6 +3134,7 @@ export type Database = {
           shuffle_options: boolean
           shuffle_questions: boolean
           status: string
+          test_scope: string
           time_limit_minutes: number | null
           title: string | null
           total_questions: number
@@ -2638,6 +3162,7 @@ export type Database = {
           shuffle_options?: boolean
           shuffle_questions?: boolean
           status?: string
+          test_scope?: string
           time_limit_minutes?: number | null
           title?: string | null
           total_questions?: number
@@ -2665,6 +3190,7 @@ export type Database = {
           shuffle_options?: boolean
           shuffle_questions?: boolean
           status?: string
+          test_scope?: string
           time_limit_minutes?: number | null
           title?: string | null
           total_questions?: number
@@ -2833,6 +3359,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_mentor_of: {
+        Args: { _mentor: string; _target: string }
+        Returns: boolean
+      }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       manages_user: {
         Args: { _manager: string; _target: string }

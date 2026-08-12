@@ -16,6 +16,8 @@ export type AssignmentRow = {
   comment: string | null;
   course_id: string | null;
   profession_id: string | null;
+  training_type: string | null;
+  target_grade: string | null;
   courses?: { id: string; title: string; description: string | null } | null;
   professions?: { id: string; name: string; slug: string | null } | null;
 };
@@ -29,7 +31,7 @@ export function myAssignmentsQuery(userId: string | undefined) {
         supabase
           .from("assignments")
           .select(
-            "id, status, due_date, assigned_at, is_mandatory, comment, course_id, profession_id, courses(id, title, description), professions(id, name, slug)",
+            "id, status, due_date, assigned_at, is_mandatory, comment, course_id, profession_id, training_type, target_grade, courses(id, title, description), professions(id, name, slug)",
           )
           .eq("user_id", userId!)
           .order("due_date", { nullsFirst: false }) as never,

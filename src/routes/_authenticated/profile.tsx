@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateMyProfile } from "@/lib/account.functions";
+import { myPassportQuery } from "@/lib/onboarding-queries";
+import { competencyStatusLabel } from "@/lib/training-types";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
@@ -37,6 +39,7 @@ function ProfilePage() {
   const attempts = useQuery(myAttemptsQuery(user?.id));
   const earned = useQuery(myAchievementsQuery(user?.id));
   const all = useQuery(allAchievementsQuery);
+  const passport = useQuery(myPassportQuery);
   const save = useServerFn(updateMyProfile);
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -126,6 +129,39 @@ function ProfilePage() {
           </Button>
         </CardContent>
       </Card>
+
+      <div>
+        <h2 className="mb-4 text-xl font-semibold text-secondary">Профессиональный паспорт</h2>
+        {(passport.data ?? []).length === 0 ? (
+          <EmptyState
+            title="Компетенции ещё не назначены"
+            description="Компетенции появятся после назначения обучения по профессии."
+          />
+        ) : (
+          <div className="space-y-3">
+            {(passport.data ?? []).map((c) => (
+              <div
+                key={c.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4"
+              >
+                <div>
+                  <p className="font-medium text-foreground">{c.title}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {(c as { professions?: { name?: string } | null }).professions?.name ??
+                      "Общая компетенция"}
+                    {c.confirmed_at
+                      ? ` · подтверждено ${new Date(c.confirmed_at).toLocaleDateString("ru-RU")}`
+                      : ""}
+                  </p>
+                </div>
+                <Badge variant={c.status === "confirmed" ? "default" : "secondary"}>
+                  {competencyStatusLabel(c.status)}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div>
         <h2 className="mb-4 text-xl font-semibold text-secondary">Достижения</h2>

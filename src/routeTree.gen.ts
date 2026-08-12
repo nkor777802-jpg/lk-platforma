@@ -20,6 +20,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDevelopmentRouteImport } from './routes/_authenticated/development'
 import { Route as AuthenticatedGamificationRouteImport } from './routes/_authenticated/gamification'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedTestsRouteImport } from './routes/_authenticated/tests'
@@ -113,6 +114,11 @@ const AuthenticatedGamificationRoute =
 const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   id: '/library',
   path: '/library',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProductsRoute = AuthenticatedProductsRouteImport.update({
@@ -338,6 +344,7 @@ export interface FileRoutesByFullPath {
   '/development': typeof AuthenticatedDevelopmentRoute
   '/gamification': typeof AuthenticatedGamificationRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/tests': typeof AuthenticatedTestsRoute
@@ -386,6 +393,7 @@ export interface FileRoutesByTo {
   '/development': typeof AuthenticatedDevelopmentRoute
   '/gamification': typeof AuthenticatedGamificationRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/tests': typeof AuthenticatedTestsRoute
@@ -437,6 +445,7 @@ export interface FileRoutesById {
   '/_authenticated/development': typeof AuthenticatedDevelopmentRoute
   '/_authenticated/gamification': typeof AuthenticatedGamificationRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
+  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/tests': typeof AuthenticatedTestsRoute
@@ -489,6 +498,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/gamification'
     | '/library'
+    | '/onboarding'
     | '/products'
     | '/profile'
     | '/tests'
@@ -537,6 +547,7 @@ export interface FileRouteTypes {
     | '/development'
     | '/gamification'
     | '/library'
+    | '/onboarding'
     | '/products'
     | '/profile'
     | '/tests'
@@ -587,6 +598,7 @@ export interface FileRouteTypes {
     | '/_authenticated/development'
     | '/_authenticated/gamification'
     | '/_authenticated/library'
+    | '/_authenticated/onboarding'
     | '/_authenticated/products'
     | '/_authenticated/profile'
     | '/_authenticated/tests'
@@ -711,6 +723,13 @@ declare module '@tanstack/react-router' {
       path: '/library'
       fullPath: '/library'
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/products': {
@@ -1038,6 +1057,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDevelopmentRoute: typeof AuthenticatedDevelopmentRoute
   AuthenticatedGamificationRoute: typeof AuthenticatedGamificationRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedTestsRoute: typeof AuthenticatedTestsRoute
@@ -1059,6 +1079,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDevelopmentRoute: AuthenticatedDevelopmentRoute,
   AuthenticatedGamificationRoute: AuthenticatedGamificationRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedTestsRoute: AuthenticatedTestsRoute,

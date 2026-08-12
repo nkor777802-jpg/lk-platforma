@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -303,9 +303,21 @@ function ProgramList() {
                 {p.mentor_name ? ` · наставник: ${p.mentor_name}` : ""}
               </p>
             </div>
-            <Badge variant={p.status === "completed" ? "default" : "secondary"}>
-              {p.status === "completed" ? "Завершена" : "В процессе"}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant={p.status === "completed" ? "default" : "secondary"}>
+                {p.status === "completed" ? "Завершена" : "В процессе"}
+              </Badge>
+              <Button asChild size="sm" variant="outline">
+                <Link
+                  to="/onboarding/print"
+                  search={{ programId: p.id }}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  PDF
+                </Link>
+              </Button>
+            </div>
           </div>
           <Progress value={p.percent} className="mt-3" />
           <p className="mt-1 text-xs text-muted-foreground">

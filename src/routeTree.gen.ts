@@ -32,6 +32,7 @@ import { Route as PublicContactsRouteImport } from './routes/_public/contacts'
 import { Route as PublicFaqRouteImport } from './routes/_public/faq'
 import { Route as PublicManagementRouteImport } from './routes/_public/management'
 import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
+import { Route as OnboardingPrintRouteImport } from './routes/onboarding.print'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as AuthenticatedAdminAssignmentsRouteImport } from './routes/_authenticated/admin/assignments'
@@ -176,6 +177,11 @@ const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
   getParentRoute: () => PublicRouteRoute,
+} as any)
+const OnboardingPrintRoute = OnboardingPrintRouteImport.update({
+  id: '/onboarding/print',
+  path: '/onboarding/print',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
@@ -362,6 +368,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof PublicFaqRoute
   '/management': typeof PublicManagementRoute
   '/privacy': typeof PublicPrivacyRoute
+  '/onboarding/print': typeof OnboardingPrintRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -412,6 +419,7 @@ export interface FileRoutesByTo {
   '/faq': typeof PublicFaqRoute
   '/management': typeof PublicManagementRoute
   '/privacy': typeof PublicPrivacyRoute
+  '/onboarding/print': typeof OnboardingPrintRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -465,6 +473,7 @@ export interface FileRoutesById {
   '/_public/faq': typeof PublicFaqRoute
   '/_public/management': typeof PublicManagementRoute
   '/_public/privacy': typeof PublicPrivacyRoute
+  '/onboarding/print': typeof OnboardingPrintRoute
   '/_public/': typeof PublicIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/assignments': typeof AuthenticatedAdminAssignmentsRoute
@@ -519,6 +528,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/management'
     | '/privacy'
+    | '/onboarding/print'
     | '/admin/analytics'
     | '/admin/assignments'
     | '/admin/audit'
@@ -569,6 +579,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/management'
     | '/privacy'
+    | '/onboarding/print'
     | '/admin/analytics'
     | '/admin/assignments'
     | '/admin/audit'
@@ -621,6 +632,7 @@ export interface FileRouteTypes {
     | '/_public/faq'
     | '/_public/management'
     | '/_public/privacy'
+    | '/onboarding/print'
     | '/_public/'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/assignments'
@@ -657,6 +669,7 @@ export interface RootRouteChildren {
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  OnboardingPrintRoute: typeof OnboardingPrintRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -821,6 +834,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/privacy'
       preLoaderRoute: typeof PublicPrivacyRouteImport
       parentRoute: typeof PublicRouteRoute
+    }
+    '/onboarding/print': {
+      id: '/onboarding/print'
+      path: '/onboarding/print'
+      fullPath: '/onboarding/print'
+      preLoaderRoute: typeof OnboardingPrintRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -1151,6 +1171,7 @@ const rootRouteChildren: RootRouteChildren = {
   PublicRouteRoute: PublicRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  OnboardingPrintRoute: OnboardingPrintRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

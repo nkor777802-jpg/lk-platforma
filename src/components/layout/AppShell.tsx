@@ -206,6 +206,22 @@ export function AppShell({ children }: { children: ReactNode }) {
               />
               Вернуться на главную страницу
             </Link>
+            <Link
+              to="/profile"
+              onClick={() => setOpen(false)}
+              className="mb-2 flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium text-secondary hover:bg-secondary/10 active:bg-secondary active:text-secondary-foreground"
+              activeProps={{ className: "bg-secondary text-secondary-foreground" }}
+            >
+              <img
+                src={brandLogos.markBlue}
+                alt=""
+                aria-hidden="true"
+                className="h-5 w-auto object-contain"
+                width={20}
+                height={20}
+              />
+              <span className="truncate">Личный кабинет{firstName ? ` · ${firstName}` : ""}</span>
+            </Link>
             {[...NAV, ...SECONDARY_NAV].map((item) => (
               <Link
                 key={item.to}

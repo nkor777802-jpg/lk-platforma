@@ -5,6 +5,7 @@ import { LogOut, Shield, X } from "lucide-react";
 import { brandLogos } from "@/lib/brand";
 import { useAuth } from "@/hooks/useAuth";
 import { myProfileQuery } from "@/lib/lms-queries";
+import { myOnboardingQuery } from "@/lib/onboarding-queries";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { clearAdminUnlock } from "@/lib/admin-unlock";
@@ -35,6 +36,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const profile = useQuery(myProfileQuery(user?.id));
+  const onboarding = useQuery(myOnboardingQuery);
+  const showOnboarding =
+    Boolean(onboarding.data?.program) && onboarding.data?.program?.status !== "completed";
+  const navItems = showOnboarding
+    ? ([{ to: "/onboarding", label: "Я Новичок" }, ...NAV] as const)
+    : NAV;
   const fullName = (profile.data as { full_name?: string | null } | null | undefined)?.full_name;
   const parts = (fullName ?? "").trim().split(/\s+/).filter(Boolean);
   const firstName = parts.length > 1 ? parts[1] : (parts[0] ?? user?.email ?? "");
@@ -68,7 +75,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             />
           </Link>
           <nav className="hidden flex-1 items-center gap-1 lg:flex">
-            {NAV.map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
@@ -222,7 +229,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               />
               <span className="truncate">Личный кабинет{firstName ? ` · ${firstName}` : ""}</span>
             </Link>
-            {[...NAV, ...SECONDARY_NAV].map((item) => (
+            {[...navItems, ...SECONDARY_NAV].map((item) => (
               <Link
                 key={item.to}
                 to={item.to}

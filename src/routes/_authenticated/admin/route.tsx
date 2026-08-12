@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import {
   BarChart3,
   BookOpen,
@@ -10,6 +11,7 @@ import {
   FolderTree,
   Inbox,
   ListChecks,
+  Lock,
   Menu,
   PenLine,
   ScrollText,
@@ -23,7 +25,11 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { EmptyState, InlineLoading } from "@/components/states";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { unlockAdminPanel } from "@/lib/admin-unlock.functions";
+import { adminUnlockKey } from "@/lib/admin-unlock";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -67,7 +73,7 @@ export const ADMIN_NAV = [
 ] as const;
 
 function AdminLayout() {
-  const { roles, loading } = useAuth();
+  const { roles, loading, user } = useAuth();
   const allowed = roles.some((r) => ["admin", "hr", "teacher", "manager"].includes(r));
   const navItems = ADMIN_NAV.filter((item) =>
     (item.roles as readonly string[]).some((r) => roles.includes(r as never)),
@@ -78,6 +84,49 @@ function AdminLayout() {
     [...navItems]
       .sort((a, b) => b.to.length - a.to.length)
       .find((i) => pathname === i.to || pathname.startsWith(`${i.to}/`))?.label ?? "Обзор";
+
+  const [unlocked, setUnlocked] = useState(false);
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+  const unlock = useServerFn(unlockAdminPanel);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    setUnlocked(sessionStorage.getItem(adminUnlockKey(user.id)) === "1");
+  }, [user?.id]);
+
+  const handleUnlock = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!user?.id) return;
+    setPending(true);
+    setError(null);
+    try {
+      const res = await unlock({ data: { password } });
+      if (res.ok) {
+        sessionStorage.setItem(adminUnlockKey(user.id), "1");
+        setUnlocked(true);
+        setPassword("");
+      } else {
+        setError("Неверный пароль");
+      }
+    } catch {
+      setError("Не удалось проверить пароль. Повторите попытку.");
+    } finally {
+      setPending(false);
+    }
+  };
+
+  /** Раздел, открытый по прямой ссылке, тоже проверяется по ролям. */
+  const section = [...ADMIN_NAV]
+    .sort((a, b) => b.to.length - a.to.length)
+    .find((i) =>
+      (i as { exact?: boolean }).exact
+        ? pathname === i.to
+        : pathname === i.to || pathname.startsWith(`${i.to}/`),
+    );
+  const sectionAllowed =
+    !section || (section.roles as readonly string[]).some((r) => roles.includes(r as never));
 
   if (loading) return <InlineLoading />;
   if (!allowed)
@@ -91,6 +140,49 @@ function AdminLayout() {
           </Link>
         }
       />
+    );
+
+  if (!unlocked)
+    return (
+      <div className="mx-auto w-full max-w-md">
+        <form
+          onSubmit={handleUnlock}
+          className="rounded-xl border border-border bg-card p-6 shadow-sm"
+        >
+          <div className="mb-4 flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+              <Lock className="h-5 w-5" />
+            </span>
+            <div>
+              <h1 className="text-lg font-semibold text-foreground">Доступ к админ-панели</h1>
+              <p className="text-sm text-muted-foreground">
+                Введите дополнительный пароль доступа
+              </p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="admin-panel-password">Пароль доступа</Label>
+            <Input
+              id="admin-panel-password"
+              type="password"
+              autoComplete="off"
+              autoFocus
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            {error ? <p className="text-sm text-destructive">{error}</p> : null}
+          </div>
+          <Button type="submit" className="mt-4 w-full" disabled={pending || !password}>
+            {pending ? "Проверка…" : "Открыть панель"}
+          </Button>
+          <Link
+            to="/dashboard"
+            className="mt-3 block text-center text-sm text-muted-foreground hover:text-foreground"
+          >
+            Вернуться в личный кабинет
+          </Link>
+        </form>
+      </div>
     );
 
   return (
@@ -139,7 +231,19 @@ function AdminLayout() {
         </nav>
       </aside>
       <div className="min-w-0">
-        <Outlet />
+        {sectionAllowed ? (
+          <Outlet />
+        ) : (
+          <EmptyState
+            title="Доступ ограничен"
+            description="У вашей роли нет прав на этот раздел админ-панели."
+            action={
+              <Link to="/admin" className="text-primary hover:underline">
+                Вернуться к обзору
+              </Link>
+            }
+          />
+        )}
       </div>
     </div>
   );

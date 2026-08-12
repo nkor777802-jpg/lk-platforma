@@ -76,6 +76,40 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
           <div className="ml-auto flex items-center gap-0.5 sm:gap-2">
             <NotificationBell />
+            <Button
+              asChild
+              size="sm"
+              className="hidden bg-secondary text-secondary-foreground hover:bg-secondary/90 lg:inline-flex"
+            >
+              <Link to="/">
+                <img
+                  src={brandLogos.markWhite}
+                  alt=""
+                  aria-hidden="true"
+                  className="mr-1.5 h-5 w-auto object-contain"
+                  width={20}
+                  height={20}
+                />
+                Вернуться на главную страницу
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="icon"
+              aria-label="Вернуться на главную страницу"
+              className="bg-secondary text-secondary-foreground hover:bg-secondary/90 lg:hidden"
+            >
+              <Link to="/">
+                <img
+                  src={brandLogos.markWhite}
+                  alt=""
+                  aria-hidden="true"
+                  className="h-5 w-auto object-contain"
+                  width={20}
+                  height={20}
+                />
+              </Link>
+            </Button>
             {canAccessAdmin ? (
               <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
                 <Link to="/admin">
@@ -129,6 +163,21 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
         {open ? (
           <nav className="max-h-[70vh] overflow-y-auto border-t border-border bg-card px-4 py-2 lg:hidden">
+            <Link
+              to="/"
+              onClick={() => setOpen(false)}
+              className="mb-2 flex items-center gap-2 rounded-md bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/90"
+            >
+              <img
+                src={brandLogos.markWhite}
+                alt=""
+                aria-hidden="true"
+                className="h-5 w-auto object-contain"
+                width={20}
+                height={20}
+              />
+              Вернуться на главную страницу
+            </Link>
             {[...NAV, ...SECONDARY_NAV].map((item) => (
               <Link
                 key={item.to}

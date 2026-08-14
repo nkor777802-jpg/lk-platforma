@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { OrgChart } from "@/components/org/OrgChart";
+import { OrgGraph } from "@/components/org/OrgGraph";
 import { publicOrgStructureQuery } from "@/lib/public-queries";
 
 const TITLE = "Организационная структура — АО «Людиновокабель»";
@@ -67,11 +67,10 @@ function PublicStructurePage() {
             </p>
           ) : (
             <>
-              <OrgChart
+              <OrgGraph
                 units={data.units}
                 title="Схема предприятия"
                 {...(data.version?.title ? { subtitle: data.version.title } : {})}
-                variant="public"
               />
               <p className="mt-4 text-xs text-muted-foreground">
                 Персональные данные работников на публичной схеме не отображаются.

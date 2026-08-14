@@ -255,3 +255,35 @@
     transform: none;
   }
 }
+
+/* --- Оргсхема: соединительные линии --- */
+.org-children > li::before,
+.org-children > li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 1px;
+  background: var(--border);
+}
+
+.org-children > li::before {
+  left: 0;
+}
+
+.org-children > li::after {
+  right: 0;
+}
+
+.org-children > li:first-child::before,
+.org-children > li:last-child::after,
+.org-children > li:only-child::before,
+.org-children > li:only-child::after {
+  display: none;
+}
+
+.org-root > li::before,
+.org-root > li::after,
+.org-root > li > .org-line-up {
+  display: none;
+}

@@ -190,6 +190,7 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
   const total = roots.reduce((sum, r) => sum + r.planned, 0);
   const [fit, setFit] = useState(true);
   const [scale, setScale] = useState(1);
+  const [innerH, setInnerH] = useState<number | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
 
@@ -207,6 +208,7 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
     if (needed <= 0 || available <= 0) return;
     const next = Math.min(1, Math.max(0.7, available / needed));
     setScale(Number(next.toFixed(3)));
+    setInnerH(needed);
   }, [fit]);
 
   useLayoutEffect(() => {
@@ -237,7 +239,11 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
           {fit ? "Одним листом" : "Обычный масштаб"}
         </button>
       </div>
-      <div ref={wrapRef} className="w-full">
+      <div
+        ref={wrapRef}
+        className="w-full"
+        style={innerH && scale < 1 ? { height: innerH * scale } : undefined}
+      >
         <div
           ref={innerRef}
           style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}

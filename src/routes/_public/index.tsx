@@ -6,6 +6,7 @@ import { publicProfessionsQuery } from "@/lib/public-queries";
 import { Section, InfoCard } from "@/components/public/sections";
 import { AnimatedStageList } from "@/components/public/animated-stage-list";
 import { ProfessionGrid } from "@/components/public/ProfessionGrid";
+import { OrgStructurePreview } from "@/components/public/OrgStructurePreview";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -110,6 +111,14 @@ function HomePage() {
         <Button asChild variant="link" className="mt-6 px-0">
           <Link to="/training">Как устроено обучение</Link>
         </Button>
+      </Section>
+
+      <Section
+        id="structure"
+        title="Структура предприятия"
+        lead="Организационная структура завода по действующей штатной расстановке: подразделения, должности и численность."
+      >
+        <OrgStructurePreview />
       </Section>
 
       <Section

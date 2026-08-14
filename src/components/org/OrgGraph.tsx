@@ -309,6 +309,34 @@ export function OrgGraph({
 
   const exportName = focusNode ? fileSlug(focusNode.name) : "обзор";
 
+  const hits = useMemo(() => searchUnits(allRoots, query), [allRoots, query]);
+
+  /** Раскрыть предков узла, прокрутить к карточке и подсветить её. */
+  const goToNode = (key: string) => {
+    const inFocus = focusKey ? Boolean(findNode(roots, key)) : true;
+    const targetBranch = inFocus ? branchId : "__all";
+    if (!inFocus) setFocusKey(null);
+    const base = inFocus ? allRoots : allRoots;
+    const keys = ancestorsOf(base, [key]);
+    setExpandedByBranch((prev) => ({
+      ...prev,
+      [targetBranch]: [...new Set([...(prev[targetBranch] ?? []), ...keys])],
+    }));
+    setQuery("");
+    setResultsOpen(false);
+    searchSnapshot.current = null;
+    window.setTimeout(() => {
+      const el = document.querySelector<HTMLElement>(`[data-node-key="${CSS.escape(key)}"]`);
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+      el.classList.add("ring-2", "ring-primary", "ring-offset-2", "ring-offset-background");
+      window.setTimeout(
+        () => el.classList.remove("ring-2", "ring-primary", "ring-offset-2", "ring-offset-background"),
+        2200,
+      );
+    }, 320);
+  };
+
   const runExport = async (format: "png" | "svg" | "pdf") => {
     const target = innerRef.current;
     if (!target) return;

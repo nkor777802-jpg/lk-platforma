@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import {
   ChevronDown,
   ChevronRight,
+  Factory,
   Maximize2,
   Minus,
   Plus,
   Scan,
   Search,
+  Users,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,12 +26,19 @@ import {
   pathTo,
   type OrgNode,
   type OrgUnitData,
+  type OrgWorkCenterLink,
 } from "@/lib/org-tree";
 
 interface Props {
   units: OrgUnitData[];
   title?: string;
   subtitle?: string;
+  /** public — без ФИО и ссылок на профили; internal — полный доступ. */
+  variant?: "public" | "internal";
+  workCenters?: OrgWorkCenterLink[];
+  /** Контейнер со схемой (без масштабирования) — для экспорта PNG/SVG. */
+  exportRef?: React.RefObject<HTMLDivElement | null>;
+  onStateChange?: (state: { focusKey: string | null; expanded: string[] }) => void;
 }
 
 function num(v: number) {

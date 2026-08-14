@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Download, FileCode2, FileSpreadsheet, Image as ImageIcon, Printer } from "lucide-react";
+import { Download, FileSpreadsheet, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { InlineLoading } from "@/components/states";
@@ -15,7 +15,6 @@ export function OrgStructureViewer() {
   const versions = useQuery(orgVersionsQuery());
   const structure = useQuery(orgStructureQuery(versionId === "active" ? null : versionId));
   const exportExcel = useServerFn(exportOrgExcel);
-  const captureRef = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState(false);
   const [view, setView] = useState<{ focusKey: string | null; expanded: string[] }>({
     focusKey: null,
@@ -35,26 +34,6 @@ export function OrgStructureViewer() {
       const link = document.createElement("a");
       link.href = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${res.base64}`;
       link.download = res.fileName;
-      link.click();
-    } catch (e) {
-      toast.error((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const downloadImage = async (format: "png" | "svg") => {
-    if (!captureRef.current) return;
-    setBusy(true);
-    try {
-      const mod = await import("html-to-image");
-      const dataUrl =
-        format === "png"
-          ? await mod.toPng(captureRef.current, { pixelRatio: 2, backgroundColor: "#ffffff" })
-          : await mod.toSvg(captureRef.current, { backgroundColor: "#ffffff" });
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = `Оргструктура_${new Date().toISOString().slice(0, 10)}.${format}`;
       link.click();
     } catch (e) {
       toast.error((e as Error).message);
@@ -93,12 +72,6 @@ export function OrgStructureViewer() {
         <Button variant="outline" size="sm" onClick={downloadExcel} disabled={busy}>
           <FileSpreadsheet className="mr-2 h-4 w-4" /> Excel
         </Button>
-        <Button variant="outline" size="sm" onClick={() => downloadImage("png")} disabled={busy}>
-          <ImageIcon className="mr-2 h-4 w-4" /> PNG
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => downloadImage("svg")} disabled={busy}>
-          <FileCode2 className="mr-2 h-4 w-4" /> SVG
-        </Button>
         <Button
           variant="outline"
           size="sm"
@@ -119,7 +92,6 @@ export function OrgStructureViewer() {
         units={data.units}
         workCenters={data.workCenters}
         variant="internal"
-        exportRef={captureRef}
         onStateChange={setView}
         title="Организационная структура"
         subtitle={data.version.title}

@@ -623,6 +623,7 @@ export function OrgGraph({
           dragging.current = false;
         }}
         onWheel={(e) => {
+          if (view === "sheet") return;
           if (!e.ctrlKey && !e.metaKey) return;
           e.preventDefault();
           setZoom((z) => Math.min(1.6, Math.max(0.35, z - e.deltaY * 0.001)));
@@ -630,8 +631,12 @@ export function OrgGraph({
       >
         <div
           ref={contentRef}
-          className="w-max origin-top-left"
-          style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
+          className={view === "sheet" ? "mx-auto w-max origin-top" : "w-max origin-top-left"}
+          style={
+            view === "sheet"
+              ? { transform: `scale(${sheetScale})`, height: sheetScale < 1 ? undefined : undefined }
+              : { transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }
+          }
         >
           <div ref={innerRef} className="bg-background">
             <OrgBranch
@@ -640,19 +645,22 @@ export function OrgGraph({
               onOpen={(n) => setDetail(n)}
               expanded={expanded}
               onToggle={toggle}
+              sheet={view === "sheet"}
             />
           </div>
         </div>
       </div>
       ) : (
         <div className={fullscreen ? "flex-1 overflow-y-auto" : "max-h-[75vh] overflow-y-auto"}>
-          <OrgPoster
-            roots={roots}
-            note={note}
-            query={query}
-            onOpen={(n) => setDetail(n)}
-            onOpenBranch={(n) => setFocusKey(n.key)}
-          />
+          <div ref={innerRef} className="bg-background">
+            <OrgPoster
+              roots={roots}
+              note={note}
+              query={query}
+              onOpen={(n) => setDetail(n)}
+              onOpenBranch={(n) => setFocusKey(n.key)}
+            />
+          </div>
         </div>
       )}
 

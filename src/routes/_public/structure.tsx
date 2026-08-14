@@ -37,19 +37,26 @@ function PublicStructurePage() {
     <>
       <section className="brand-pattern-blue text-secondary-foreground">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:py-20">
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Организационная структура</h1>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Организационная структура{stats?.year ? `, ${stats.year} год` : ""}
+          </h1>
           <p className="mt-4 max-w-3xl text-lg opacity-90">
             Как устроено предприятие: подразделения, должности и численность.
           </p>
           {stats ? (
             <dl className="mt-8 flex flex-wrap gap-8">
               {[
-                { label: "Подразделений", value: num(stats.units) },
-                { label: "Должностей", value: num(stats.positions) },
-                { label: "Численность", value: num(stats.planned) },
+                { label: "Подразделений", value: num(stats.units), accent: false },
+                { label: "Должностей", value: num(stats.positions), accent: false },
+                { label: "Штатная численность", value: num(stats.planned), accent: false },
+                {
+                  label: "в том числе основных производственных рабочих",
+                  value: num(stats.productionWorkers),
+                  accent: true,
+                },
               ].map((m) => (
-                <div key={m.label}>
-                  <dd className="text-3xl font-bold">{m.value}</dd>
+                <div key={m.label} className="max-w-[16rem]">
+                  <dd className={`text-3xl font-bold ${m.accent ? "text-primary" : ""}`}>{m.value}</dd>
                   <dt className="text-sm opacity-80">{m.label}</dt>
                 </div>
               ))}

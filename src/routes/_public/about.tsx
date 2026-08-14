@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { about, company } from "@/content/site";
 import { useCompany } from "@/hooks/useCompany";
 import { Section, InfoCard } from "@/components/public/sections";
+import { PageHero } from "@/components/public/PageHero";
 
 const TITLE = "О предприятии — Людиновокабель";
 const DESCRIPTION =

@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { isProductionWorker } from "./org-tree";
+import { isProductionUnitKey, isProductionWorker } from "./org-tree";
 
 const contactSchema = z.object({
   fullName: z.string().trim().min(2, "Укажите ФИО").max(120),
@@ -132,7 +132,7 @@ export const getPublicOrgStructure = createServerFn({ method: "GET" }).handler(a
     top: units.filter((u) => u.level === 1).length,
     productionWorkers: Math.round(
       units
-        .filter((u) => u.key.startsWith("root/производственный департамент"))
+        .filter((u) => isProductionUnitKey(u.key))
         .reduce(
           (s, u) => s + u.positions.reduce((ps, p) => ps + (isProductionWorker(p.name) ? p.planned : 0), 0),
           0,

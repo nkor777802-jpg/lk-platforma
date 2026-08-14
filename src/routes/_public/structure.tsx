@@ -50,7 +50,7 @@ function PublicStructurePage() {
                 { label: "Должностей", value: num(stats.positions), accent: false },
                 { label: "Штатная численность", value: num(stats.planned), accent: false },
                 {
-                  label: "в том числе основных производственных рабочих",
+                  label: "в том числе производственных рабочих",
                   value: num(stats.productionWorkers),
                   accent: true,
                 },

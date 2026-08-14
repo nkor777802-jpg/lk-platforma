@@ -256,6 +256,13 @@ export function OrgGraph({
     return out;
   }, [roots]);
 
+  const detailCenters = useMemo(() => {
+    if (!detail?.departmentId) return [];
+    return workCenters
+      .filter((l) => l.departmentId === detail.departmentId && l.center)
+      .map((l) => l.center!);
+  }, [detail, workCenters]);
+
   const detailSheet = (
     <Sheet open={Boolean(detail)} onOpenChange={(o) => !o && setDetail(null)}>
       <SheetContent className="w-full overflow-y-auto sm:max-w-md">

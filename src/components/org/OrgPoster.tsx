@@ -12,6 +12,7 @@ import {
   MonitorCog,
   ShieldCheck,
   UserRound,
+  UserRoundCog,
   Users,
   UsersRound,
   Wallet,
@@ -108,6 +109,40 @@ export function IconFor({ node, depth, className }: { node: OrgNode; depth: numb
   return <Users className={cls} />;
 }
 
+/** Подсветка руководителя подразделения: значок + должность + ФИО. */
+export function HeadBadge({
+  node,
+  inverted,
+  className,
+}: {
+  node: OrgNode;
+  inverted?: boolean;
+  className?: string;
+}) {
+  const position = headPositionOf(node);
+  if (!position && !node.managerName) return null;
+  const box = inverted
+    ? "border-current/30 bg-foreground/10"
+    : "border-primary/30 bg-primary/10";
+  const title = inverted ? "" : "text-primary";
+  const sub = inverted ? "opacity-80" : "text-muted-foreground";
+  return (
+    <span
+      className={`mt-1.5 flex items-start gap-1.5 rounded-md border px-2 py-1 text-left ${box} ${className ?? ""}`}
+    >
+      <UserRoundCog className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${title}`} aria-hidden />
+      <span className="min-w-0">
+        {position ? (
+          <span className={`block text-[11px] font-semibold leading-snug break-words ${title}`}>{position}</span>
+        ) : null}
+        {node.managerName ? (
+          <span className={`block text-[11px] leading-snug break-words ${sub}`}>{node.managerName}</span>
+        ) : null}
+      </span>
+    </span>
+  );
+}
+
 interface Props {
   roots: OrgNode[];
   note?: string | undefined;
@@ -181,21 +216,14 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
                   <span className="block text-sm font-bold uppercase leading-snug text-secondary break-words">
                     {node.name}
                   </span>
-                  {headPositionOf(node) ? (
-                    <span className="mt-1 block text-xs font-medium text-primary break-words">
-                      {headPositionOf(node)}
-                    </span>
-                  ) : null}
-                  {node.managerName ? (
-                    <span className="mt-1 block text-xs text-muted-foreground break-words">{node.managerName}</span>
-                  ) : null}
+                  <HeadBadge node={node} />
                 </span>
               </button>
 
               <div className="flex items-center justify-between gap-2 border-t border-border px-4 py-2 text-xs text-muted-foreground">
                 <span>
                   {node.children.length ? `${fmt(node.children.length)} подразд. · ` : ""}
-                  штат {fmt(node.planned)}
+                  штат {fmt(node.planned)} ед.
                 </span>
               </div>
 

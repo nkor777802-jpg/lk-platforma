@@ -1,22 +1,53 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { brandLogos } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
-const NAV = [
+type NavLink = { to: string; label: string };
+type NavGroup = { label: string; items: NavLink[] };
+type NavEntry = NavLink | NavGroup;
+
+const NAV: NavEntry[] = [
   { to: "/", label: "Главная" },
-  { to: "/about", label: "О предприятии" },
-  { to: "/management", label: "Руководство" },
-  { to: "/training", label: "Обучение" },
-  { to: "/structure", label: "Структура" },
-  { to: "/training/professions", label: "Обучение по профессиям" },
+  {
+    label: "АО «Людиновокабель»",
+    items: [
+      { to: "/about", label: "О предприятии" },
+      { to: "/structure", label: "Структура" },
+      { to: "/management", label: "Руководство" },
+    ],
+  },
+  {
+    label: "Структура обучения",
+    items: [
+      { to: "/training", label: "Структура обучения" },
+      { to: "/training/professions", label: "Возможные профессии для обучения" },
+    ],
+  },
   { to: "/faq", label: "Частые вопросы" },
   { to: "/contacts", label: "Контакты" },
-] as const;
+];
+
+function isGroup(e: NavEntry): e is NavGroup {
+  return "items" in e;
+}
 
 export function PublicHeader() {
   const [open, setOpen] = useState(false);
+  const linkClass =
+    "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur">
@@ -43,17 +74,41 @@ export function PublicHeader() {
           translate="no"
           className="notranslate hidden flex-1 items-center gap-1 lg:flex"
         >
-          {NAV.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              activeOptions={{ exact: item.to === "/" }}
-              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              activeProps={{ className: "bg-secondary/10 text-secondary" }}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {NAV.map((entry) =>
+            isGroup(entry) ? (
+              <DropdownMenu key={entry.label}>
+                <DropdownMenuTrigger
+                  className={`${linkClass} inline-flex items-center gap-1 data-[state=open]:bg-secondary/10 data-[state=open]:text-secondary`}
+                >
+                  {entry.label}
+                  <ChevronDown className="h-4 w-4" aria-hidden />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="notranslate min-w-56">
+                  {entry.items.map((item) => (
+                    <DropdownMenuItem key={item.to} asChild>
+                      <Link
+                        to={item.to}
+                        className="cursor-pointer"
+                        activeProps={{ className: "bg-secondary/10 text-secondary" }}
+                      >
+                        {item.label}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link
+                key={entry.to}
+                to={entry.to}
+                activeOptions={{ exact: entry.to === "/" }}
+                className={linkClass}
+                activeProps={{ className: "bg-secondary/10 text-secondary" }}
+              >
+                {entry.label}
+              </Link>
+            ),
+          )}
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
@@ -91,18 +146,40 @@ export function PublicHeader() {
           className="notranslate border-t border-border bg-card lg:hidden"
         >
           <div className="mx-auto flex max-w-7xl flex-col p-2">
-            {NAV.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                activeOptions={{ exact: item.to === "/" }}
-                onClick={() => setOpen(false)}
-                className="rounded-md px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-                activeProps={{ className: "bg-secondary/10 text-secondary" }}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {NAV.map((entry) =>
+              isGroup(entry) ? (
+                <Collapsible key={entry.label}>
+                  <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground [&[data-state=open »]]:text-foreground">
+                    {entry.label}
+                    <ChevronDown className="h-4 w-4 transition-transform" aria-hidden />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="flex flex-col pl-3">
+                    {entry.items.map((item) => (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        onClick={() => setOpen(false)}
+                        className="rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+                        activeProps={{ className: "bg-secondary/10 text-secondary" }}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </CollapsibleContent>
+                </Collapsible>
+              ) : (
+                <Link
+                  key={entry.to}
+                  to={entry.to}
+                  activeOptions={{ exact: entry.to === "/" }}
+                  onClick={() => setOpen(false)}
+                  className="rounded-md px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                  activeProps={{ className: "bg-secondary/10 text-secondary" }}
+                >
+                  {entry.label}
+                </Link>
+              ),
+            )}
           </div>
         </nav>
       ) : null}

@@ -216,7 +216,7 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
         </div>
       ) : null}
 
-      <div className="org-bus mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="org-bus mt-6 grid gap-x-4 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {topLevel.map((node) => {
           const kind = kindOf(node, 1);
           const highlighted = Boolean(query.trim()) && matches(node, query);

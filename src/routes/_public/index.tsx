@@ -77,7 +77,7 @@ function HomePage() {
                 <Link to="/auth">Войти в систему обучения</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="bg-transparent">
-                <Link to="/training/professions">Смотреть профессии</Link>
+                <Link to="/training/professions">Возможные профессии для обучения</Link>
               </Button>
             </div>
           </div>

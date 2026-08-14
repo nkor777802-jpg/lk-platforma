@@ -382,7 +382,8 @@ export async function loadStructure(input: {
       name: u.name,
       unitType: u.unit_type,
       level: u.level,
-      managerName: input.canSeePersonal ? u.manager_name : null,
+      // ФИО руководителя подразделения показываем всем — это публичная информация.
+      managerName: u.manager_name,
       planned: Number(u.planned_units),
       actual: Number(u.actual_units),
       vacant: Number(u.vacant_units),

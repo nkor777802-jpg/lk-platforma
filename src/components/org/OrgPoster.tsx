@@ -129,6 +129,7 @@ export function HeadBadge({
 }) {
   const position = headPositionOf(node);
   if (!position) return null;
+  const manager = (node.managerName ?? "").trim();
   const box = inverted
     ? "border-current/30 bg-foreground/10"
     : "border-primary/30 bg-primary/10";
@@ -154,11 +155,17 @@ export function HeadBadge({
           <TooltipContent side="top" className="max-w-[240px] text-left">
             <span className="block font-semibold">Руководитель подразделения</span>
             <span className="block text-xs opacity-90">{position}</span>
+            {manager ? <span className="block text-xs opacity-90">{manager}</span> : null}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
       <span className="min-w-0">
         <span className={`block text-[11px] font-semibold leading-snug break-words ${title}`}>{position}</span>
+        {manager ? (
+          <span className={`block text-[11px] leading-snug break-words ${inverted ? "opacity-90" : "text-foreground/80"}`}>
+            {manager}
+          </span>
+        ) : null}
       </span>
     </span>
   );
@@ -257,6 +264,9 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
               </span>
               {headPositionOf(head) ? (
                 <span className="block text-xs text-foreground/80 break-words">{headPositionOf(head)}</span>
+              ) : null}
+              {head.managerName ? (
+                <span className="block text-xs font-semibold text-foreground break-words">{head.managerName}</span>
               ) : null}
               <span className="mt-0.5 block text-[11px] text-muted-foreground">
                 Общая численность — {fmt(total)} сотрудников

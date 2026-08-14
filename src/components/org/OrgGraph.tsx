@@ -677,7 +677,15 @@ export function OrgGraph({
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/40" aria-hidden /> Рабочие места и профессии
         </span>
-        <span className="ml-auto">{focusNode ? "Перетаскивайте схему мышью, Ctrl + колесо — масштаб" : "Выберите подразделение, чтобы увидеть подробную структуру"}</span>
+        <span className="ml-auto">
+          {!focusNode
+            ? "Выберите подразделение, чтобы увидеть подробную структуру"
+            : view === "sheet"
+              ? sheetScale <= MIN_SHEET_SCALE
+                ? "Ветка очень большая — откройте вложенное подразделение или разверните на весь экран"
+                : "Вся ветка на одном листе, масштаб подобран автоматически"
+              : "Перетаскивайте схему мышью, Ctrl + колесо — масштаб"}
+        </span>
       </div>
 
       {detailSheet}

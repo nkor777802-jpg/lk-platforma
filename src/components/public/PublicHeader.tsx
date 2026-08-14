@@ -149,7 +149,7 @@ export function PublicHeader() {
             {NAV.map((entry) =>
               isGroup(entry) ? (
                 <Collapsible key={entry.label}>
-                  <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground [&[data-state=open »]]:text-foreground">
+                  <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
                     {entry.label}
                     <ChevronDown className="h-4 w-4 transition-transform" aria-hidden />
                   </CollapsibleTrigger>

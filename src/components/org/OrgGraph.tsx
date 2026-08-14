@@ -498,8 +498,6 @@ export function OrgGraph({
           <div ref={innerRef} className="bg-background">
             <OrgPoster
               roots={roots}
-              title={title}
-              subtitle={subtitle}
               note={note}
               query={query}
               onOpen={(n) => setDetail(n)}

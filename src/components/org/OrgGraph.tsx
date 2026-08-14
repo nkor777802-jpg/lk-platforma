@@ -496,7 +496,7 @@ export function OrgGraph({
           className="h-9"
           onClick={() => setExpanded(new Set(roots.map((r) => r.key)))}
         >
-          Свернуть
+          Свернуть всё
         </Button>
 
         <div className="flex items-center gap-1">
@@ -532,6 +532,24 @@ export function OrgGraph({
         </div>
       </div>
 
+      <nav className="flex flex-wrap items-center gap-1 border-b border-border px-3 py-2 text-xs text-muted-foreground">
+        <button type="button" className="hover:underline" onClick={() => setFocusKey(null)}>
+          Вся структура
+        </button>
+        {focusCrumbs.map((c) => (
+          <span key={c.key} className="flex items-center gap-1">
+            <ChevronRight className="h-3 w-3" />
+            <button
+              type="button"
+              className="text-left hover:underline"
+              onClick={() => setFocusKey(c.key)}
+            >
+              {c.name}
+            </button>
+          </span>
+        ))}
+      </nav>
+
       <div
         ref={canvasRef}
         className={[
@@ -564,18 +582,20 @@ export function OrgGraph({
           className="w-max origin-top-left"
           style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
         >
-          <ul className="org-children org-root flex items-start justify-center pt-8 pb-16">
-            {roots.map((root) => (
-              <GraphNode
-                key={root.key}
-                node={root}
-                expanded={expanded}
-                toggle={toggle}
-                query={query}
-                onOpen={(n) => setDetail(n)}
-              />
-            ))}
-          </ul>
+          <div ref={innerRef} className="bg-background">
+            <ul className="org-children org-root flex items-start justify-center pt-8 pb-16">
+              {roots.map((root) => (
+                <GraphNode
+                  key={root.key}
+                  node={root}
+                  expanded={expanded}
+                  toggle={toggle}
+                  query={query}
+                  onOpen={(n) => setDetail(n)}
+                />
+              ))}
+            </ul>
+          </div>
         </div>
         {roots.length === 0 ? (
           <p className="p-6 text-sm text-muted-foreground">Структура не загружена.</p>

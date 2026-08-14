@@ -38,7 +38,7 @@ function PublicStructurePage() {
       <section className="brand-pattern-blue text-secondary-foreground">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:py-20">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Организационная структура{stats?.year ? `, ${stats.year} год` : ""}
+            Организационная структура{stats?.year ? ` ${stats.year} год` : ""}
           </h1>
           <p className="mt-4 max-w-3xl text-lg opacity-90">
             Как устроено предприятие: подразделения, должности и численность.

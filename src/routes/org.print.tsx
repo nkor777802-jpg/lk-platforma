@@ -112,7 +112,7 @@ function OrgPrintPage() {
 
       <div className="print-sheet mx-auto max-w-5xl rounded-lg border border-border bg-background p-8 shadow-sm">
         <header className="mb-6 flex items-center justify-between gap-4 border-b border-border pb-4">
-          <img src={brandLogos.light} alt={company.name} className="h-12 w-auto" />
+          <img src={brandLogos.fullColor} alt={company.legalName} className="h-12 w-auto" />
           <div className="text-right text-xs text-muted-foreground">
             <p className="text-sm font-semibold text-secondary">Организационная структура</p>
             <p>{structure.data.version.title}</p>
@@ -148,7 +148,7 @@ function OrgPrintPage() {
         </table>
 
         <footer className="mt-6 border-t border-border pt-3 text-[10px] text-muted-foreground">
-          {company.name} · сформировано {new Date().toLocaleDateString("ru-RU")}
+          {company.legalName} · сформировано {new Date().toLocaleDateString("ru-RU")}
         </footer>
       </div>
     </div>

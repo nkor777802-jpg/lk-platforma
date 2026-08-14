@@ -60,6 +60,18 @@ export function isProductionWorker(positionName: string): boolean {
   return !NON_WORKER_TITLES.some((t) => n.startsWith(t));
 }
 
+/** Подразделения основного и вспомогательного производства. */
+const PRODUCTION_UNIT_KEYS = [
+  "root/производственный департамент/служба директора по производству/цех № 1",
+  "root/производственный департамент/техническая служба",
+];
+
+/** Относится ли подразделение к основному или вспомогательному производству. */
+export function isProductionUnitKey(key: string): boolean {
+  const k = key.trim().toLowerCase();
+  return PRODUCTION_UNIT_KEYS.some((p) => k === p || k.startsWith(`${p}/`));
+}
+
 export interface OrgNode extends OrgUnitData {
   children: OrgNode[];
 }

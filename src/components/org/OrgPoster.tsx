@@ -212,20 +212,20 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
               </span>
             </span>
           </button>
-          <span className="h-6 w-px bg-border" aria-hidden />
+          <span className="org-link h-6 w-0.5" aria-hidden />
         </div>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="org-bus mt-6 grid gap-x-4 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {topLevel.map((node) => {
           const kind = kindOf(node, 1);
           const highlighted = Boolean(query.trim()) && matches(node, query);
           return (
+            <div key={node.key} className="flex">
             <div
-              key={node.key}
               data-node-key={node.key}
               className={[
-                "flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md",
+                "flex w-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md",
                 highlighted ? "ring-2 ring-ring ring-offset-2 ring-offset-background" : "",
               ].join(" ")}
             >
@@ -265,6 +265,7 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
                   <ChevronRight className="h-3.5 w-3.5" />
                 </button>
               ) : null}
+            </div>
             </div>
           );
         })}

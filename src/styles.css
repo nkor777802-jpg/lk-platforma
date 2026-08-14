@@ -257,14 +257,18 @@
 }
 
 /* --- Оргсхема: соединительные линии --- */
+.org-link {
+  background: color-mix(in oklab, var(--secondary) 45%, transparent);
+}
+
 .org-children > li::before,
 .org-children > li::after {
   content: "";
   position: absolute;
   top: 0;
   width: 50%;
-  height: 1px;
-  background: var(--border);
+  height: 2px;
+  background: color-mix(in oklab, var(--secondary) 45%, transparent);
 }
 
 .org-children > li::before {
@@ -286,4 +290,89 @@
 .org-root > li::after,
 .org-root > li > .org-line-up {
   display: none;
+}
+
+/* Вертикальная направляющая вложенных уровней */
+.org-vlist {
+  border-left: 2px solid color-mix(in oklab, var(--secondary) 45%, transparent);
+}
+
+.org-vlist > li::before {
+  content: "";
+  position: absolute;
+  left: -1rem;
+  top: 1.25rem;
+  width: 1rem;
+  height: 2px;
+  background: color-mix(in oklab, var(--secondary) 45%, transparent);
+}
+
+/* --- Обзорный лист: шина связей от руководителя к карточкам --- */
+.org-bus {
+  position: relative;
+}
+
+.org-bus > * {
+  position: relative;
+}
+
+/* Вертикальный отвод к каждой карточке */
+.org-bus > *::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -1.5rem;
+  width: 2px;
+  height: 1.5rem;
+  transform: translateX(-50%);
+  background: color-mix(in oklab, var(--secondary) 45%, transparent);
+}
+
+/* Горизонтальные перемычки: соединяют центры соседних карточек в одном ряду */
+.org-bus > *::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  right: calc(-1rem - 50%);
+  top: -1.5rem;
+  height: 2px;
+  background: color-mix(in oklab, var(--secondary) 45%, transparent);
+}
+
+/* Мобильная сетка в одну колонку — связи не рисуем */
+.org-bus > *::before,
+.org-bus > *::after {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .org-bus > *::before,
+  .org-bus > *::after {
+    display: block;
+  }
+  .org-bus > *:nth-child(2n)::after,
+  .org-bus > *:last-child::after {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .org-bus > *:nth-child(2n)::after {
+    display: block;
+  }
+  .org-bus > *:nth-child(3n)::after,
+  .org-bus > *:last-child::after {
+    display: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .org-bus > *:nth-child(2n)::after,
+  .org-bus > *:nth-child(3n)::after {
+    display: block;
+  }
+  .org-bus > *:nth-child(4n)::after,
+  .org-bus > *:last-child::after {
+    display: none;
+  }
 }

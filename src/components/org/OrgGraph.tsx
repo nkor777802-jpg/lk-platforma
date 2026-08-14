@@ -316,8 +316,7 @@ export function OrgGraph({
     const inFocus = focusKey ? Boolean(findNode(roots, key)) : true;
     const targetBranch = inFocus ? branchId : "__all";
     if (!inFocus) setFocusKey(null);
-    const base = inFocus ? allRoots : allRoots;
-    const keys = ancestorsOf(base, [key]);
+    const keys = ancestorsOf(allRoots, [key]);
     setExpandedByBranch((prev) => ({
       ...prev,
       [targetBranch]: [...new Set([...(prev[targetBranch] ?? []), ...keys])],

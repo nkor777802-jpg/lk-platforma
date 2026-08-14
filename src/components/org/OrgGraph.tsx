@@ -647,14 +647,58 @@ export function OrgGraph({
           {subtitle ? <p className="truncate text-xs text-muted-foreground">{subtitle}</p> : null}
         </div>
 
-        <div className="relative w-56">
+        <div className="relative w-72">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Поиск"
-            className="h-9 pl-9"
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setResultsOpen(true);
+            }}
+            onFocus={() => setResultsOpen(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setResultsOpen(false);
+              if (e.key === "Enter" && hits[0]) goToNode(hits[0].node.key);
+            }}
+            placeholder="Подразделение, отдел или должность"
+            className="h-9 pl-9 pr-8"
           />
+          {query ? (
+            <button
+              type="button"
+              aria-label="Очистить поиск"
+              onClick={() => {
+                setQuery("");
+                setResultsOpen(false);
+              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          ) : null}
+          {resultsOpen && query.trim() ? (
+            <div className="absolute left-0 top-full z-40 mt-1 max-h-80 w-full overflow-auto rounded-lg border border-border bg-popover p-1 shadow-lg">
+              <p className="px-2 py-1 text-[11px] text-muted-foreground">
+                {hits.length ? `Найдено: ${hits.length}` : "Ничего не найдено"}
+              </p>
+              {hits.map((h) => (
+                <button
+                  key={h.node.key}
+                  type="button"
+                  onClick={() => goToNode(h.node.key)}
+                  className="block w-full rounded-md px-2 py-1.5 text-left hover:bg-muted focus-visible:outline-none focus-visible:bg-muted"
+                >
+                  <span className="block text-sm font-medium text-secondary break-words">{h.node.name}</span>
+                  {h.reason ? (
+                    <span className="block text-xs text-primary break-words">{h.reason}</span>
+                  ) : null}
+                  {h.path.length ? (
+                    <span className="block text-[11px] text-muted-foreground break-words">{h.path.join(" › ")}</span>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         {focusNode ? (

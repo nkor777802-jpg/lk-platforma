@@ -328,11 +328,7 @@ export function OrgGraph({
                     .map((p, i) => (
                       <li key={`${p.fullName}-${i}`} className="border-b border-border py-1">
                         {p.profileId ? (
-                          <Link
-                            to="/admin/users"
-                            search={{ q: p.fullName ?? "" }}
-                            className="font-medium text-secondary hover:underline"
-                          >
+                          <Link to="/admin/users" className="font-medium text-secondary hover:underline">
                             {p.fullName}
                           </Link>
                         ) : (

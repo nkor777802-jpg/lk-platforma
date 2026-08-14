@@ -484,19 +484,28 @@ export function OrgGraph({
           fullscreen ? "flex-1" : "h-[70vh]",
         ].join(" ")}
         onPointerDown={(e) => {
+          if ((e.target as HTMLElement).closest("button, a, input, [role='button']")) return;
           dragRef.current = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y };
-          e.currentTarget.setPointerCapture(e.pointerId);
         }}
         onPointerMove={(e) => {
           const d = dragRef.current;
           if (!d) return;
-          setPan({ x: d.px + (e.clientX - d.x), y: d.py + (e.clientY - d.y) });
+          const dx = e.clientX - d.x;
+          const dy = e.clientY - d.y;
+          if (!dragging.current) {
+            if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+            dragging.current = true;
+            e.currentTarget.setPointerCapture(e.pointerId);
+          }
+          setPan({ x: d.px + dx, y: d.py + dy });
         }}
         onPointerUp={() => {
           dragRef.current = null;
+          dragging.current = false;
         }}
         onPointerLeave={() => {
           dragRef.current = null;
+          dragging.current = false;
         }}
         onWheel={(e) => {
           if (!e.ctrlKey && !e.metaKey) return;

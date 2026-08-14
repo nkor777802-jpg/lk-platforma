@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { isProductionWorker } from "./org-tree";
 
 const contactSchema = z.object({
   fullName: z.string().trim().min(2, "Укажите ФИО").max(120),
@@ -129,6 +130,17 @@ export const getPublicOrgStructure = createServerFn({ method: "GET" }).handler(a
     positions: units.reduce((s, u) => s + u.positions.length, 0),
     planned: Math.round(units.reduce((s, u) => s + (u.level === 0 ? u.planned : 0), 0) || units.reduce((s, u) => s + u.planned, 0)),
     top: units.filter((u) => u.level === 1).length,
+    productionWorkers: Math.round(
+      units
+        .filter((u) => u.key.startsWith("root/производственный департамент"))
+        .reduce(
+          (s, u) => s + u.positions.reduce((ps, p) => ps + (isProductionWorker(p.name) ? p.planned : 0), 0),
+          0,
+        ),
+    ),
+    year: res.version.effective_from
+      ? new Date(res.version.effective_from).getFullYear()
+      : new Date().getFullYear(),
   };
   return {
     version: { title: res.version.title, effectiveFrom: res.version.effective_from },

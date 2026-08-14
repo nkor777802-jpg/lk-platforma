@@ -31,6 +31,35 @@ export interface OrgWorkCenterLink {
   } | null;
 }
 
+/** Должности руководителей, ИТР и служащих — не относятся к основным производственным рабочим. */
+const NON_WORKER_TITLES = [
+  "директор",
+  "заместитель",
+  "главный",
+  "начальник",
+  "мастер",
+  "инженер",
+  "ведущий",
+  "специалист",
+  "менеджер",
+  "технолог",
+  "конструктор",
+  "переводчик",
+  "экономист",
+  "бухгалтер",
+  "диспетчер",
+  "кладовщик",
+  "секретарь",
+  "управляющий",
+];
+
+/** Основной производственный рабочий: должность не относится к руководителям/ИТР/служащим. */
+export function isProductionWorker(positionName: string): boolean {
+  const n = positionName.trim().toLowerCase();
+  if (!n) return false;
+  return !NON_WORKER_TITLES.some((t) => n.startsWith(t));
+}
+
 export interface OrgNode extends OrgUnitData {
   children: OrgNode[];
 }

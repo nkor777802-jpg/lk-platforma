@@ -35,6 +35,8 @@ interface Props {
   workCenters?: { departmentId: string | null; center: { id: string; code: string | null; name: string; site: string | null; area: string | null; process: string | null } | null }[];
   title?: string;
   subtitle?: string;
+  /** public — без ФИО и режимов с персональными данными. */
+  variant?: "internal" | "public";
 }
 
 function num(v: number) {
@@ -200,8 +202,15 @@ function TreeBranch({
   );
 }
 
-export function OrgChart({ units, workCenters = [], title, subtitle }: Props) {
+export function OrgChart({ units, workCenters = [], title, subtitle, variant = "internal" }: Props) {
   const isMobile = useIsMobile();
+  const modeOptions = useMemo(
+    () =>
+      variant === "public"
+        ? ORG_MODES.filter((m) => !["employees", "managers"].includes(m.value))
+        : ORG_MODES,
+    [variant],
+  );
   const roots = useMemo(() => buildTree(units), [units]);
   const [mode, setMode] = useState<OrgMode>("org");
   const [query, setQuery] = useState("");
@@ -280,7 +289,7 @@ export function OrgChart({ units, workCenters = [], title, subtitle }: Props) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {ORG_MODES.map((m) => (
+              {modeOptions.map((m) => (
                 <SelectItem key={m.value} value={m.value}>
                   {m.label}
                 </SelectItem>
@@ -402,7 +411,7 @@ export function OrgChart({ units, workCenters = [], title, subtitle }: Props) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {ORG_MODES.map((m) => (
+            {modeOptions.map((m) => (
               <SelectItem key={m.value} value={m.value}>
                 {m.label}
               </SelectItem>

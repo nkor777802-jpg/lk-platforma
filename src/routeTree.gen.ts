@@ -21,9 +21,9 @@ import { Route as AuthenticatedDevelopmentRouteImport } from './routes/_authenti
 import { Route as AuthenticatedGamificationRouteImport } from './routes/_authenticated/gamification'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedOrgStructureRouteImport } from './routes/_authenticated/org-structure'
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as AuthenticatedStructureRouteImport } from './routes/_authenticated/structure'
 import { Route as AuthenticatedTestsRouteImport } from './routes/_authenticated/tests'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
@@ -33,6 +33,7 @@ import { Route as PublicContactsRouteImport } from './routes/_public/contacts'
 import { Route as PublicFaqRouteImport } from './routes/_public/faq'
 import { Route as PublicManagementRouteImport } from './routes/_public/management'
 import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
+import { Route as PublicStructureRouteImport } from './routes/_public/structure'
 import { Route as OnboardingPrintRouteImport } from './routes/onboarding.print'
 import { Route as OrgPrintRouteImport } from './routes/org.print'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -125,6 +126,12 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOrgStructureRoute =
+  AuthenticatedOrgStructureRouteImport.update({
+    id: '/org-structure',
+    path: '/org-structure',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProductsRoute = AuthenticatedProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -133,11 +140,6 @@ const AuthenticatedProductsRoute = AuthenticatedProductsRouteImport.update({
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedStructureRoute = AuthenticatedStructureRouteImport.update({
-  id: '/structure',
-  path: '/structure',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTestsRoute = AuthenticatedTestsRouteImport.update({
@@ -183,6 +185,11 @@ const PublicManagementRoute = PublicManagementRouteImport.update({
 const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicStructureRoute = PublicStructureRouteImport.update({
+  id: '/structure',
+  path: '/structure',
   getParentRoute: () => PublicRouteRoute,
 } as any)
 const OnboardingPrintRoute = OnboardingPrintRouteImport.update({
@@ -370,9 +377,9 @@ export interface FileRoutesByFullPath {
   '/gamification': typeof AuthenticatedGamificationRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/org-structure': typeof AuthenticatedOrgStructureRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/structure': typeof AuthenticatedStructureRoute
   '/tests': typeof AuthenticatedTestsRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/about': typeof PublicAboutRoute
@@ -381,6 +388,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof PublicFaqRoute
   '/management': typeof PublicManagementRoute
   '/privacy': typeof PublicPrivacyRoute
+  '/structure': typeof PublicStructureRoute
   '/onboarding/print': typeof OnboardingPrintRoute
   '/org/print': typeof OrgPrintRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -423,9 +431,9 @@ export interface FileRoutesByTo {
   '/gamification': typeof AuthenticatedGamificationRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/org-structure': typeof AuthenticatedOrgStructureRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/structure': typeof AuthenticatedStructureRoute
   '/tests': typeof AuthenticatedTestsRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/about': typeof PublicAboutRoute
@@ -434,6 +442,7 @@ export interface FileRoutesByTo {
   '/faq': typeof PublicFaqRoute
   '/management': typeof PublicManagementRoute
   '/privacy': typeof PublicPrivacyRoute
+  '/structure': typeof PublicStructureRoute
   '/onboarding/print': typeof OnboardingPrintRoute
   '/org/print': typeof OrgPrintRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -479,9 +488,9 @@ export interface FileRoutesById {
   '/_authenticated/gamification': typeof AuthenticatedGamificationRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/org-structure': typeof AuthenticatedOrgStructureRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
-  '/_authenticated/structure': typeof AuthenticatedStructureRoute
   '/_authenticated/tests': typeof AuthenticatedTestsRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_public/about': typeof PublicAboutRoute
@@ -490,6 +499,7 @@ export interface FileRoutesById {
   '/_public/faq': typeof PublicFaqRoute
   '/_public/management': typeof PublicManagementRoute
   '/_public/privacy': typeof PublicPrivacyRoute
+  '/_public/structure': typeof PublicStructureRoute
   '/onboarding/print': typeof OnboardingPrintRoute
   '/org/print': typeof OrgPrintRoute
   '/_public/': typeof PublicIndexRoute
@@ -536,9 +546,9 @@ export interface FileRouteTypes {
     | '/gamification'
     | '/library'
     | '/onboarding'
+    | '/org-structure'
     | '/products'
     | '/profile'
-    | '/structure'
     | '/tests'
     | '/videos'
     | '/about'
@@ -547,6 +557,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/management'
     | '/privacy'
+    | '/structure'
     | '/onboarding/print'
     | '/org/print'
     | '/admin/analytics'
@@ -589,9 +600,9 @@ export interface FileRouteTypes {
     | '/gamification'
     | '/library'
     | '/onboarding'
+    | '/org-structure'
     | '/products'
     | '/profile'
-    | '/structure'
     | '/tests'
     | '/videos'
     | '/about'
@@ -600,6 +611,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/management'
     | '/privacy'
+    | '/structure'
     | '/onboarding/print'
     | '/org/print'
     | '/admin/analytics'
@@ -644,9 +656,9 @@ export interface FileRouteTypes {
     | '/_authenticated/gamification'
     | '/_authenticated/library'
     | '/_authenticated/onboarding'
+    | '/_authenticated/org-structure'
     | '/_authenticated/products'
     | '/_authenticated/profile'
-    | '/_authenticated/structure'
     | '/_authenticated/tests'
     | '/_authenticated/videos'
     | '/_public/about'
@@ -655,6 +667,7 @@ export interface FileRouteTypes {
     | '/_public/faq'
     | '/_public/management'
     | '/_public/privacy'
+    | '/_public/structure'
     | '/onboarding/print'
     | '/org/print'
     | '/_public/'
@@ -783,6 +796,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/org-structure': {
+      id: '/_authenticated/org-structure'
+      path: '/org-structure'
+      fullPath: '/org-structure'
+      preLoaderRoute: typeof AuthenticatedOrgStructureRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/products': {
       id: '/_authenticated/products'
       path: '/products'
@@ -795,13 +815,6 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/structure': {
-      id: '/_authenticated/structure'
-      path: '/structure'
-      fullPath: '/structure'
-      preLoaderRoute: typeof AuthenticatedStructureRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tests': {
@@ -865,6 +878,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PublicPrivacyRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/structure': {
+      id: '/_public/structure'
+      path: '/structure'
+      fullPath: '/structure'
+      preLoaderRoute: typeof PublicStructureRouteImport
       parentRoute: typeof PublicRouteRoute
     }
     '/onboarding/print': {
@@ -1139,9 +1159,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGamificationRoute: typeof AuthenticatedGamificationRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedOrgStructureRoute: typeof AuthenticatedOrgStructureRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
-  AuthenticatedStructureRoute: typeof AuthenticatedStructureRoute
   AuthenticatedTestsRoute: typeof AuthenticatedTestsRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedLearningCourseIdRoute: typeof AuthenticatedLearningCourseIdRoute
@@ -1162,9 +1182,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGamificationRoute: AuthenticatedGamificationRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedOrgStructureRoute: AuthenticatedOrgStructureRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
-  AuthenticatedStructureRoute: AuthenticatedStructureRoute,
   AuthenticatedTestsRoute: AuthenticatedTestsRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedLearningCourseIdRoute: AuthenticatedLearningCourseIdRoute,
@@ -1186,6 +1206,7 @@ interface PublicRouteRouteChildren {
   PublicFaqRoute: typeof PublicFaqRoute
   PublicManagementRoute: typeof PublicManagementRoute
   PublicPrivacyRoute: typeof PublicPrivacyRoute
+  PublicStructureRoute: typeof PublicStructureRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicTrainingProfessionsRoute: typeof PublicTrainingProfessionsRoute
   PublicTrainingIndexRoute: typeof PublicTrainingIndexRoute
@@ -1198,6 +1219,7 @@ const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicFaqRoute: PublicFaqRoute,
   PublicManagementRoute: PublicManagementRoute,
   PublicPrivacyRoute: PublicPrivacyRoute,
+  PublicStructureRoute: PublicStructureRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicTrainingProfessionsRoute: PublicTrainingProfessionsRoute,
   PublicTrainingIndexRoute: PublicTrainingIndexRoute,

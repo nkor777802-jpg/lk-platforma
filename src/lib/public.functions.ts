@@ -117,7 +117,8 @@ export const getPublicOrgStructure = createServerFn({ method: "GET" }).handler(a
     name: u.name,
     unitType: u.unitType,
     level: u.level,
-    managerName: u.managerName,
+    // Публично показываем ФИО только топ-руководства (уровни 0 и 1).
+    managerName: u.level <= 1 ? u.managerName : null,
     planned: u.planned,
     actual: u.actual,
     vacant: u.vacant,

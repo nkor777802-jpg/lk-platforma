@@ -559,10 +559,13 @@ export function OrgGraph({
           >
             <Scan className="h-4 w-4" />
           </Button>
+        </div>
+
+        {focusNode ? (
           <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => setFullscreen((f) => !f)} aria-label="Во весь экран">
             {fullscreen ? <X className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
           </Button>
-        </div>
+        ) : null}
       </div>
 
       <nav className="flex flex-wrap items-center gap-1 border-b border-border px-3 py-2 text-xs text-muted-foreground">
@@ -587,14 +590,19 @@ export function OrgGraph({
       <div
         ref={canvasRef}
         className={[
-          "org-canvas relative cursor-grab overflow-hidden bg-muted/30 active:cursor-grabbing",
+          "org-canvas relative bg-muted/30",
+          view === "sheet"
+            ? "overflow-x-hidden overflow-y-auto"
+            : "cursor-grab overflow-hidden active:cursor-grabbing",
           fullscreen ? "flex-1" : "h-[70vh]",
         ].join(" ")}
         onPointerDown={(e) => {
+          if (view === "sheet") return;
           if ((e.target as HTMLElement).closest("button, a, input, [role='button']")) return;
           dragRef.current = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y };
         }}
         onPointerMove={(e) => {
+          if (view === "sheet") return;
           const d = dragRef.current;
           if (!d) return;
           const dx = e.clientX - d.x;

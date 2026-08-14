@@ -496,18 +496,16 @@ export function OrgGraph({
           style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
         >
           <div ref={innerRef} className="bg-background">
-            <ul className="org-children org-root flex items-start justify-center pt-8 pb-16">
-              {roots.map((root) => (
-                <GraphNode
-                  key={root.key}
-                  node={root}
-                  expanded={expanded}
-                  toggle={toggle}
-                  query={query}
-                  onOpen={(n) => setDetail(n)}
-                />
-              ))}
-            </ul>
+            <OrgPoster
+              roots={roots}
+              title={title}
+              subtitle={subtitle}
+              note={note}
+              query={query}
+              onOpen={(n) => setDetail(n)}
+              openPanels={expanded}
+              onTogglePanel={toggle}
+            />
           </div>
         </div>
         {roots.length === 0 ? (
@@ -517,13 +515,16 @@ export function OrgGraph({
 
       <div className="flex flex-wrap items-center gap-4 border-t border-border px-3 py-2 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden /> Предприятие
+          <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden /> Руководство
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-secondary" aria-hidden /> Дирекции и подразделения
+          <span className="h-2.5 w-2.5 rounded-full bg-secondary" aria-hidden /> Службы, отделы и цеха
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-accent" aria-hidden /> Участки и службы
+          <span className="h-2.5 w-2.5 rounded-full bg-accent" aria-hidden /> Участки, смены, рабочие центры
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/40" aria-hidden /> Рабочие места и профессии
         </span>
         <span className="ml-auto">Перетаскивайте схему мышью, Ctrl + колесо — масштаб</span>
       </div>

@@ -44,6 +44,18 @@ export function kindOf(node: OrgNode, depth: number): Kind {
 
 export const KIND_CLASS: Record<Kind, string> = {
   root: "border-primary bg-primary text-primary-foreground",
+  lead: "border-primary/50 bg-primary/10 text-foreground",
+  unit: "border-secondary/30 bg-card text-foreground",
+  shop: "border-secondary bg-secondary text-secondary-foreground",
+  area: "border-accent/50 bg-accent/15 text-foreground",
+  shift: "border-accent/40 bg-accent/10 text-foreground",
+  center: "border-accent/60 bg-accent/25 text-foreground",
+  place: "border-secondary/30 bg-muted text-foreground",
+};
+
+/** Кружок иконки подразделения: фирменный оранжевый, кроме карточек с плотной заливкой. */
+export const KIND_ICON_CLASS: Record<Kind, string> = {
+  root: "border-primary bg-primary text-primary-foreground",
   lead: "border-primary/40 bg-primary/10 text-primary",
   unit: "border-primary/25 bg-primary/5 text-primary",
   shop: "border-secondary bg-secondary text-secondary-foreground",

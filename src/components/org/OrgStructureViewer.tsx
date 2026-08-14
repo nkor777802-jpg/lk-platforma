@@ -21,10 +21,9 @@ export function OrgStructureViewer() {
   const downloadExcel = async () => {
     setBusy(true);
     try {
-      const res = await exportOrgExcel
-        ? await exportExcel({ data: { versionId: versionId === "active" ? null : versionId, scope: "all" } })
-        : null;
-      if (!res) return;
+      const res = await exportExcel({
+        data: { versionId: versionId === "active" ? null : versionId, scope: "all" },
+      });
       const link = document.createElement("a");
       link.href = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${res.base64}`;
       link.download = res.fileName;

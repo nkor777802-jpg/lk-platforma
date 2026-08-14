@@ -314,7 +314,13 @@ export interface OrgStructureUnit {
     actual: number;
     vacant: number;
   }[];
-  people: { fullName: string | null; positionName: string; isVacancy: boolean; grade: string | null }[];
+  people: {
+    fullName: string | null;
+    positionName: string;
+    isVacancy: boolean;
+    grade: string | null;
+    profileId: string | null;
+  }[];
 }
 
 export async function loadStructure(input: {
@@ -339,7 +345,8 @@ export async function loadStructure(input: {
   const version = versions?.[0] ?? null;
   if (!version) return { version: null, units: [] as OrgStructureUnit[], workCenters: [] };
 
-  const [{ data: units }, { data: positions }, { data: assignments }, { data: links }] = await Promise.all([
+  const [{ data: units }, { data: positions }, { data: assignments }, { data: links }, { data: profileRows }] =
+    await Promise.all([
     db
       .from("org_snapshot_units")
       .select("external_key, parent_key, name, unit_type, level, sort_order, manager_name, planned_units, actual_units, vacant_units, department_id")
@@ -355,7 +362,17 @@ export async function loadStructure(input: {
       .select("unit_key, position_name, full_name, is_vacancy, grade")
       .eq("version_id", version.id),
     db.from("org_unit_work_centers").select("department_id, work_centers(id, code, name, site, area, process)"),
-  ]);
+      input.canSeePersonal
+        ? db.from("profiles").select("id, full_name")
+        : Promise.resolve({ data: [] as { id: string; full_name: string | null }[] }),
+    ]);
+
+  const normName = (v: string | null | undefined) => (v ?? "").toLowerCase().replace(/\s+/g, " ").trim();
+  const profileByName = new Map<string, string>();
+  for (const p of profileRows ?? []) {
+    const key = normName(p.full_name);
+    if (key && !profileByName.has(key)) profileByName.set(key, p.id);
+  }
 
   const byKey = new Map<string, OrgStructureUnit>();
   for (const u of units ?? []) {
@@ -389,6 +406,7 @@ export async function loadStructure(input: {
       positionName: a.position_name,
       isVacancy: a.is_vacancy,
       grade: input.canSeePersonal ? a.grade : null,
+      profileId: input.canSeePersonal ? (profileByName.get(normName(a.full_name)) ?? null) : null,
     });
   }
 

@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "@/components/layout/AppShell";
 import { OrgStructureViewer } from "@/components/org/OrgStructureViewer";
 
 export const Route = createFileRoute("/_authenticated/structure")({
@@ -25,8 +24,7 @@ export const Route = createFileRoute("/_authenticated/structure")({
 
 function StructurePage() {
   return (
-    <AppShell>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-secondary">Структура предприятия</h1>
           <p className="text-sm text-muted-foreground">
@@ -34,7 +32,6 @@ function StructurePage() {
           </p>
         </div>
         <OrgStructureViewer />
-      </div>
-    </AppShell>
+    </div>
   );
 }

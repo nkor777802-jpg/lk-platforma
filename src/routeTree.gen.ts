@@ -23,6 +23,7 @@ import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedStructureRouteImport } from './routes/_authenticated/structure'
 import { Route as AuthenticatedTestsRouteImport } from './routes/_authenticated/tests'
 import { Route as AuthenticatedVideosRouteImport } from './routes/_authenticated/videos'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
@@ -132,6 +133,11 @@ const AuthenticatedProductsRoute = AuthenticatedProductsRouteImport.update({
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStructureRoute = AuthenticatedStructureRouteImport.update({
+  id: '/structure',
+  path: '/structure',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTestsRoute = AuthenticatedTestsRouteImport.update({
@@ -366,6 +372,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/structure': typeof AuthenticatedStructureRoute
   '/tests': typeof AuthenticatedTestsRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/about': typeof PublicAboutRoute
@@ -418,6 +425,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/products': typeof AuthenticatedProductsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/structure': typeof AuthenticatedStructureRoute
   '/tests': typeof AuthenticatedTestsRoute
   '/videos': typeof AuthenticatedVideosRoute
   '/about': typeof PublicAboutRoute
@@ -473,6 +481,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/structure': typeof AuthenticatedStructureRoute
   '/_authenticated/tests': typeof AuthenticatedTestsRoute
   '/_authenticated/videos': typeof AuthenticatedVideosRoute
   '/_public/about': typeof PublicAboutRoute
@@ -529,6 +538,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/products'
     | '/profile'
+    | '/structure'
     | '/tests'
     | '/videos'
     | '/about'
@@ -581,6 +591,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/products'
     | '/profile'
+    | '/structure'
     | '/tests'
     | '/videos'
     | '/about'
@@ -635,6 +646,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/products'
     | '/_authenticated/profile'
+    | '/_authenticated/structure'
     | '/_authenticated/tests'
     | '/_authenticated/videos'
     | '/_public/about'
@@ -783,6 +795,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/structure': {
+      id: '/_authenticated/structure'
+      path: '/structure'
+      fullPath: '/structure'
+      preLoaderRoute: typeof AuthenticatedStructureRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tests': {
@@ -1122,6 +1141,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedStructureRoute: typeof AuthenticatedStructureRoute
   AuthenticatedTestsRoute: typeof AuthenticatedTestsRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedLearningCourseIdRoute: typeof AuthenticatedLearningCourseIdRoute
@@ -1144,6 +1164,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedStructureRoute: AuthenticatedStructureRoute,
   AuthenticatedTestsRoute: AuthenticatedTestsRoute,
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedLearningCourseIdRoute: AuthenticatedLearningCourseIdRoute,

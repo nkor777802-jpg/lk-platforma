@@ -22,6 +22,7 @@ const NAV = [
 ] as const;
 
 const SECONDARY_NAV = [
+  { to: "/structure", label: "Структура" },
   { to: "/company", label: "О компании" },
   { to: "/products", label: "Продукция" },
   { to: "/professions", label: "Профессии" },

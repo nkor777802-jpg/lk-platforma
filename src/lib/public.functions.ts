@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { isProductionWorker } from "./org-tree";
 
 const contactSchema = z.object({
   fullName: z.string().trim().min(2, "Укажите ФИО").max(120),

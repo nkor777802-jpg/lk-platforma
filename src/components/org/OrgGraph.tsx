@@ -162,21 +162,34 @@ export function OrgGraph({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusKey, expanded, view]);
 
-  // Начальный режим просмотра из URL (?view=sheet).
+  // Начальное состояние из URL (?view=sheet&focus=...&open=a|b).
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("view") === "sheet") setView("sheet");
+    const sp = new URLSearchParams(window.location.search);
+    if (sp.get("view") === "sheet") setView("sheet");
+    const f = sp.get("focus");
+    if (f) setFocusKey(f);
+    const open = sp.get("open");
+    if (open) {
+      const keys = open.split("|").filter(Boolean);
+      setExpandedByBranch({ [f ?? "__all"]: keys });
+    }
   }, []);
 
-  // Синхронизация режима с адресной строкой.
+  // Синхронизация вида, ветки и раскрытия с адресной строкой.
   useEffect(() => {
     const url = new URL(window.location.href);
     if (view === "sheet") url.searchParams.set("view", "sheet");
     else url.searchParams.delete("view");
+    if (focusKey) url.searchParams.set("focus", focusKey);
+    else url.searchParams.delete("focus");
+    const open = expandedByBranch[branchId] ?? [];
+    if (open.length) url.searchParams.set("open", open.join("|"));
+    else url.searchParams.delete("open");
     window.history.replaceState(null, "", url.toString());
-  }, [view]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, focusKey, expandedByBranch, branchId]);
 
   useEffect(() => {
-    setExpanded(new Set());
     setPan({ x: 0, y: 0 });
   }, [roots]);
 
@@ -243,51 +256,116 @@ export function OrgGraph({
     return acc;
   }, [roots]);
 
+  // Отбрасываем ключи, которых больше нет в дереве (после смены версии ШР).
   useEffect(() => {
-    if (focusNode) setExpanded(new Set([focusNode.key]));
-  }, [focusNode]);
+    const alive = new Set(panelKeys);
+    setExpandedByBranch((prev) => {
+      const cur = prev[branchId];
+      if (!cur) return prev;
+      const next = cur.filter((k) => alive.has(k));
+      if (next.length === cur.length) return prev;
+      return { ...prev, [branchId]: next };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [panelKeys, branchId]);
 
+  // Поиск раскрывает найденные ветки, но не теряет ручное состояние.
   useEffect(() => {
-    if (!query.trim()) return;
-    const hits = keysMatching(roots, query);
+    const q = query.trim();
+    if (!q) {
+      const snap = searchSnapshot.current;
+      searchSnapshot.current = null;
+      if (snap) setExpandedByBranch((prev) => ({ ...prev, [branchId]: snap }));
+      return;
+    }
+    if (!searchSnapshot.current) searchSnapshot.current = [...expanded];
+    const hits = keysMatching(roots, q);
     if (!hits.length) return;
-    setExpanded(new Set(ancestorsOf(roots, hits)));
-  }, [query, roots]);
+    const base = searchSnapshot.current ?? [];
+    setExpandedByBranch((prev) => ({
+      ...prev,
+      [branchId]: [...new Set([...base, ...ancestorsOf(roots, hits)])],
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, roots, branchId]);
 
   const toggle = (key: string) =>
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
+    setExpandedByBranch((prev) => {
+      const cur = new Set(prev[branchId] ?? (focusNode ? [focusNode.key] : []));
+      if (cur.has(key)) cur.delete(key);
+      else cur.add(key);
+      return { ...prev, [branchId]: [...cur] };
     });
 
   const exportName = focusNode ? fileSlug(focusNode.name) : "обзор";
 
-  const downloadImage = async (format: "png" | "svg") => {
+  const runExport = async (format: "png" | "svg" | "pdf") => {
     const target = innerRef.current;
     if (!target) return;
     setBusy(true);
+    const restore = expandedByBranch[branchId] ?? null;
     try {
+      if (exportScope === "branch") {
+        setExpandedKeys(panelKeys);
+        await new Promise((r) => window.setTimeout(r, 350));
+      }
       const mod = await import("html-to-image");
+      const node = innerRef.current ?? target;
       const options = {
-        backgroundColor: "#ffffff",
+        backgroundColor: EXPORT_BG[exportBg].value,
         skipFonts: true,
-        width: target.scrollWidth,
-        height: target.scrollHeight,
+        width: node.scrollWidth,
+        height: node.scrollHeight,
         style: { transform: "none", margin: "0" },
       };
-      const dataUrl =
-        format === "png"
-          ? await mod.toPng(target, { ...options, pixelRatio: 2 })
-          : await mod.toSvg(target, options);
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = `Оргструктура_${exportName}_${new Date().toISOString().slice(0, 10)}.${format}`;
-      link.click();
+      const stamp = new Date().toISOString().slice(0, 10);
+      const baseName = `Оргструктура_${exportName}_${stamp}`;
+
+      if (format === "svg") {
+        const dataUrl = await mod.toSvg(node, options);
+        triggerDownload(dataUrl, `${baseName}.svg`);
+      } else if (format === "png") {
+        const dataUrl = await mod.toPng(node, { ...options, pixelRatio: exportScale });
+        triggerDownload(dataUrl, `${baseName}.png`);
+      } else {
+        // PDF: снимок текущего вида вписывается в лист A4/A3 нужной ориентации.
+        const dataUrl = await mod.toPng(node, {
+          ...options,
+          backgroundColor: EXPORT_BG[exportBg].value ?? "#ffffff",
+          pixelRatio: exportScale,
+        });
+        const { jsPDF } = await import("jspdf");
+        const pxW = node.scrollWidth;
+        const pxH = node.scrollHeight;
+        const landscape = pxW >= pxH;
+        const format4 = Math.max(pxW, pxH) > 1600 ? "a3" : "a4";
+        const doc = new jsPDF({ orientation: landscape ? "landscape" : "portrait", unit: "mm", format: format4 });
+        const pw = doc.internal.pageSize.getWidth();
+        const ph = doc.internal.pageSize.getHeight();
+        const m = 8;
+        const footer = 8;
+        const k = Math.min((pw - m * 2) / pxW, (ph - m * 2 - footer) / pxH);
+        const w = pxW * k;
+        const h = pxH * k;
+        doc.addImage(dataUrl, "PNG", (pw - w) / 2, m, w, h, undefined, "FAST");
+        doc.setFontSize(8);
+        doc.setTextColor(120);
+        doc.text(
+          [title ?? "Организационная структура", focusNode?.name ?? "Вся структура", subtitle ?? "", stamp]
+            .filter(Boolean)
+            .join("  •  "),
+          m,
+          ph - 4,
+        );
+        doc.save(`${baseName}.pdf`);
+      }
+      setExportOpen(false);
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
+      if (exportScope === "branch") {
+        setExpandedByBranch((prev) => ({ ...prev, [branchId]: restore ?? (focusNode ? [focusNode.key] : []) }));
+      }
       setBusy(false);
     }
   };

@@ -112,7 +112,7 @@ export function OrgGraph({
   }, [focusKey, expanded]);
 
   useEffect(() => {
-    setExpanded(new Set(defaultExpanded(roots, 1)));
+    setExpanded(new Set());
     setPan({ x: 0, y: 0 });
   }, [roots]);
 
@@ -144,11 +144,18 @@ export function OrgGraph({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded]);
 
+  const panelKeys = useMemo(() => {
+    const top = roots.length === 1 ? roots[0]!.children : roots;
+    return top.filter(isBigBranch).map((n) => n.key);
+  }, [roots]);
+
   useEffect(() => {
     if (!query.trim()) return;
     const hits = keysMatching(roots, query);
-    if (hits.length) setExpanded(new Set(ancestorsOf(roots, hits)));
-  }, [query, roots]);
+    if (!hits.length) return;
+    const chain = new Set(ancestorsOf(roots, hits));
+    setExpanded(new Set(panelKeys.filter((k) => chain.has(k))));
+  }, [query, roots, panelKeys]);
 
   const toggle = (key: string) =>
     setExpanded((prev) => {
@@ -157,16 +164,6 @@ export function OrgGraph({
       else next.add(key);
       return next;
     });
-
-  const allKeys = useMemo(() => {
-    const out: string[] = [];
-    const walk = (n: OrgNode) => {
-      out.push(n.key);
-      n.children.forEach(walk);
-    };
-    roots.forEach(walk);
-    return out;
-  }, [roots]);
 
   const detailCenters = useMemo(() => {
     if (!detail?.departmentId) return [];

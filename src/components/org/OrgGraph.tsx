@@ -526,18 +526,7 @@ export function OrgGraph({
     const currentNode = drillKey ? findNode(roots, drillKey) : null;
     const list = currentNode ? currentNode.children : roots;
     const crumbs = drillKey ? pathTo(roots, drillKey) : [];
-    const q = query.trim().toLowerCase();
-    const hits = q
-      ? units
-          .filter(
-            (u) =>
-              u.name.toLowerCase().includes(q) ||
-              (u.managerName ?? "").toLowerCase().includes(q) ||
-              u.positions.some((p) => p.name.toLowerCase().includes(q)) ||
-              u.people.some((p) => (p.fullName ?? "").toLowerCase().includes(q)),
-          )
-          .slice(0, 30)
-      : [];
+    const mobileHits = searchUnits(allRoots, query, 30);
 
     return (
       <div className="space-y-4">
@@ -546,25 +535,31 @@ export function OrgGraph({
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Поиск подразделения"
+            placeholder="Подразделение, отдел или должность"
             className="pl-9"
           />
         </div>
 
         {query.trim() ? (
           <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">Найдено: {hits.length}</p>
-            {hits.map((u) => (
+            <p className="text-xs text-muted-foreground">
+              {mobileHits.length ? `Найдено: ${mobileHits.length}` : "Ничего не найдено"}
+            </p>
+            {mobileHits.map((h) => (
               <button
-                key={u.key}
+                key={h.node.key}
                 type="button"
                 onClick={() => {
-                  setDrillKey(u.key);
+                  setDrillKey(h.node.key);
                   setQuery("");
                 }}
                 className="w-full rounded-lg border border-border bg-card px-3 py-3 text-left"
               >
-                <span className="font-medium text-secondary break-words">{u.name}</span>
+                <span className="block font-medium text-secondary break-words">{h.node.name}</span>
+                {h.reason ? <span className="block text-xs text-primary break-words">{h.reason}</span> : null}
+                {h.path.length ? (
+                  <span className="block text-[11px] text-muted-foreground break-words">{h.path.join(" › ")}</span>
+                ) : null}
               </button>
             ))}
           </div>

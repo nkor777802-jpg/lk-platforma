@@ -212,11 +212,11 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
               </span>
             </span>
           </button>
-          <span className="h-6 w-px bg-border" aria-hidden />
+          <span className="org-link h-6 w-0.5" aria-hidden />
         </div>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="org-bus mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {topLevel.map((node) => {
           const kind = kindOf(node, 1);
           const highlighted = Boolean(query.trim()) && matches(node, query);

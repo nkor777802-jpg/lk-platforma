@@ -634,7 +634,7 @@ export function OrgGraph({
           className={view === "sheet" ? "mx-auto w-max origin-top" : "w-max origin-top-left"}
           style={
             view === "sheet"
-              ? { transform: `scale(${sheetScale})`, height: sheetScale < 1 ? undefined : undefined }
+              ? { transform: `scale(${sheetScale})` }
               : { transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }
           }
         >

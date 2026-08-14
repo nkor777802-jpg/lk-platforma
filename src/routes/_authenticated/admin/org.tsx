@@ -4,6 +4,10 @@ import { adminTableQuery } from "@/lib/admin-queries";
 import { EntityManager } from "@/components/admin/EntityManager";
 import { ManagementEditor } from "@/components/admin/ManagementEditor";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { OrgStructureViewer } from "@/components/org/OrgStructureViewer";
+import { OrgImportWizard } from "@/components/org/OrgImportWizard";
+import { OrgVersionsPanel } from "@/components/org/OrgVersionsPanel";
+import { OrgWorkCenterLinks } from "@/components/org/OrgWorkCenterLinks";
 
 export const Route = createFileRoute("/_authenticated/admin/org")({
   component: OrgPage,
@@ -25,13 +29,33 @@ function OrgPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="departments">
+      <Tabs defaultValue="chart">
         <TabsList className="flex flex-wrap">
+          <TabsTrigger value="chart">Схема</TabsTrigger>
+          <TabsTrigger value="import">Импорт ШР</TabsTrigger>
+          <TabsTrigger value="versions">Версии</TabsTrigger>
+          <TabsTrigger value="production">Производство</TabsTrigger>
           <TabsTrigger value="departments">Подразделения</TabsTrigger>
           <TabsTrigger value="positions">Должности</TabsTrigger>
           <TabsTrigger value="groups">Группы</TabsTrigger>
           <TabsTrigger value="management">Руководство</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="chart" className="pt-6">
+          <OrgStructureViewer />
+        </TabsContent>
+
+        <TabsContent value="import" className="pt-6">
+          <OrgImportWizard />
+        </TabsContent>
+
+        <TabsContent value="versions" className="pt-6">
+          <OrgVersionsPanel />
+        </TabsContent>
+
+        <TabsContent value="production" className="pt-6">
+          <OrgWorkCenterLinks />
+        </TabsContent>
 
         <TabsContent value="departments" className="pt-6">
           <EntityManager

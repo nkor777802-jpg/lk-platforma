@@ -738,9 +738,12 @@ export type Database = {
           description: string | null
           head_name: string | null
           id: string
+          level: number
+          manager_profile_id: string | null
           name: string
           parent_id: string | null
           sort_order: number
+          unit_type: string | null
           updated_at: string
         }
         Insert: {
@@ -749,9 +752,12 @@ export type Database = {
           description?: string | null
           head_name?: string | null
           id?: string
+          level?: number
+          manager_profile_id?: string | null
           name: string
           parent_id?: string | null
           sort_order?: number
+          unit_type?: string | null
           updated_at?: string
         }
         Update: {
@@ -760,12 +766,22 @@ export type Database = {
           description?: string | null
           head_name?: string | null
           id?: string
+          level?: number
+          manager_profile_id?: string | null
           name?: string
           parent_id?: string | null
           sort_order?: number
+          unit_type?: string | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "departments_manager_profile_id_fkey"
+            columns: ["manager_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "departments_parent_id_fkey"
             columns: ["parent_id"]
@@ -1964,6 +1980,473 @@ export type Database = {
           },
         ]
       }
+      org_import_runs: {
+        Row: {
+          actor_id: string | null
+          actor_name: string | null
+          created_at: string
+          diff: Json
+          file_name: string | null
+          file_path: string | null
+          id: string
+          mapping: Json
+          sheet_name: string | null
+          stats: Json
+          status: string
+          updated_at: string
+          validation: Json
+          version_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          diff?: Json
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          mapping?: Json
+          sheet_name?: string | null
+          stats?: Json
+          status?: string
+          updated_at?: string
+          validation?: Json
+          version_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          diff?: Json
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          mapping?: Json
+          sheet_name?: string | null
+          stats?: Json
+          status?: string
+          updated_at?: string
+          validation?: Json
+          version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_import_runs_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_import_runs_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "org_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_mapping_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean
+          mapping: Json
+          name: string
+          sheet_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          mapping?: Json
+          name: string
+          sheet_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          mapping?: Json
+          name?: string
+          sheet_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      org_snapshot_assignments: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          grade: string | null
+          hire_date: string | null
+          id: string
+          is_vacancy: boolean
+          personnel_number: string | null
+          position_name: string
+          profile_id: string | null
+          rate: number | null
+          review_status: string
+          snapshot_position_id: string | null
+          source_row: number | null
+          unit_key: string
+          version_id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          grade?: string | null
+          hire_date?: string | null
+          id?: string
+          is_vacancy?: boolean
+          personnel_number?: string | null
+          position_name: string
+          profile_id?: string | null
+          rate?: number | null
+          review_status?: string
+          snapshot_position_id?: string | null
+          source_row?: number | null
+          unit_key: string
+          version_id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          grade?: string | null
+          hire_date?: string | null
+          id?: string
+          is_vacancy?: boolean
+          personnel_number?: string | null
+          position_name?: string
+          profile_id?: string | null
+          rate?: number | null
+          review_status?: string
+          snapshot_position_id?: string | null
+          source_row?: number | null
+          unit_key?: string
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_snapshot_assignments_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_snapshot_assignments_snapshot_position_id_fkey"
+            columns: ["snapshot_position_id"]
+            isOneToOne: false
+            referencedRelation: "org_snapshot_positions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_snapshot_assignments_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "org_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_snapshot_positions: {
+        Row: {
+          actual_units: number
+          category: string | null
+          created_at: string
+          id: string
+          name: string
+          planned_units: number
+          position_id: string | null
+          review_status: string
+          sort_order: number
+          source_row: number | null
+          unit_key: string
+          vacant_units: number
+          version_id: string
+        }
+        Insert: {
+          actual_units?: number
+          category?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          planned_units?: number
+          position_id?: string | null
+          review_status?: string
+          sort_order?: number
+          source_row?: number | null
+          unit_key: string
+          vacant_units?: number
+          version_id: string
+        }
+        Update: {
+          actual_units?: number
+          category?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          planned_units?: number
+          position_id?: string | null
+          review_status?: string
+          sort_order?: number
+          source_row?: number | null
+          unit_key?: string
+          vacant_units?: number
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_snapshot_positions_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "positions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_snapshot_positions_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "org_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_snapshot_units: {
+        Row: {
+          actual_units: number
+          created_at: string
+          department_id: string | null
+          external_key: string
+          id: string
+          level: number
+          manager_name: string | null
+          name: string
+          parent_key: string | null
+          planned_units: number
+          review_status: string
+          sort_order: number
+          source_row: number | null
+          unit_type: string | null
+          vacant_units: number
+          version_id: string
+        }
+        Insert: {
+          actual_units?: number
+          created_at?: string
+          department_id?: string | null
+          external_key: string
+          id?: string
+          level?: number
+          manager_name?: string | null
+          name: string
+          parent_key?: string | null
+          planned_units?: number
+          review_status?: string
+          sort_order?: number
+          source_row?: number | null
+          unit_type?: string | null
+          vacant_units?: number
+          version_id: string
+        }
+        Update: {
+          actual_units?: number
+          created_at?: string
+          department_id?: string | null
+          external_key?: string
+          id?: string
+          level?: number
+          manager_name?: string | null
+          name?: string
+          parent_key?: string | null
+          planned_units?: number
+          review_status?: string
+          sort_order?: number
+          source_row?: number | null
+          unit_type?: string | null
+          vacant_units?: number
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_snapshot_units_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_snapshot_units_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "org_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_subordination: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          note: string | null
+          subordinate_department_id: string | null
+          subordinate_profile_id: string | null
+          superior_department_id: string | null
+          superior_profile_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          subordinate_department_id?: string | null
+          subordinate_profile_id?: string | null
+          superior_department_id?: string | null
+          superior_profile_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          subordinate_department_id?: string | null
+          subordinate_profile_id?: string | null
+          superior_department_id?: string | null
+          superior_profile_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_subordination_subordinate_department_id_fkey"
+            columns: ["subordinate_department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_subordination_subordinate_profile_id_fkey"
+            columns: ["subordinate_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_subordination_superior_department_id_fkey"
+            columns: ["superior_department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_subordination_superior_profile_id_fkey"
+            columns: ["superior_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_unit_work_centers: {
+        Row: {
+          created_at: string
+          department_id: string
+          id: string
+          work_center_id: string
+        }
+        Insert: {
+          created_at?: string
+          department_id: string
+          id?: string
+          work_center_id: string
+        }
+        Update: {
+          created_at?: string
+          department_id?: string
+          id?: string
+          work_center_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_unit_work_centers_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "org_unit_work_centers_work_center_id_fkey"
+            columns: ["work_center_id"]
+            isOneToOne: false
+            referencedRelation: "work_centers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_versions: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          created_by: string | null
+          created_by_name: string | null
+          effective_from: string | null
+          id: string
+          notes: string | null
+          published_at: string | null
+          source_file_name: string | null
+          source_file_path: string | null
+          stats: Json
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          created_by_name?: string | null
+          effective_from?: string | null
+          id?: string
+          notes?: string | null
+          published_at?: string | null
+          source_file_name?: string | null
+          source_file_path?: string | null
+          stats?: Json
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          created_by_name?: string | null
+          effective_from?: string | null
+          id?: string
+          notes?: string | null
+          published_at?: string | null
+          source_file_name?: string | null
+          source_file_path?: string | null
+          stats?: Json
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_versions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_settings: {
         Row: {
           description: string | null
@@ -1987,6 +2470,7 @@ export type Database = {
       }
       positions: {
         Row: {
+          category: string | null
           code: string | null
           created_at: string
           department_id: string | null
@@ -1994,10 +2478,12 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          profession_id: string | null
           sort_order: number
           updated_at: string
         }
         Insert: {
+          category?: string | null
           code?: string | null
           created_at?: string
           department_id?: string | null
@@ -2005,10 +2491,12 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          profession_id?: string | null
           sort_order?: number
           updated_at?: string
         }
         Update: {
+          category?: string | null
           code?: string | null
           created_at?: string
           department_id?: string | null
@@ -2016,6 +2504,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          profession_id?: string | null
           sort_order?: number
           updated_at?: string
         }
@@ -2025,6 +2514,13 @@ export type Database = {
             columns: ["department_id"]
             isOneToOne: false
             referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "positions_profession_id_fkey"
+            columns: ["profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
             referencedColumns: ["id"]
           },
         ]

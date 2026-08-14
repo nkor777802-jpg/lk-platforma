@@ -428,14 +428,8 @@ export function OrgGraph({
             </SheetHeader>
             {headPositionOf(detail) ? (
               <p className="mt-4 text-sm">
-                <span className="text-muted-foreground">Должность руководителя: </span>
-                {headPositionOf(detail)}
-              </p>
-            ) : null}
-            {detail.managerName ? (
-              <p className="mt-4 text-sm">
                 <span className="text-muted-foreground">Руководитель: </span>
-                {detail.managerName}
+                {headPositionOf(detail)}
               </p>
             ) : null}
             {detail.children.length ? (

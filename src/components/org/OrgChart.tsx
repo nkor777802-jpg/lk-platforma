@@ -22,6 +22,7 @@ import {
   buildTree,
   defaultExpanded,
   findNode,
+  headPositionOf,
   keysMatching,
   matches,
   pathTo,
@@ -82,8 +83,8 @@ function NodeCard({
         <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{node.unitType}</div>
       ) : null}
 
-      {(mode === "org" || mode === "managers") && node.managerName ? (
-        <div className="mt-1 text-xs text-foreground/80 break-words">Рук.: {node.managerName}</div>
+      {(mode === "org" || mode === "managers") && headPositionOf(node) ? (
+        <div className="mt-1 text-xs text-foreground/80 break-words">Рук.: {headPositionOf(node)}</div>
       ) : null}
 
       {mode === "staffing" || mode === "org" ? (

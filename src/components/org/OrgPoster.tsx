@@ -19,6 +19,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { headPositionOf, matches, type OrgNode } from "@/lib/org-tree";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Maximize2, Minimize2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -186,37 +188,95 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
   const head = roots.length === 1 ? roots[0]! : null;
   const topLevel = head ? head.children : roots;
   const total = roots.reduce((sum, r) => sum + r.planned, 0);
+  const [fit, setFit] = useState(true);
+  const [scale, setScale] = useState(1);
+  const [innerH, setInnerH] = useState<number | null>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+
+  const recalc = useCallback(() => {
+    const wrap = wrapRef.current;
+    const inner = innerRef.current;
+    if (!wrap || !inner) return;
+    if (!fit) {
+      setScale(1);
+      return;
+    }
+    const top = wrap.getBoundingClientRect().top;
+    const available = window.innerHeight - top - 24;
+    const needed = inner.scrollHeight;
+    if (needed <= 0 || available <= 0) return;
+    const next = Math.min(1, Math.max(0.7, available / needed));
+    setScale(Number(next.toFixed(3)));
+    setInnerH(needed);
+  }, [fit]);
+
+  useLayoutEffect(() => {
+    recalc();
+  }, [recalc, topLevel.length]);
+
+  useEffect(() => {
+    const inner = innerRef.current;
+    if (!inner) return;
+    const ro = new ResizeObserver(() => recalc());
+    ro.observe(inner);
+    window.addEventListener("resize", recalc);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", recalc);
+    };
+  }, [recalc]);
 
   return (
-    <div className="w-full px-4 pb-8 pt-6 sm:px-6">
+    <div className="w-full px-4 pb-6 pt-4 sm:px-6">
+      <div className="mb-2 flex justify-end">
+        <button
+          type="button"
+          onClick={() => setFit((v) => !v)}
+          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {fit ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+          {fit ? "Одним листом" : "Обычный масштаб"}
+        </button>
+      </div>
+      <div
+        ref={wrapRef}
+        className="w-full"
+        style={innerH && scale < 1 ? { height: innerH * scale } : undefined}
+      >
+        <div
+          ref={innerRef}
+          style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}
+          className="w-full origin-top transition-transform"
+        >
       {head ? (
         <div className="flex flex-col items-center">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{head.name}</p>
           <button
             type="button"
             onClick={() => onOpen(head)}
-            className="mt-3 flex w-full max-w-md items-center gap-4 rounded-2xl border-2 border-primary bg-card px-6 py-4 text-left shadow-lg transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="mt-2 flex w-full max-w-md items-center gap-3 rounded-2xl border-2 border-primary bg-card px-5 py-3 text-left shadow-lg transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <UserRound className="h-6 w-6" aria-hidden />
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <UserRound className="h-5 w-5" aria-hidden />
             </span>
             <span className="min-w-0">
-              <span className="block text-base font-bold uppercase tracking-wide text-secondary">
+              <span className="block text-sm font-bold uppercase tracking-wide text-secondary">
                 Генеральный директор
               </span>
               {head.managerName ? (
-                <span className="block text-sm text-foreground/80 break-words">{head.managerName}</span>
+                <span className="block text-xs text-foreground/80 break-words">{head.managerName}</span>
               ) : null}
-              <span className="mt-0.5 block text-xs text-muted-foreground">
+              <span className="mt-0.5 block text-[11px] text-muted-foreground">
                 Общая численность — {fmt(total)} сотрудников
               </span>
             </span>
           </button>
-          <span className="org-link h-6 w-0.5" aria-hidden />
+          <span className="org-link h-5 w-0.5" aria-hidden />
         </div>
       ) : null}
 
-      <div className="org-bus mt-6 grid gap-x-4 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="org-bus mt-6 grid gap-x-3 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {topLevel.map((node) => {
           const kind = kindOf(node, 1);
           const highlighted = Boolean(query.trim()) && matches(node, query);
@@ -232,46 +292,48 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
               <button
                 type="button"
                 onClick={() => onOpen(node)}
-                className="flex flex-1 items-start gap-3 px-4 pb-3 pt-4 text-left transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                className="flex flex-1 items-start gap-2.5 px-3 pb-2 pt-3 text-left transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
               >
                 <span
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${KIND_ICON_CLASS[kind]}`}
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border ${KIND_ICON_CLASS[kind]}`}
                   aria-hidden
                 >
-                  <IconFor node={node} depth={1} className="h-5 w-5" />
+                  <IconFor node={node} depth={1} className="h-4 w-4" />
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-sm font-bold uppercase leading-snug text-secondary break-words">
+                  <span className="block text-[12px] font-bold uppercase leading-snug text-secondary break-words">
                     {node.name}
                   </span>
                   <HeadBadge node={node} />
                 </span>
               </button>
 
-              <div className="flex items-center justify-between gap-2 border-t border-border px-4 py-2 text-xs text-muted-foreground">
-                <span>
+              <div className="flex items-stretch justify-between gap-2 border-t border-border">
+                <span className="flex min-w-0 items-center px-3 py-1.5 text-[11px] text-muted-foreground">
                   {node.children.length ? `${fmt(node.children.length)} подразд. · ` : ""}
                   штат {fmt(node.planned)} ед.
                 </span>
+                {node.children.length ? (
+                  <button
+                    type="button"
+                    onClick={() => onOpenBranch(node)}
+                    aria-label={`Структура подразделения: ${node.name}`}
+                    className="flex shrink-0 items-center gap-1 bg-secondary px-2.5 text-[10px] font-semibold uppercase tracking-wide text-secondary-foreground transition-colors hover:bg-secondary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+                  >
+                    Структура
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                ) : null}
               </div>
-
-              {node.children.length ? (
-                <button
-                  type="button"
-                  onClick={() => onOpenBranch(node)}
-                  className="flex items-center justify-center gap-1.5 bg-secondary px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-foreground transition-colors hover:bg-secondary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
-                >
-                  Структура подразделения
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </button>
-              ) : null}
             </div>
             </div>
           );
         })}
       </div>
+        </div>
+      </div>
 
-      <div className="mt-6 rounded-xl border border-dashed border-border px-4 py-3 text-xs text-muted-foreground">
+      <div className="mt-3 rounded-lg border border-dashed border-border px-3 py-2 text-[11px] text-muted-foreground">
         Оргструктура формируется автоматически по данным предприятия.
         {note ? <span className="ml-1 font-medium text-secondary">{note}</span> : null}
       </div>

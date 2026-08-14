@@ -376,3 +376,16 @@
     display: none;
   }
 }
+
+/* Пятиколоночный «один лист» на широких экранах */
+@media (min-width: 1536px) {
+  .org-bus > *:nth-child(2n)::after,
+  .org-bus > *:nth-child(3n)::after,
+  .org-bus > *:nth-child(4n)::after {
+    display: block;
+  }
+  .org-bus > *:nth-child(5n)::after,
+  .org-bus > *:last-child::after {
+    display: none;
+  }
+}

@@ -9,6 +9,7 @@ import { InlineLoading } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { orgStructureQuery } from "@/lib/org-queries";
+import { canPrintOrgStructure } from "@/lib/org.functions";
 import { buildTree, findNode, pathTo, type OrgNode } from "@/lib/org-tree";
 
 export const Route = createFileRoute("/org/print")({

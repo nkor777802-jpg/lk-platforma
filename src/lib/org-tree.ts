@@ -115,6 +115,21 @@ export function findNode(nodes: OrgNode[], key: string): OrgNode | null {
   return null;
 }
 
+/** Должность руководителя подразделения (первая позиция с категорией «руководитель»). */
+export function headPositionOf(unit: Pick<OrgUnitData, "positions">): string | null {
+  const head = unit.positions.find((p) => (p.category ?? "").toLowerCase().includes("руковод"));
+  return head ? head.name.replace(/\s+/g, " ").trim() : null;
+}
+
+function findNodeLegacy(nodes: OrgNode[], key: string): OrgNode | null {
+  for (const n of nodes) {
+    if (n.key === key) return n;
+    const found = findNodeLegacy(n.children, key);
+    if (found) return found;
+  }
+  return null;
+}
+
 export function pathTo(nodes: OrgNode[], key: string): OrgNode[] {
   for (const n of nodes) {
     if (n.key === key) return [n];

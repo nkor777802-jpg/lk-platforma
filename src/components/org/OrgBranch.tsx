@@ -36,7 +36,7 @@ function BranchNode({
       ].join(" ")}
     >
       {depth > 1 && !vertical ? (
-        <span className="org-line-up absolute left-1/2 top-0 h-6 w-px -translate-x-1/2 bg-border" aria-hidden />
+        <span className="org-line-up org-link absolute left-1/2 top-0 h-6 w-0.5 -translate-x-1/2" aria-hidden />
       ) : null}
       <div className={depth > 1 && !vertical ? "pt-6" : ""}>
         <div
@@ -85,11 +85,11 @@ function BranchNode({
 
       {node.children.length && open ? (
         <>
-          {childrenVertical ? null : <span className="h-6 w-px bg-border" aria-hidden />}
+          {childrenVertical ? null : <span className="org-link h-6 w-0.5" aria-hidden />}
           <ul
             className={
               childrenVertical
-                ? "ml-4 mt-2 flex flex-col items-start gap-2 border-l border-border pl-4"
+                ? "org-vlist ml-4 mt-2 flex flex-col items-start gap-2 pl-4"
                 : "org-children flex items-start justify-center"
             }
           >

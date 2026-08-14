@@ -3,6 +3,7 @@ import { platform, stages } from "@/content/site";
 import { Section, InfoCard } from "@/components/public/sections";
 import { AnimatedStageList } from "@/components/public/animated-stage-list";
 import { Button } from "@/components/ui/button";
+import { PageHero } from "@/components/public/PageHero";
 
 const TITLE = "Обучение и аттестация — Людиновокабель";
 const DESCRIPTION =
@@ -27,12 +28,7 @@ export const Route = createFileRoute("/_public/training/")({
 function TrainingPage() {
   return (
     <>
-      <div className="brand-pattern-blue text-secondary-foreground">
-        <div className="mx-auto max-w-7xl px-4 py-16">
-          <h1 className="text-4xl font-bold sm:text-5xl">Система обучения</h1>
-          <p className="mt-4 max-w-3xl text-lg opacity-90">{platform.lead}</p>
-        </div>
-      </div>
+      <PageHero title="Система обучения" lead={platform.lead} />
 
       <Section title="Как это работает">
         <div className="grid gap-6 md:grid-cols-2">

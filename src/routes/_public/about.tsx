@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { about, company } from "@/content/site";
 import { useCompany } from "@/hooks/useCompany";
 import { Section, InfoCard } from "@/components/public/sections";
+import { PageHero } from "@/components/public/PageHero";
 
 const TITLE = "О предприятии — Людиновокабель";
 const DESCRIPTION =
@@ -27,15 +28,7 @@ function AboutPage() {
   const company = useCompany();
   return (
     <>
-      <div className="brand-pattern-blue text-secondary-foreground">
-        <div className="mx-auto max-w-7xl px-4 py-16 lg:py-20">
-          <p className="text-sm font-semibold uppercase tracking-widest text-primary">
-            {company.legalName}
-          </p>
-          <h1 className="mt-4 text-4xl font-bold sm:text-5xl">О предприятии</h1>
-          <p className="mt-4 max-w-3xl text-lg opacity-90">{about.lead}</p>
-        </div>
-      </div>
+      <PageHero eyebrow={company.legalName} title="О предприятии" lead={about.lead} />
 
       <Section title="Чем занимается предприятие">
         <div className="grid gap-6 md:grid-cols-3">

@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { publicManagementQuery } from "@/lib/public-queries";
 import { EmptyState } from "@/components/states";
 import { ManagementCard } from "@/components/public/ManagementCard";
+import { PageHero } from "@/components/public/PageHero";
 
 const TITLE = "Руководство — Людиновокабель";
 const DESCRIPTION =
@@ -33,18 +34,11 @@ function ManagementPage() {
 
   return (
     <>
-      <div className="brand-pattern-blue text-secondary-foreground">
-        <div className="mx-auto max-w-7xl px-4 py-16 lg:py-20">
-          <p className="text-sm font-semibold uppercase tracking-widest text-primary">
-            АО «Людиновокабель»
-          </p>
-          <h1 className="mt-4 text-4xl font-bold sm:text-5xl">Руководство</h1>
-          <p className="mt-4 max-w-3xl text-lg opacity-90">
-            Управленческая команда предприятия: кто отвечает за производство, качество и развитие
-            персонала.
-          </p>
-        </div>
-      </div>
+      <PageHero
+        eyebrow="АО «Людиновокабель»"
+        title="Руководство"
+        lead="Управленческая команда предприятия: кто отвечает за производство, качество и развитие персонала."
+      />
 
       <section className="mx-auto max-w-7xl px-4 py-12 lg:py-16">
         {data.length === 0 ? (

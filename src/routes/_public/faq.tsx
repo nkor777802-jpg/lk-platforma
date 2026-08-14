@@ -7,6 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { PageHero } from "@/components/public/PageHero";
 
 const TITLE = "Частые вопросы об обучении — Людиновокабель";
 const DESCRIPTION =
@@ -45,11 +46,10 @@ export const Route = createFileRoute("/_public/faq")({
 function FaqPage() {
   return (
     <>
-      <div className="brand-pattern-blue text-secondary-foreground">
-        <div className="mx-auto max-w-7xl px-4 py-16">
-          <h1 className="text-4xl font-bold sm:text-5xl">Частые вопросы</h1>
-        </div>
-      </div>
+      <PageHero
+        title="Частые вопросы"
+        lead="Ответы на типовые вопросы работников об обучении, тестировании и аттестации."
+      />
       <Section title="Ответы на вопросы работников">
         <Accordion type="single" collapsible className="max-w-3xl">
           {faq.map((item) => (

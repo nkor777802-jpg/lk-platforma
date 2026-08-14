@@ -74,14 +74,14 @@ export function OrgStructurePreview() {
         {top.map(({ unit: u, agg }) => (
           <div
             key={u.key}
-            className="group h-full rounded-lg border border-border bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-md"
+            className="group h-full rounded-xl bg-secondary p-4 text-secondary-foreground shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
           >
             <span className="block h-1 w-10 rounded-full bg-accent transition-all group-hover:w-16" aria-hidden />
-            <h3 className="mt-3 text-sm font-semibold text-secondary">{u.name}</h3>
+            <h3 className="mt-3 text-sm font-semibold">{u.name}</h3>
             {u.unitType ? (
-              <p className="mt-1 text-[11px] uppercase tracking-wide text-muted-foreground">{u.unitType}</p>
+              <p className="mt-1 text-[11px] uppercase tracking-wide opacity-70">{u.unitType}</p>
             ) : null}
-            <p className="mt-2 text-xs text-muted-foreground">
+            <p className="mt-2 text-xs opacity-80">
               Штат {num(agg.planned)} · Подразделений {num(agg.units)} · Должностей {num(agg.positions)}
             </p>
           </div>

@@ -49,7 +49,7 @@ function TrainingPage() {
             <Link to="/auth">Войти в систему обучения</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link to="/training/professions">Профессии и программы</Link>
+            <Link to="/training/professions">Обучение по профессиям</Link>
           </Button>
         </div>
       </Section>

@@ -122,7 +122,7 @@ function HomePage() {
       </Section>
 
       <Section
-        title="Профессии"
+        title="Обучение по профессиям"
         lead="Программы обучения по рабочим профессиям кабельного производства. Прохождение доступно после входа в систему."
       >
         <ProfessionGrid items={professions.slice(0, 6)} />

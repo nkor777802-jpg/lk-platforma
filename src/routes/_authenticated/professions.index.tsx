@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/_authenticated/professions/")({
   head: () => ({
     meta: [
-      { title: "Профессии — Академия «Людиновокабель»" },
+      { title: "Обучение по профессиям — Академия «Людиновокабель»" },
       { name: "description", content: "Программы обучения по профессиям кабельного производства." },
-      { property: "og:title", content: "Профессии кабельного производства" },
+      { property: "og:title", content: "Обучение по профессиям кабельного производства" },
       { property: "og:description", content: "Программы обучения, материалы и аттестация по профессиям." },
     ],
   }),
@@ -23,7 +23,7 @@ function ProfessionsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Профессии</h1>
+        <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Обучение по профессиям</h1>
         <p className="mt-2 text-muted-foreground">
           Выберите профессию, чтобы изучить материалы и пройти аттестацию.
         </p>

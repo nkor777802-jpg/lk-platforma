@@ -99,6 +99,7 @@ export function OrgGraph({
   const [drillKey, setDrillKey] = useState<string | null>(null);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const dragRef = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
+  const dragging = useRef(false);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const innerRef = useRef<HTMLDivElement | null>(null);
@@ -484,19 +485,28 @@ export function OrgGraph({
           fullscreen ? "flex-1" : "h-[70vh]",
         ].join(" ")}
         onPointerDown={(e) => {
+          if ((e.target as HTMLElement).closest("button, a, input, [role='button']")) return;
           dragRef.current = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y };
-          e.currentTarget.setPointerCapture(e.pointerId);
         }}
         onPointerMove={(e) => {
           const d = dragRef.current;
           if (!d) return;
-          setPan({ x: d.px + (e.clientX - d.x), y: d.py + (e.clientY - d.y) });
+          const dx = e.clientX - d.x;
+          const dy = e.clientY - d.y;
+          if (!dragging.current) {
+            if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+            dragging.current = true;
+            e.currentTarget.setPointerCapture(e.pointerId);
+          }
+          setPan({ x: d.px + dx, y: d.py + dy });
         }}
         onPointerUp={() => {
           dragRef.current = null;
+          dragging.current = false;
         }}
         onPointerLeave={() => {
           dragRef.current = null;
+          dragging.current = false;
         }}
         onWheel={(e) => {
           if (!e.ctrlKey && !e.metaKey) return;
@@ -545,7 +555,7 @@ export function OrgGraph({
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/40" aria-hidden /> Рабочие места и профессии
         </span>
-        <span className="ml-auto">{focusNode ? "Перетаскивайте схему мышью, Ctrl + колесо — масштаб" : "Выберите департамент, чтобы увидеть подробную структуру"}</span>
+        <span className="ml-auto">{focusNode ? "Перетаскивайте схему мышью, Ctrl + колесо — масштаб" : "Выберите подразделение, чтобы увидеть подробную структуру"}</span>
       </div>
 
       {detailSheet}

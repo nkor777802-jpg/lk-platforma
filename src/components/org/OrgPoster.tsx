@@ -1,4 +1,21 @@
-import { Briefcase, Building2, ChevronRight, Cog, Factory, Layers, UserRound, Users } from "lucide-react";
+import {
+  Briefcase,
+  Building2,
+  ChevronRight,
+  ClipboardList,
+  Cog,
+  Factory,
+  Handshake,
+  Landmark,
+  Layers,
+  Megaphone,
+  MonitorCog,
+  UserRound,
+  Users,
+  UsersRound,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
 import { matches, type OrgNode } from "@/lib/org-tree";
 
 export function fmt(v: number) {
@@ -46,9 +63,29 @@ export const KIND_META: Record<Kind, string> = {
   place: "text-muted-foreground",
 };
 
+/** Индивидуальные иконки верхнеуровневых подразделений штатной расстановки. */
+const UNIT_ICONS: { test: RegExp; icon: LucideIcon }[] = [
+  { test: /административно-управленческий/i, icon: Landmark },
+  { test: /планировани|автоматизаци/i, icon: ClipboardList },
+  { test: /финансов/i, icon: Wallet },
+  { test: /персонал/i, icon: UsersRound },
+  { test: /информационн|ит\b/i, icon: MonitorCog },
+  { test: /коммерческ/i, icon: Handshake },
+  { test: /маркетинг/i, icon: Megaphone },
+  { test: /производствен/i, icon: Factory },
+];
+
+export function iconForName(name: string): LucideIcon | null {
+  return UNIT_ICONS.find((u) => u.test.test(name))?.icon ?? null;
+}
+
 export function IconFor({ node, depth, className }: { node: OrgNode; depth: number; className?: string }) {
   const kind = kindOf(node, depth);
   const cls = className ?? "h-4 w-4 shrink-0";
+  if (depth === 1) {
+    const Special = iconForName(node.name);
+    if (Special) return <Special className={cls} />;
+  }
   if (kind === "root") return <Building2 className={cls} />;
   if (kind === "shop") return <Factory className={cls} />;
   if (kind === "lead") return <Briefcase className={cls} />;
@@ -146,7 +183,7 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
                   onClick={() => onOpenBranch(node)}
                   className="flex items-center justify-center gap-1.5 bg-secondary px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-secondary-foreground transition-colors hover:bg-secondary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                 >
-                  Структура департамента
+                  Структура подразделения
                   <ChevronRight className="h-3.5 w-3.5" />
                 </button>
               ) : null}

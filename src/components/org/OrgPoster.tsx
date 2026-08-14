@@ -132,17 +132,19 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
           <button
             type="button"
             onClick={() => onOpen(head)}
-            className="mt-3 flex w-full max-w-md items-center gap-4 rounded-2xl border border-primary bg-primary px-6 py-4 text-left text-primary-foreground shadow-lg transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="mt-3 flex w-full max-w-md items-center gap-4 rounded-2xl border-2 border-primary bg-card px-6 py-4 text-left shadow-lg transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-foreground/15">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
               <UserRound className="h-6 w-6" aria-hidden />
             </span>
             <span className="min-w-0">
-              <span className="block text-base font-bold uppercase tracking-wide">Генеральный директор</span>
+              <span className="block text-base font-bold uppercase tracking-wide text-secondary">
+                Генеральный директор
+              </span>
               {head.managerName ? (
-                <span className="block text-sm text-primary-foreground/90 break-words">{head.managerName}</span>
+                <span className="block text-sm text-foreground/80 break-words">{head.managerName}</span>
               ) : null}
-              <span className="mt-0.5 block text-xs text-primary-foreground/80">
+              <span className="mt-0.5 block text-xs text-muted-foreground">
                 Общая численность — {fmt(total)} сотрудников
               </span>
             </span>

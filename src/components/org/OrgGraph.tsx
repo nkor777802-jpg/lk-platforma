@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import {
   ChevronDown,
   ChevronRight,
+  Factory,
   Maximize2,
   Minus,
   Plus,
   Scan,
   Search,
+  Users,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,12 +26,19 @@ import {
   pathTo,
   type OrgNode,
   type OrgUnitData,
+  type OrgWorkCenterLink,
 } from "@/lib/org-tree";
 
 interface Props {
   units: OrgUnitData[];
   title?: string;
   subtitle?: string;
+  /** public — без ФИО и ссылок на профили; internal — полный доступ. */
+  variant?: "public" | "internal";
+  workCenters?: OrgWorkCenterLink[];
+  /** Контейнер со схемой (без масштабирования) — для экспорта PNG/SVG. */
+  exportRef?: React.RefObject<HTMLDivElement | null>;
+  onStateChange?: (state: { focusKey: string | null; expanded: string[] }) => void;
 }
 
 function num(v: number) {
@@ -153,9 +163,21 @@ function GraphNode({
   );
 }
 
-export function OrgGraph({ units, title, subtitle }: Props) {
+export function OrgGraph({
+  units,
+  title,
+  subtitle,
+  variant = "public",
+  workCenters = [],
+  exportRef,
+  onStateChange,
+}: Props) {
   const isMobile = useIsMobile();
-  const roots = useMemo(() => buildTree(units), [units]);
+  const allRoots = useMemo(() => buildTree(units), [units]);
+  const [focusKey, setFocusKey] = useState<string | null>(null);
+  const focusNode = useMemo(() => (focusKey ? findNode(allRoots, focusKey) : null), [allRoots, focusKey]);
+  const roots = useMemo(() => (focusNode ? [focusNode] : allRoots), [allRoots, focusNode]);
+  const focusCrumbs = useMemo(() => (focusKey ? pathTo(allRoots, focusKey) : []), [allRoots, focusKey]);
   const [query, setQuery] = useState("");
   const [zoom, setZoom] = useState(0.9);
   const [fullscreen, setFullscreen] = useState(false);
@@ -166,7 +188,16 @@ export function OrgGraph({ units, title, subtitle }: Props) {
   const dragRef = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const innerRef = useRef<HTMLDivElement | null>(null);
 
+  useEffect(() => {
+    if (exportRef) exportRef.current = innerRef.current;
+  });
+
+  useEffect(() => {
+    onStateChange?.({ focusKey, expanded: [...expanded] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusKey, expanded]);
 
   useEffect(() => {
     setExpanded(new Set(defaultExpanded(roots, 1)));
@@ -225,6 +256,13 @@ export function OrgGraph({ units, title, subtitle }: Props) {
     return out;
   }, [roots]);
 
+  const detailCenters = useMemo(() => {
+    if (!detail?.departmentId) return [];
+    return workCenters
+      .filter((l) => l.departmentId === detail.departmentId && l.center)
+      .map((l) => l.center!);
+  }, [detail, workCenters]);
+
   const detailSheet = (
     <Sheet open={Boolean(detail)} onOpenChange={(o) => !o && setDetail(null)}>
       <SheetContent className="w-full overflow-y-auto sm:max-w-md">
@@ -241,6 +279,18 @@ export function OrgGraph({ units, title, subtitle }: Props) {
                 <span className="text-muted-foreground">Руководитель: </span>
                 {detail.managerName}
               </p>
+            ) : null}
+            {detail.children.length ? (
+              <Button
+                size="sm"
+                className="mt-4"
+                onClick={() => {
+                  setFocusKey(detail.key);
+                  setDetail(null);
+                }}
+              >
+                Открыть ветку подразделения
+              </Button>
             ) : null}
             {detail.positions.length ? (
               <div className="mt-6">
@@ -267,6 +317,46 @@ export function OrgGraph({ units, title, subtitle }: Props) {
                 </ul>
               </div>
             ) : null}
+            {variant === "internal" && detail.people.some((p) => p.fullName) ? (
+              <div className="mt-6">
+                <h3 className="flex items-center gap-2 text-sm font-semibold text-secondary">
+                  <Users className="h-4 w-4" /> Сотрудники
+                </h3>
+                <ul className="mt-2 space-y-1 text-sm">
+                  {detail.people
+                    .filter((p) => p.fullName)
+                    .map((p, i) => (
+                      <li key={`${p.fullName}-${i}`} className="border-b border-border py-1">
+                        {p.profileId ? (
+                          <Link to="/admin/users" className="font-medium text-secondary hover:underline">
+                            {p.fullName}
+                          </Link>
+                        ) : (
+                          <span className="font-medium">{p.fullName}</span>
+                        )}
+                        <span className="block text-xs text-muted-foreground break-words">{p.positionName}</span>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            ) : null}
+            {variant === "internal" && detailCenters.length ? (
+              <div className="mt-6">
+                <h3 className="flex items-center gap-2 text-sm font-semibold text-secondary">
+                  <Factory className="h-4 w-4" /> Рабочие центры
+                </h3>
+                <ul className="mt-2 space-y-1 text-sm">
+                  {detailCenters.map((c) => (
+                    <li key={c.id} className="border-b border-border py-1">
+                      <span className="font-medium break-words">{c.name}</span>
+                      <span className="block text-xs text-muted-foreground">
+                        {[c.code, c.site, c.area, c.process].filter(Boolean).join(" · ") || "—"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </>
         ) : null}
       </SheetContent>
@@ -278,8 +368,17 @@ export function OrgGraph({ units, title, subtitle }: Props) {
     const currentNode = drillKey ? findNode(roots, drillKey) : null;
     const list = currentNode ? currentNode.children : roots;
     const crumbs = drillKey ? pathTo(roots, drillKey) : [];
-    const hits = query.trim()
-      ? units.filter((u) => u.name.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 30)
+    const q = query.trim().toLowerCase();
+    const hits = q
+      ? units
+          .filter(
+            (u) =>
+              u.name.toLowerCase().includes(q) ||
+              (u.managerName ?? "").toLowerCase().includes(q) ||
+              u.positions.some((p) => p.name.toLowerCase().includes(q)) ||
+              u.people.some((p) => (p.fullName ?? "").toLowerCase().includes(q)),
+          )
+          .slice(0, 30)
       : [];
 
     return (
@@ -406,7 +505,7 @@ export function OrgGraph({ units, title, subtitle }: Props) {
           className="h-9"
           onClick={() => setExpanded(new Set(roots.map((r) => r.key)))}
         >
-          Свернуть
+          Свернуть всё
         </Button>
 
         <div className="flex items-center gap-1">
@@ -442,6 +541,24 @@ export function OrgGraph({ units, title, subtitle }: Props) {
         </div>
       </div>
 
+      <nav className="flex flex-wrap items-center gap-1 border-b border-border px-3 py-2 text-xs text-muted-foreground">
+        <button type="button" className="hover:underline" onClick={() => setFocusKey(null)}>
+          Вся структура
+        </button>
+        {focusCrumbs.map((c) => (
+          <span key={c.key} className="flex items-center gap-1">
+            <ChevronRight className="h-3 w-3" />
+            <button
+              type="button"
+              className="text-left hover:underline"
+              onClick={() => setFocusKey(c.key)}
+            >
+              {c.name}
+            </button>
+          </span>
+        ))}
+      </nav>
+
       <div
         ref={canvasRef}
         className={[
@@ -474,18 +591,20 @@ export function OrgGraph({ units, title, subtitle }: Props) {
           className="w-max origin-top-left"
           style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
         >
-          <ul className="org-children org-root flex items-start justify-center pt-8 pb-16">
-            {roots.map((root) => (
-              <GraphNode
-                key={root.key}
-                node={root}
-                expanded={expanded}
-                toggle={toggle}
-                query={query}
-                onOpen={(n) => setDetail(n)}
-              />
-            ))}
-          </ul>
+          <div ref={innerRef} className="bg-background">
+            <ul className="org-children org-root flex items-start justify-center pt-8 pb-16">
+              {roots.map((root) => (
+                <GraphNode
+                  key={root.key}
+                  node={root}
+                  expanded={expanded}
+                  toggle={toggle}
+                  query={query}
+                  onOpen={(n) => setDetail(n)}
+                />
+              ))}
+            </ul>
+          </div>
         </div>
         {roots.length === 0 ? (
           <p className="p-6 text-sm text-muted-foreground">Структура не загружена.</p>

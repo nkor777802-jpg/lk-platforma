@@ -9,11 +9,11 @@ import { InlineLoading } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { orgStructureQuery } from "@/lib/org-queries";
-import { buildTree, type OrgNode } from "@/lib/org-tree";
+import { buildTree, findNode, pathTo, type OrgNode } from "@/lib/org-tree";
 
 export const Route = createFileRoute("/org/print")({
   ssr: false,
-  validateSearch: z.object({ versionId: z.string().uuid().optional() }),
+  validateSearch: z.object({ versionId: z.string().uuid().optional(), focus: z.string().optional() }),
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
@@ -57,15 +57,15 @@ function flatten(nodes: OrgNode[], acc: OrgNode[] = []): OrgNode[] {
 }
 
 function OrgPrintPage() {
-  const { versionId } = Route.useSearch();
+  const { versionId, focus } = Route.useSearch();
   const [orientation, setOrientation] = useState<Orientation>("landscape");
   const [margin, setMargin] = useState("12");
 
   const structure = useQuery(orgStructureQuery(versionId ?? null));
-  const rows = useMemo(
-    () => flatten(buildTree(structure.data?.units ?? [])),
-    [structure.data],
-  );
+  const tree = useMemo(() => buildTree(structure.data?.units ?? []), [structure.data]);
+  const branch = useMemo(() => (focus ? findNode(tree, focus) : null), [tree, focus]);
+  const branchPath = useMemo(() => (focus ? pathTo(tree, focus) : []), [tree, focus]);
+  const rows = useMemo(() => flatten(branch ? [branch] : tree), [tree, branch]);
 
   const ready = structure.isSuccess && rows.length > 0;
   useEffect(() => {
@@ -116,6 +116,9 @@ function OrgPrintPage() {
           <div className="text-right text-xs text-muted-foreground">
             <p className="text-sm font-semibold text-secondary">Организационная структура</p>
             <p>{structure.data.version.title}</p>
+            {branchPath.length ? (
+              <p>Ветка: {branchPath.map((n) => n.name).join(" / ")}</p>
+            ) : null}
             <p>Действует с: {structure.data.version.effective_from ?? "—"}</p>
           </div>
         </header>

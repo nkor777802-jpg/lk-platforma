@@ -10,7 +10,25 @@ export interface OrgUnitData {
   vacant: number;
   departmentId: string | null;
   positions: { name: string; category: string | null; planned: number; actual: number; vacant: number }[];
-  people: { fullName: string | null; positionName: string; isVacancy: boolean; grade: string | null }[];
+  people: {
+    fullName: string | null;
+    positionName: string;
+    isVacancy: boolean;
+    grade: string | null;
+    profileId?: string | null;
+  }[];
+}
+
+export interface OrgWorkCenterLink {
+  departmentId: string | null;
+  center: {
+    id: string;
+    code: string | null;
+    name: string;
+    site: string | null;
+    area: string | null;
+    process: string | null;
+  } | null;
 }
 
 export interface OrgNode extends OrgUnitData {

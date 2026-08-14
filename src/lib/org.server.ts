@@ -437,6 +437,46 @@ export function parseStaffing(base64: string, mappingInput?: Partial<OrgMapping>
     issues.push({ level: "ERROR", row: null, message: "Не найдено ни одного подразделения — проверьте сопоставление колонок" });
   }
 
+  // --- Структурная валидация дерева ---
+  const seenKeys = new Set<string>();
+  for (const u of units) {
+    if (seenKeys.has(u.key)) {
+      issues.push({ level: "ERROR", row: u.sourceRow, value: u.name, message: `Дубль идентификатора подразделения: ${u.key}` });
+    }
+    seenKeys.add(u.key);
+  }
+  for (const u of units) {
+    if (!u.parentKey) {
+      if (u.key !== root.key) {
+        issues.push({ level: "ERROR", row: u.sourceRow, value: u.name, message: "Подразделение без места в дереве (не указан вышестоящий уровень)" });
+      }
+      continue;
+    }
+    if (!unitByKey.has(u.parentKey)) {
+      issues.push({ level: "ERROR", row: u.sourceRow, value: u.name, message: `Не найдено вышестоящее подразделение: ${u.parentKey}` });
+    }
+  }
+  for (const u of units) {
+    const path = new Set<string>([u.key]);
+    let cur = u.parentKey ? unitByKey.get(u.parentKey) : undefined;
+    while (cur) {
+      if (path.has(cur.key)) {
+        issues.push({ level: "ERROR", row: u.sourceRow, value: u.name, message: "Циклическая подчинённость подразделений" });
+        break;
+      }
+      path.add(cur.key);
+      cur = cur.parentKey ? unitByKey.get(cur.parentKey) : undefined;
+    }
+  }
+  for (const a of assignments) {
+    if (!unitByKey.has(a.unitKey)) {
+      issues.push({ level: "ERROR", row: a.sourceRow, value: a.fullName ?? a.positionName, message: "Сотрудник вне известного подразделения" });
+    }
+    if (!a.positionName.trim()) {
+      issues.push({ level: "ERROR", row: a.sourceRow, value: a.fullName ?? "", message: "Сотрудник без должности" });
+    }
+  }
+
   const people = assignments.filter((a) => !a.isVacancy && a.fullName).length;
   const vacancies = assignments.filter((a) => a.isVacancy).length;
 

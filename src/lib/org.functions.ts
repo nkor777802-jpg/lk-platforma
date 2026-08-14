@@ -278,3 +278,15 @@ export const setWorkCenterLink = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+/** Доступ к печати и графическому экспорту оргструктуры: только admin и hr. */
+export const canPrintOrgStructure = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+    const roles = (data ?? []).map((r) => r.role as string);
+    return { allowed: roles.includes("admin") || roles.includes("hr") };
+  });

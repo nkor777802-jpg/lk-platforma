@@ -40,7 +40,7 @@ import {
   type OrgUnitData,
   type OrgWorkCenterLink,
 } from "@/lib/org-tree";
-import { OrgPoster } from "./OrgPoster";
+import { HeadBadge, OrgPoster } from "./OrgPoster";
 import { OrgBranch } from "./OrgBranch";
 
 interface Props {

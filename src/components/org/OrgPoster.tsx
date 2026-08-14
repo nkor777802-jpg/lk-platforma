@@ -217,12 +217,12 @@ export function OrgPoster({ roots, title, subtitle, note, query, onOpen, openPan
     <div className="min-w-max bg-background px-8 pb-10 pt-6">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold uppercase tracking-tight text-secondary">
-            {title ?? "Оргструктура предприятия"}
-          </h2>
+          {title ? (
+            <h2 className="text-xl font-bold uppercase tracking-tight text-secondary">{title}</h2>
+          ) : null}
           {subtitle ? <p className="text-sm text-muted-foreground">{subtitle}</p> : null}
         </div>
-        <div className="flex items-center gap-3 rounded-xl border border-primary/40 bg-primary/10 px-4 py-2">
+        <div className="ml-auto flex items-center gap-3 rounded-xl border border-primary/40 bg-primary/10 px-4 py-2">
           <UserRound className="h-5 w-5 text-primary" aria-hidden />
           <div>
             <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Общая численность</p>
@@ -272,12 +272,10 @@ export function OrgPoster({ roots, title, subtitle, note, query, onOpen, openPan
         </div>
       ) : null}
 
-      {note ? (
-        <div className="mt-8 rounded-xl border border-dashed border-border px-4 py-3 text-xs text-muted-foreground">
-          Оргструктура строится автоматически по действующей штатной расстановке.
-          <span className="ml-1 font-medium text-secondary">{note}</span>
-        </div>
-      ) : null}
+      <div className="mt-8 rounded-xl border border-dashed border-border px-4 py-3 text-xs text-muted-foreground">
+        Оргструктура строится автоматически по данным штатной расстановки.
+        {note ? <span className="ml-1 font-medium text-secondary">{note}</span> : null}
+      </div>
     </div>
   );
 }

@@ -195,7 +195,7 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
       </div>
 
       <div className="mt-6 rounded-xl border border-dashed border-border px-4 py-3 text-xs text-muted-foreground">
-        Оргструктура строится автоматически по данным штатной расстановки.
+        Оргструктура формируется автоматически по данным предприятия.
         {note ? <span className="ml-1 font-medium text-secondary">{note}</span> : null}
       </div>
     </div>

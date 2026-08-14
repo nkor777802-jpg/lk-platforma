@@ -39,14 +39,14 @@ function PublicStructurePage() {
         <div className="mx-auto max-w-7xl px-4 py-16 sm:py-20">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Организационная структура</h1>
           <p className="mt-4 max-w-3xl text-lg opacity-90">
-            Как устроено предприятие: подразделения, должности и штатная численность.
+            Как устроено предприятие: подразделения, должности и численность.
           </p>
           {stats ? (
             <dl className="mt-8 flex flex-wrap gap-8">
               {[
                 { label: "Подразделений", value: num(stats.units) },
                 { label: "Должностей", value: num(stats.positions) },
-                { label: "Штатных единиц", value: num(stats.planned) },
+                { label: "Численность", value: num(stats.planned) },
               ].map((m) => (
                 <div key={m.label}>
                   <dd className="text-3xl font-bold">{m.value}</dd>
@@ -70,7 +70,7 @@ function PublicStructurePage() {
                 units={data.units}
                 title="Схема предприятия"
                 {...(data.version?.title ? { subtitle: data.version.title } : {})}
-                note="Актуально по действующей штатной расстановке"
+                note="Актуальная версия структуры"
               />
               <p className="mt-4 text-xs text-muted-foreground">
                 Персональные данные работников на публичной схеме не отображаются.

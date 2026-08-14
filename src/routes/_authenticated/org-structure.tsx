@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/org-structure")({
       { property: "og:title", content: "Организационная структура предприятия" },
       {
         property: "og:description",
-        content: "Подразделения, руководители, штатная численность и связь с производственными участками.",
+        content: "Подразделения, руководители, численность и связь с производственными участками.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

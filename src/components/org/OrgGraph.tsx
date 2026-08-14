@@ -555,7 +555,7 @@ export function OrgGraph({
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/40" aria-hidden /> Рабочие места и профессии
         </span>
-        <span className="ml-auto">{focusNode ? "Перетаскивайте схему мышью, Ctrl + колесо — масштаб" : "Выберите департамент, чтобы увидеть подробную структуру"}</span>
+        <span className="ml-auto">{focusNode ? "Перетаскивайте схему мышью, Ctrl + колесо — масштаб" : "Выберите подразделение, чтобы увидеть подробную структуру"}</span>
       </div>
 
       {detailSheet}

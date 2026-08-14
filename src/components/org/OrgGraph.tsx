@@ -31,6 +31,7 @@ import {
   ancestorsOf,
   buildTree,
   findNode,
+  headPositionOf,
   keysMatching,
   matches,
   pathTo,
@@ -396,6 +397,12 @@ export function OrgGraph({
                 {detail.unitType ? `${detail.unitType} · ` : ""}Штатных единиц {num(detail.planned)}
               </SheetDescription>
             </SheetHeader>
+            {headPositionOf(detail) ? (
+              <p className="mt-4 text-sm">
+                <span className="text-muted-foreground">Должность руководителя: </span>
+                {headPositionOf(detail)}
+              </p>
+            ) : null}
             {detail.managerName ? (
               <p className="mt-4 text-sm">
                 <span className="text-muted-foreground">Руководитель: </span>

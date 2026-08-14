@@ -17,7 +17,7 @@ import {
   Wallet,
   type LucideIcon,
 } from "lucide-react";
-import { matches, type OrgNode } from "@/lib/org-tree";
+import { headPositionOf, matches, type OrgNode } from "@/lib/org-tree";
 
 export function fmt(v: number) {
   return new Intl.NumberFormat("ru-RU").format(Math.round(v));
@@ -178,6 +178,11 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
                   <span className="block text-sm font-bold uppercase leading-snug text-secondary break-words">
                     {node.name}
                   </span>
+                  {headPositionOf(node) ? (
+                    <span className="mt-1 block text-xs font-medium text-primary break-words">
+                      {headPositionOf(node)}
+                    </span>
+                  ) : null}
                   {node.managerName ? (
                     <span className="mt-1 block text-xs text-muted-foreground break-words">{node.managerName}</span>
                   ) : null}

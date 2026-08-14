@@ -31,6 +31,7 @@ import {
   ancestorsOf,
   buildTree,
   findNode,
+  headPositionOf,
   keysMatching,
   matches,
   pathTo,
@@ -396,6 +397,12 @@ export function OrgGraph({
                 {detail.unitType ? `${detail.unitType} · ` : ""}Штатных единиц {num(detail.planned)}
               </SheetDescription>
             </SheetHeader>
+            {headPositionOf(detail) ? (
+              <p className="mt-4 text-sm">
+                <span className="text-muted-foreground">Должность руководителя: </span>
+                {headPositionOf(detail)}
+              </p>
+            ) : null}
             {detail.managerName ? (
               <p className="mt-4 text-sm">
                 <span className="text-muted-foreground">Руководитель: </span>
@@ -551,6 +558,9 @@ export function OrgGraph({
             {currentNode ? (
               <div className={`rounded-xl border px-4 py-3 ${styleFor(currentNode.level).card}`}>
                 <p className="text-base font-semibold break-words">{currentNode.name}</p>
+                {headPositionOf(currentNode) ? (
+                  <p className={`mt-1 text-xs ${styleFor(currentNode.level).meta}`}>{headPositionOf(currentNode)}</p>
+                ) : null}
                 {currentNode.managerName ? (
                   <p className={`mt-1 text-xs ${styleFor(currentNode.level).meta}`}>{currentNode.managerName}</p>
                 ) : null}

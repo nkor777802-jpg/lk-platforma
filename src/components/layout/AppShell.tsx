@@ -32,7 +32,8 @@ const SECONDARY_NAV = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { roles, signOut, user } = useAuth();
-  const canAccessAdmin = roles.some((r) => ["admin", "hr", "teacher", "manager"].includes(r));
+  /** Кнопка админ-панели и уведомления видны только администратору и HR. */
+  const canAccessAdmin = roles.some((r) => ["admin", "hr"].includes(r));
   const router = useRouter();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -88,7 +89,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-0.5 sm:gap-2">
-            <NotificationBell />
+            {canAccessAdmin ? <NotificationBell /> : null}
             <Button
               asChild
               size="sm"

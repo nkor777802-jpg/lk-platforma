@@ -336,9 +336,10 @@ export function OrgGraph({
         triggerDownload(dataUrl, `${baseName}.png`);
       } else {
         // PDF: снимок текущего вида вписывается в лист A4/A3 нужной ориентации.
+        const bg = EXPORT_BG[exportBg].value;
         const dataUrl = await mod.toPng(node, {
           ...options,
-          backgroundColor: EXPORT_BG[exportBg].value ?? "#ffffff",
+          backgroundColor: bg === "transparent" ? "#ffffff" : bg,
           pixelRatio: exportScale,
         });
         const { jsPDF } = await import("jspdf");

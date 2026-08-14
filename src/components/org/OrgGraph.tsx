@@ -19,7 +19,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import {
   ancestorsOf,
   buildTree,
-  defaultExpanded,
   findNode,
   keysMatching,
   matches,
@@ -28,11 +27,14 @@ import {
   type OrgUnitData,
   type OrgWorkCenterLink,
 } from "@/lib/org-tree";
+import { isBigBranch, OrgPoster } from "./OrgPoster";
 
 interface Props {
   units: OrgUnitData[];
   title?: string;
   subtitle?: string;
+  /** Подпись об актуальности данных штатной расстановки. */
+  note?: string;
   /** public — без ФИО и ссылок на профили; internal — полный доступ. */
   variant?: "public" | "internal";
   workCenters?: OrgWorkCenterLink[];
@@ -72,101 +74,11 @@ function styleFor(level: number) {
   return LEVEL_STYLES[Math.min(level, LEVEL_STYLES.length - 1)]!;
 }
 
-function subtreeCounts(node: OrgNode): { units: number; positions: number } {
-  return node.children.reduce(
-    (acc, c) => {
-      const s = subtreeCounts(c);
-      return { units: acc.units + 1 + s.units, positions: acc.positions + s.positions };
-    },
-    { units: 0, positions: node.positions.length },
-  );
-}
-
-function GraphNode({
-  node,
-  expanded,
-  toggle,
-  query,
-  onOpen,
-}: {
-  node: OrgNode;
-  expanded: Set<string>;
-  toggle: (key: string) => void;
-  query: string;
-  onOpen: (node: OrgNode) => void;
-}) {
-  const s = styleFor(node.level);
-  const isOpen = expanded.has(node.key);
-  const hasChildren = node.children.length > 0;
-  const highlighted = Boolean(query.trim()) && matches(node, query);
-  const counts = subtreeCounts(node);
-
-  return (
-    <li className="relative flex flex-col items-center px-3">
-      {/* линия вверх к родителю */}
-      <span className={`org-line-up absolute left-1/2 top-0 h-6 w-px -translate-x-1/2 ${s.line}`} aria-hidden />
-      <div className="relative pt-6">
-        <button
-          type="button"
-          onClick={() => onOpen(node)}
-          className={[
-            "w-56 rounded-xl border px-4 py-3 text-left transition-all duration-200",
-            "hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            s.card,
-            highlighted ? "ring-2 ring-ring ring-offset-2 ring-offset-background" : "",
-          ].join(" ")}
-        >
-          <span className="block text-sm font-semibold leading-snug break-words">{node.name}</span>
-          {node.unitType ? (
-            <span className={`mt-1 block text-[10px] uppercase tracking-wide ${s.meta}`}>{node.unitType}</span>
-          ) : null}
-          {node.managerName ? (
-            <span className={`mt-1 block text-xs break-words ${s.meta}`}>{node.managerName}</span>
-          ) : null}
-          <span className={`mt-2 block text-xs ${s.meta}`}>
-            Штат {num(node.planned)}
-            {counts.units > 0 ? ` · Подр. ${num(counts.units)}` : ""}
-            {counts.positions > 0 ? ` · Долж. ${num(counts.positions)}` : ""}
-          </span>
-        </button>
-
-        {hasChildren ? (
-          <button
-            type="button"
-            aria-label={isOpen ? "Свернуть" : "Развернуть"}
-            onClick={() => toggle(node.key)}
-            className="absolute -bottom-3 left-1/2 z-10 flex h-6 w-6 -translate-x-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {isOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
-          </button>
-        ) : null}
-      </div>
-
-      {hasChildren && isOpen ? (
-        <>
-          <span className={`h-6 w-px ${s.line}`} aria-hidden />
-          <ul className="org-children relative flex items-start justify-center pt-0">
-            {node.children.map((child) => (
-              <GraphNode
-                key={child.key}
-                node={child}
-                expanded={expanded}
-                toggle={toggle}
-                query={query}
-                onOpen={onOpen}
-              />
-            ))}
-          </ul>
-        </>
-      ) : null}
-    </li>
-  );
-}
-
 export function OrgGraph({
   units,
   title,
   subtitle,
+  note,
   variant = "public",
   workCenters = [],
   exportRef,

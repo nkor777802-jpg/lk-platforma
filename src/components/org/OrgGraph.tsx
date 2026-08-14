@@ -273,6 +273,18 @@ export function OrgGraph({
                 {detail.managerName}
               </p>
             ) : null}
+            {detail.children.length ? (
+              <Button
+                size="sm"
+                className="mt-4"
+                onClick={() => {
+                  setFocusKey(detail.key);
+                  setDetail(null);
+                }}
+              >
+                Открыть ветку подразделения
+              </Button>
+            ) : null}
             {detail.positions.length ? (
               <div className="mt-6">
                 <h3 className="text-sm font-semibold text-secondary">Должности</h3>
@@ -293,6 +305,50 @@ export function OrgGraph({
                   {detail.children.map((c) => (
                     <li key={c.key} className="break-words">
                       {c.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {variant === "internal" && detail.people.some((p) => p.fullName) ? (
+              <div className="mt-6">
+                <h3 className="flex items-center gap-2 text-sm font-semibold text-secondary">
+                  <Users className="h-4 w-4" /> Сотрудники
+                </h3>
+                <ul className="mt-2 space-y-1 text-sm">
+                  {detail.people
+                    .filter((p) => p.fullName)
+                    .map((p, i) => (
+                      <li key={`${p.fullName}-${i}`} className="border-b border-border py-1">
+                        {p.profileId ? (
+                          <Link
+                            to="/admin/users"
+                            search={{ q: p.fullName ?? "" }}
+                            className="font-medium text-secondary hover:underline"
+                          >
+                            {p.fullName}
+                          </Link>
+                        ) : (
+                          <span className="font-medium">{p.fullName}</span>
+                        )}
+                        <span className="block text-xs text-muted-foreground break-words">{p.positionName}</span>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            ) : null}
+            {variant === "internal" && detailCenters.length ? (
+              <div className="mt-6">
+                <h3 className="flex items-center gap-2 text-sm font-semibold text-secondary">
+                  <Factory className="h-4 w-4" /> Рабочие центры
+                </h3>
+                <ul className="mt-2 space-y-1 text-sm">
+                  {detailCenters.map((c) => (
+                    <li key={c.id} className="border-b border-border py-1">
+                      <span className="font-medium break-words">{c.name}</span>
+                      <span className="block text-xs text-muted-foreground">
+                        {[c.code, c.site, c.area, c.process].filter(Boolean).join(" · ") || "—"}
+                      </span>
                     </li>
                   ))}
                 </ul>

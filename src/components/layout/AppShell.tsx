@@ -272,8 +272,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         </main>
       </div>
 
-      <footer className="brand-pattern-blue border-t border-border py-8 text-secondary-foreground">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between">
+      <footer className="brand-pattern-blue mt-auto border-t border-border text-secondary-foreground">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-12 sm:flex-row sm:items-center sm:justify-between">
           <img
             src={brandLogos.fullCompactWhite}
             alt={brandLogos.alt}
@@ -291,6 +291,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           <p className="break-words text-sm opacity-80">
             Корпоративная платформа обучения и аттестации · {user?.email}
           </p>
+        </div>
+        <div className="border-t border-primary-foreground/10">
+          <div className="mx-auto max-w-7xl px-4 py-5 text-xs opacity-70">
+            © {new Date().getFullYear()} АО «Людиновокабель». Все права защищены.
+          </div>
         </div>
       </footer>
     </div>

@@ -19,6 +19,12 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { headPositionOf, matches, type OrgNode } from "@/lib/org-tree";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function fmt(v: number) {
   return new Intl.NumberFormat("ru-RU").format(Math.round(v));

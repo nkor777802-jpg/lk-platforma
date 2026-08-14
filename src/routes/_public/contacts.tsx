@@ -3,6 +3,7 @@ import { company } from "@/content/site";
 import { useCompany } from "@/hooks/useCompany";
 import { Section } from "@/components/public/sections";
 import { ContactForm } from "@/components/public/ContactForm";
+import { PageHero } from "@/components/public/PageHero";
 
 const TITLE = "Контакты — Людиновокабель";
 const DESCRIPTION =
@@ -28,14 +29,7 @@ function ContactsPage() {
   const company = useCompany();
   return (
     <>
-      <div className="brand-pattern-blue text-secondary-foreground">
-        <div className="mx-auto max-w-7xl px-4 py-16">
-          <h1 className="text-4xl font-bold sm:text-5xl">Контакты</h1>
-          <p className="mt-4 max-w-3xl text-lg opacity-90">
-            Вопросы по обучению, доступу в систему и аттестации.
-          </p>
-        </div>
-      </div>
+      <PageHero title="Контакты" lead="Вопросы по обучению, доступу в систему и аттестации." />
 
       <Section title="Как с нами связаться">
         <div className="grid gap-10 lg:grid-cols-2">

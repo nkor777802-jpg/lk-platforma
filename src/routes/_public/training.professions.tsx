@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { publicProfessionsQuery } from "@/lib/public-queries";
 import { ProfessionGrid } from "@/components/public/ProfessionGrid";
 import { Section } from "@/components/public/sections";
+import { PageHero } from "@/components/public/PageHero";
 
 const TITLE = "Обучение по профессиям кабельного производства — Людиновокабель";
 const DESCRIPTION =
@@ -46,15 +47,10 @@ function ProfessionsPage() {
 
   return (
     <>
-      <div className="brand-pattern-blue text-secondary-foreground">
-        <div className="mx-auto max-w-7xl px-4 py-16">
-          <h1 className="text-4xl font-bold sm:text-5xl">Обучение по профессиям</h1>
-          <p className="mt-4 max-w-3xl text-lg opacity-90">
-            Направления производства и программы обучения. Прохождение обучения возможно только
-            после авторизации в системе.
-          </p>
-        </div>
-      </div>
+      <PageHero
+        title="Обучение по профессиям"
+        lead="Направления производства и программы обучения. Прохождение обучения возможно только после авторизации в системе."
+      />
 
       <Section title="Программы обучения">
         <ProfessionGrid items={data} />

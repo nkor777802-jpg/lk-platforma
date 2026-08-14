@@ -1,9 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
 import {
   ChevronDown,
   ChevronRight,
   Factory,
+  FileCode2,
+  Image as ImageIcon,
   Maximize2,
   Minus,
   Plus,
@@ -41,11 +44,17 @@ interface Props {
   workCenters?: OrgWorkCenterLink[];
   /** Контейнер со схемой (без масштабирования) — для экспорта PNG/SVG. */
   exportRef?: React.RefObject<HTMLDivElement | null>;
-  onStateChange?: (state: { focusKey: string | null; expanded: string[] }) => void;
+  onStateChange?: (state: { focusKey: string | null; expanded: string[]; view?: "tree" | "sheet" }) => void;
 }
 
 function num(v: number) {
   return new Intl.NumberFormat("ru-RU").format(Math.round(v));
+}
+
+const MIN_SHEET_SCALE = 0.45;
+
+function fileSlug(name: string) {
+  return name.trim().replace(/\s+/g, "-").replace(/[\\/:*?"<>|]/g, "").slice(0, 60);
 }
 
 const LEVEL_STYLES = [
@@ -93,6 +102,10 @@ export function OrgGraph({
   const focusCrumbs = useMemo(() => (focusKey ? pathTo(allRoots, focusKey) : []), [allRoots, focusKey]);
   const [query, setQuery] = useState("");
   const [zoom, setZoom] = useState(0.9);
+  const [view, setView] = useState<"tree" | "sheet">("tree");
+  const [sheetScale, setSheetScale] = useState(1);
+  const [sheetSize, setSheetSize] = useState<{ w: number; h: number } | null>(null);
+  const [busy, setBusy] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [detail, setDetail] = useState<OrgNode | null>(null);
@@ -109,9 +122,22 @@ export function OrgGraph({
   });
 
   useEffect(() => {
-    onStateChange?.({ focusKey, expanded: [...expanded] });
+    onStateChange?.({ focusKey, expanded: [...expanded], view });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focusKey, expanded]);
+  }, [focusKey, expanded, view]);
+
+  // Начальный режим просмотра из URL (?view=sheet).
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("view") === "sheet") setView("sheet");
+  }, []);
+
+  // Синхронизация режима с адресной строкой.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (view === "sheet") url.searchParams.set("view", "sheet");
+    else url.searchParams.delete("view");
+    window.history.replaceState(null, "", url.toString());
+  }, [view]);
 
   useEffect(() => {
     setExpanded(new Set());
@@ -146,6 +172,31 @@ export function OrgGraph({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded]);
 
+  // Листовой режим: автоподбор масштаба под размер области.
+  useLayoutEffect(() => {
+    if (view !== "sheet" || !focusNode) return;
+    const canvas = canvasRef.current;
+    const inner = innerRef.current;
+    if (!canvas || !inner) return;
+    const recompute = () => {
+      const cw = canvas.clientWidth - 16;
+      // Опорная высота фиксирована (не clientHeight канваса), иначе подгонка зациклится.
+      const ch = (fullscreen ? window.innerHeight - 220 : window.innerHeight * 0.7) - 16;
+      const w = inner.scrollWidth;
+      const h = inner.scrollHeight;
+      if (w <= 0 || h <= 0 || cw <= 0 || ch <= 0) return;
+      const raw = Math.min(1, cw / w, ch / h);
+      // Ширина вписывается всегда; по высоте допускаем прокрутку ради читаемости.
+      setSheetScale(Math.min(cw / w, Math.max(MIN_SHEET_SCALE, raw)));
+      setSheetSize({ w, h });
+    };
+    recompute();
+    const ro = new ResizeObserver(recompute);
+    ro.observe(canvas);
+    ro.observe(inner);
+    return () => ro.disconnect();
+  }, [view, focusNode, fullscreen, query]);
+
   const panelKeys = useMemo(() => {
     const acc: string[] = [];
     const walk = (n: OrgNode) => {
@@ -174,6 +225,36 @@ export function OrgGraph({
       else next.add(key);
       return next;
     });
+
+  const exportName = focusNode ? fileSlug(focusNode.name) : "обзор";
+
+  const downloadImage = async (format: "png" | "svg") => {
+    const target = innerRef.current;
+    if (!target) return;
+    setBusy(true);
+    try {
+      const mod = await import("html-to-image");
+      const options = {
+        backgroundColor: "#ffffff",
+        skipFonts: true,
+        width: target.scrollWidth,
+        height: target.scrollHeight,
+        style: { transform: "none", margin: "0" },
+      };
+      const dataUrl =
+        format === "png"
+          ? await mod.toPng(target, { ...options, pixelRatio: 2 })
+          : await mod.toSvg(target, options);
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `Оргструктура_${exportName}_${new Date().toISOString().slice(0, 10)}.${format}`;
+      link.click();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const detailCenters = useMemo(() => {
     if (!detail?.departmentId) return [];
@@ -416,6 +497,32 @@ export function OrgGraph({
         </div>
 
         {focusNode ? (
+          <div className="flex items-center rounded-md border border-border p-0.5">
+            <button
+              type="button"
+              onClick={() => setView("tree")}
+              className={`rounded px-2.5 py-1.5 text-xs font-medium ${view === "tree" ? "bg-secondary text-secondary-foreground" : "text-muted-foreground hover:bg-muted"}`}
+            >
+              Дерево
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("sheet")}
+              className={`rounded px-2.5 py-1.5 text-xs font-medium ${view === "sheet" ? "bg-secondary text-secondary-foreground" : "text-muted-foreground hover:bg-muted"}`}
+            >
+              Один лист
+            </button>
+          </div>
+        ) : null}
+
+        <Button variant="outline" size="sm" className="h-9" disabled={busy} onClick={() => downloadImage("png")}>
+          <ImageIcon className="mr-2 h-4 w-4" /> PNG{focusNode ? " (ветка)" : ""}
+        </Button>
+        <Button variant="outline" size="sm" className="h-9" disabled={busy} onClick={() => downloadImage("svg")}>
+          <FileCode2 className="mr-2 h-4 w-4" /> SVG{focusNode ? " (ветка)" : ""}
+        </Button>
+
+        {focusNode && view === "tree" ? (
           <>
             <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set(panelKeys))}>
               Развернуть всё
@@ -426,7 +533,11 @@ export function OrgGraph({
           </>
         ) : null}
 
-        <div className={focusNode ? "flex items-center gap-1" : "hidden"}>
+        {focusNode && view === "sheet" ? (
+          <span className="text-xs text-muted-foreground">Вписано, {Math.round(sheetScale * 100)}%</span>
+        ) : null}
+
+        <div className={focusNode && view === "tree" ? "flex items-center gap-1" : "hidden"}>
           <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => setZoom((z) => Math.max(0.35, z - 0.1))} aria-label="Уменьшить">
             <Minus className="h-4 w-4" />
           </Button>
@@ -453,10 +564,13 @@ export function OrgGraph({
           >
             <Scan className="h-4 w-4" />
           </Button>
+        </div>
+
+        {focusNode ? (
           <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => setFullscreen((f) => !f)} aria-label="Во весь экран">
             {fullscreen ? <X className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
           </Button>
-        </div>
+        ) : null}
       </div>
 
       <nav className="flex flex-wrap items-center gap-1 border-b border-border px-3 py-2 text-xs text-muted-foreground">
@@ -481,14 +595,24 @@ export function OrgGraph({
       <div
         ref={canvasRef}
         className={[
-          "org-canvas relative cursor-grab overflow-hidden bg-muted/30 active:cursor-grabbing",
+          "org-canvas relative bg-muted/30",
+          view === "sheet"
+            ? "overflow-x-hidden overflow-y-auto"
+            : "cursor-grab overflow-hidden active:cursor-grabbing",
           fullscreen ? "flex-1" : "h-[70vh]",
         ].join(" ")}
+        style={
+          view === "sheet" && !fullscreen && sheetSize && typeof window !== "undefined"
+            ? { height: Math.min(window.innerHeight * 0.7, sheetSize.h * sheetScale + 32) }
+            : undefined
+        }
         onPointerDown={(e) => {
+          if (view === "sheet") return;
           if ((e.target as HTMLElement).closest("button, a, input, [role='button']")) return;
           dragRef.current = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y };
         }}
         onPointerMove={(e) => {
+          if (view === "sheet") return;
           const d = dragRef.current;
           if (!d) return;
           const dx = e.clientX - d.x;
@@ -509,6 +633,7 @@ export function OrgGraph({
           dragging.current = false;
         }}
         onWheel={(e) => {
+          if (view === "sheet") return;
           if (!e.ctrlKey && !e.metaKey) return;
           e.preventDefault();
           setZoom((z) => Math.min(1.6, Math.max(0.35, z - e.deltaY * 0.001)));
@@ -516,8 +641,16 @@ export function OrgGraph({
       >
         <div
           ref={contentRef}
-          className="w-max origin-top-left"
-          style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
+          className={view === "sheet" ? "mx-auto origin-top-left" : "w-max origin-top-left"}
+          style={
+            view === "sheet"
+              ? {
+                  transform: `scale(${sheetScale})`,
+                  width: sheetSize ? sheetSize.w * sheetScale : undefined,
+                  height: sheetSize ? sheetSize.h * sheetScale : undefined,
+                }
+              : { transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }
+          }
         >
           <div ref={innerRef} className="bg-background">
             <OrgBranch
@@ -526,19 +659,22 @@ export function OrgGraph({
               onOpen={(n) => setDetail(n)}
               expanded={expanded}
               onToggle={toggle}
+              sheet={view === "sheet"}
             />
           </div>
         </div>
       </div>
       ) : (
         <div className={fullscreen ? "flex-1 overflow-y-auto" : "max-h-[75vh] overflow-y-auto"}>
-          <OrgPoster
-            roots={roots}
-            note={note}
-            query={query}
-            onOpen={(n) => setDetail(n)}
-            onOpenBranch={(n) => setFocusKey(n.key)}
-          />
+          <div ref={innerRef} className="bg-background">
+            <OrgPoster
+              roots={roots}
+              note={note}
+              query={query}
+              onOpen={(n) => setDetail(n)}
+              onOpenBranch={(n) => setFocusKey(n.key)}
+            />
+          </div>
         </div>
       )}
 
@@ -555,7 +691,15 @@ export function OrgGraph({
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/40" aria-hidden /> Рабочие места и профессии
         </span>
-        <span className="ml-auto">{focusNode ? "Перетаскивайте схему мышью, Ctrl + колесо — масштаб" : "Выберите подразделение, чтобы увидеть подробную структуру"}</span>
+        <span className="ml-auto">
+          {!focusNode
+            ? "Выберите подразделение, чтобы увидеть подробную структуру"
+            : view === "sheet"
+              ? sheetScale <= MIN_SHEET_SCALE
+                ? "Ветка очень большая — откройте вложенное подразделение или разверните на весь экран"
+                : "Вся ветка на одном листе, масштаб подобран автоматически"
+              : "Перетаскивайте схему мышью, Ctrl + колесо — масштаб"}
+        </span>
       </div>
 
       {detailSheet}

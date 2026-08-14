@@ -637,19 +637,18 @@ export function OrgGraph({
           </div>
         ) : null}
 
-        <Button variant="outline" size="sm" className="h-9" disabled={busy} onClick={() => downloadImage("png")}>
-          <ImageIcon className="mr-2 h-4 w-4" /> PNG{focusNode ? " (ветка)" : ""}
-        </Button>
-        <Button variant="outline" size="sm" className="h-9" disabled={busy} onClick={() => downloadImage("svg")}>
-          <FileCode2 className="mr-2 h-4 w-4" /> SVG{focusNode ? " (ветка)" : ""}
-        </Button>
+        {isStaff ? (
+          <Button variant="outline" size="sm" className="h-9" disabled={busy} onClick={() => setExportOpen(true)}>
+            <Download className="mr-2 h-4 w-4" /> Экспорт{focusNode ? " (ветка)" : ""}
+          </Button>
+        ) : null}
 
         {focusNode && view === "tree" ? (
           <>
-            <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set(panelKeys))}>
+            <Button variant="outline" size="sm" className="h-9" onClick={() => setExpandedKeys(panelKeys)}>
               Развернуть всё
             </Button>
-            <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set())}>
+            <Button variant="outline" size="sm" className="h-9" onClick={() => setExpandedKeys([])}>
               Свернуть всё
             </Button>
           </>

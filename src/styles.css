@@ -328,17 +328,51 @@
   background: color-mix(in oklab, var(--secondary) 45%, transparent);
 }
 
-/* Горизонтальные полушины: соединяют соседние карточки в одном ряду */
+/* Горизонтальные перемычки: соединяют центры соседних карточек в одном ряду */
 .org-bus > *::after {
   content: "";
   position: absolute;
   left: 50%;
-  right: -1rem;
+  right: calc(-1rem - 50%);
   top: -1.5rem;
   height: 2px;
   background: color-mix(in oklab, var(--secondary) 45%, transparent);
 }
 
-.org-bus > *:last-child::after {
+/* Мобильная сетка в одну колонку — связи не рисуем */
+.org-bus > *::before,
+.org-bus > *::after {
   display: none;
+}
+
+@media (min-width: 640px) {
+  .org-bus > *::before,
+  .org-bus > *::after {
+    display: block;
+  }
+  .org-bus > *:nth-child(2n)::after,
+  .org-bus > *:last-child::after {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .org-bus > *:nth-child(2n)::after {
+    display: block;
+  }
+  .org-bus > *:nth-child(3n)::after,
+  .org-bus > *:last-child::after {
+    display: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .org-bus > *:nth-child(2n)::after,
+  .org-bus > *:nth-child(3n)::after {
+    display: block;
+  }
+  .org-bus > *:nth-child(4n)::after,
+  .org-bus > *:last-child::after {
+    display: none;
+  }
 }

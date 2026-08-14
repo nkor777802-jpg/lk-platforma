@@ -368,8 +368,17 @@ export function OrgGraph({
     const currentNode = drillKey ? findNode(roots, drillKey) : null;
     const list = currentNode ? currentNode.children : roots;
     const crumbs = drillKey ? pathTo(roots, drillKey) : [];
-    const hits = query.trim()
-      ? units.filter((u) => u.name.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 30)
+    const q = query.trim().toLowerCase();
+    const hits = q
+      ? units
+          .filter(
+            (u) =>
+              u.name.toLowerCase().includes(q) ||
+              (u.managerName ?? "").toLowerCase().includes(q) ||
+              u.positions.some((p) => p.name.toLowerCase().includes(q)) ||
+              u.people.some((p) => (p.fullName ?? "").toLowerCase().includes(q)),
+          )
+          .slice(0, 30)
       : [];
 
     return (

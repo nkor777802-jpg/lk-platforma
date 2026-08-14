@@ -600,6 +600,11 @@ export function OrgGraph({
             : "cursor-grab overflow-hidden active:cursor-grabbing",
           fullscreen ? "flex-1" : "h-[70vh]",
         ].join(" ")}
+        style={
+          view === "sheet" && !fullscreen && sheetSize
+            ? { height: Math.min(window.innerHeight * 0.7, sheetSize.h * sheetScale + 32) }
+            : undefined
+        }
         onPointerDown={(e) => {
           if (view === "sheet") return;
           if ((e.target as HTMLElement).closest("button, a, input, [role='button']")) return;

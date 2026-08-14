@@ -492,6 +492,32 @@ export function OrgGraph({
         </div>
 
         {focusNode ? (
+          <div className="flex items-center rounded-md border border-border p-0.5">
+            <button
+              type="button"
+              onClick={() => setView("tree")}
+              className={`rounded px-2.5 py-1.5 text-xs font-medium ${view === "tree" ? "bg-secondary text-secondary-foreground" : "text-muted-foreground hover:bg-muted"}`}
+            >
+              Дерево
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("sheet")}
+              className={`rounded px-2.5 py-1.5 text-xs font-medium ${view === "sheet" ? "bg-secondary text-secondary-foreground" : "text-muted-foreground hover:bg-muted"}`}
+            >
+              Один лист
+            </button>
+          </div>
+        ) : null}
+
+        <Button variant="outline" size="sm" className="h-9" disabled={busy} onClick={() => downloadImage("png")}>
+          <ImageIcon className="mr-2 h-4 w-4" /> PNG{focusNode ? " (ветка)" : ""}
+        </Button>
+        <Button variant="outline" size="sm" className="h-9" disabled={busy} onClick={() => downloadImage("svg")}>
+          <FileCode2 className="mr-2 h-4 w-4" /> SVG{focusNode ? " (ветка)" : ""}
+        </Button>
+
+        {focusNode && view === "tree" ? (
           <>
             <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set(panelKeys))}>
               Развернуть всё
@@ -502,7 +528,11 @@ export function OrgGraph({
           </>
         ) : null}
 
-        <div className={focusNode ? "flex items-center gap-1" : "hidden"}>
+        {focusNode && view === "sheet" ? (
+          <span className="text-xs text-muted-foreground">Вписано, {Math.round(sheetScale * 100)}%</span>
+        ) : null}
+
+        <div className={focusNode && view === "tree" ? "flex items-center gap-1" : "hidden"}>
           <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => setZoom((z) => Math.max(0.35, z - 0.1))} aria-label="Уменьшить">
             <Minus className="h-4 w-4" />
           </Button>

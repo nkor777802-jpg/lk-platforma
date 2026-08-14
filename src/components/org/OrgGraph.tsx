@@ -171,6 +171,28 @@ export function OrgGraph({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded]);
 
+  // Листовой режим: автоподбор масштаба под размер области.
+  useLayoutEffect(() => {
+    if (view !== "sheet" || !focusNode) return;
+    const canvas = canvasRef.current;
+    const inner = innerRef.current;
+    if (!canvas || !inner) return;
+    const recompute = () => {
+      const cw = canvas.clientWidth - 16;
+      const ch = canvas.clientHeight - 16;
+      const w = inner.scrollWidth;
+      const h = inner.scrollHeight;
+      if (w <= 0 || h <= 0 || cw <= 0 || ch <= 0) return;
+      const raw = Math.min(1, cw / w, ch / h);
+      setSheetScale(Math.max(MIN_SHEET_SCALE, raw));
+    };
+    recompute();
+    const ro = new ResizeObserver(recompute);
+    ro.observe(canvas);
+    ro.observe(inner);
+    return () => ro.disconnect();
+  }, [view, focusNode, fullscreen, query]);
+
   const panelKeys = useMemo(() => {
     const acc: string[] = [];
     const walk = (n: OrgNode) => {

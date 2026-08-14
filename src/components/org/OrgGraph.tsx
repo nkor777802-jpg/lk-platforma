@@ -163,9 +163,21 @@ function GraphNode({
   );
 }
 
-export function OrgGraph({ units, title, subtitle }: Props) {
+export function OrgGraph({
+  units,
+  title,
+  subtitle,
+  variant = "public",
+  workCenters = [],
+  exportRef,
+  onStateChange,
+}: Props) {
   const isMobile = useIsMobile();
-  const roots = useMemo(() => buildTree(units), [units]);
+  const allRoots = useMemo(() => buildTree(units), [units]);
+  const [focusKey, setFocusKey] = useState<string | null>(null);
+  const focusNode = useMemo(() => (focusKey ? findNode(allRoots, focusKey) : null), [allRoots, focusKey]);
+  const roots = useMemo(() => (focusNode ? [focusNode] : allRoots), [allRoots, focusNode]);
+  const focusCrumbs = useMemo(() => (focusKey ? pathTo(allRoots, focusKey) : []), [allRoots, focusKey]);
   const [query, setQuery] = useState("");
   const [zoom, setZoom] = useState(0.9);
   const [fullscreen, setFullscreen] = useState(false);
@@ -176,7 +188,16 @@ export function OrgGraph({ units, title, subtitle }: Props) {
   const dragRef = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const innerRef = useRef<HTMLDivElement | null>(null);
 
+  useEffect(() => {
+    if (exportRef) exportRef.current = innerRef.current;
+  });
+
+  useEffect(() => {
+    onStateChange?.({ focusKey, expanded: [...expanded] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusKey, expanded]);
 
   useEffect(() => {
     setExpanded(new Set(defaultExpanded(roots, 1)));

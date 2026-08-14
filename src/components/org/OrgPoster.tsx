@@ -221,11 +221,11 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
           const kind = kindOf(node, 1);
           const highlighted = Boolean(query.trim()) && matches(node, query);
           return (
+            <div key={node.key} className="flex">
             <div
-              key={node.key}
               data-node-key={node.key}
               className={[
-                "flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md",
+                "flex w-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md",
                 highlighted ? "ring-2 ring-ring ring-offset-2 ring-offset-background" : "",
               ].join(" ")}
             >
@@ -265,6 +265,7 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
                   <ChevronRight className="h-3.5 w-3.5" />
                 </button>
               ) : null}
+            </div>
             </div>
           );
         })}

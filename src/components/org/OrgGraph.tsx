@@ -35,6 +35,7 @@ import {
   keysMatching,
   matches,
   pathTo,
+  searchUnits,
   type OrgNode,
   type OrgUnitData,
   type OrgWorkCenterLink,
@@ -132,6 +133,7 @@ export function OrgGraph({
   const roots = useMemo(() => (focusNode ? [focusNode] : allRoots), [allRoots, focusNode]);
   const focusCrumbs = useMemo(() => (focusKey ? pathTo(allRoots, focusKey) : []), [allRoots, focusKey]);
   const [query, setQuery] = useState("");
+  const [resultsOpen, setResultsOpen] = useState(false);
   const [zoom, setZoom] = useState(0.9);
   const [view, setView] = useState<"tree" | "sheet">("tree");
   const [sheetScale, setSheetScale] = useState(1);

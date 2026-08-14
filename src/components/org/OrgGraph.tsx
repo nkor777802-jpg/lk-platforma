@@ -414,14 +414,18 @@ export function OrgGraph({
           />
         </div>
 
-        <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set(panelKeys))}>
-          Развернуть всё
-        </Button>
-        <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set())}>
-          Свернуть всё
-        </Button>
+        {focusNode ? (
+          <>
+            <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set(panelKeys))}>
+              Развернуть всё
+            </Button>
+            <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set())}>
+              Свернуть всё
+            </Button>
+          </>
+        ) : null}
 
-        <div className="flex items-center gap-1">
+        <div className={focusNode ? "flex items-center gap-1" : "hidden"}>
           <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => setZoom((z) => Math.max(0.35, z - 0.1))} aria-label="Уменьшить">
             <Minus className="h-4 w-4" />
           </Button>
@@ -472,6 +476,7 @@ export function OrgGraph({
         ))}
       </nav>
 
+      {focusNode ? (
       <div
         ref={canvasRef}
         className={[
@@ -505,20 +510,27 @@ export function OrgGraph({
           style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
         >
           <div ref={innerRef} className="bg-background">
-            <OrgPoster
-              roots={roots}
-              note={note}
+            <OrgBranch
+              root={focusNode}
               query={query}
               onOpen={(n) => setDetail(n)}
-              openPanels={expanded}
-              onTogglePanel={toggle}
+              expanded={expanded}
+              onToggle={toggle}
             />
           </div>
         </div>
-        {roots.length === 0 ? (
-          <p className="p-6 text-sm text-muted-foreground">Структура не загружена.</p>
-        ) : null}
       </div>
+      ) : (
+        <div className={fullscreen ? "flex-1 overflow-y-auto" : "max-h-[75vh] overflow-y-auto"}>
+          <OrgPoster
+            roots={roots}
+            note={note}
+            query={query}
+            onOpen={(n) => setDetail(n)}
+            onOpenBranch={(n) => setFocusKey(n.key)}
+          />
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-4 border-t border-border px-3 py-2 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
@@ -533,7 +545,7 @@ export function OrgGraph({
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/40" aria-hidden /> Рабочие места и профессии
         </span>
-        <span className="ml-auto">Перетаскивайте схему мышью, Ctrl + колесо — масштаб</span>
+        <span className="ml-auto">{focusNode ? "Перетаскивайте схему мышью, Ctrl + колесо — масштаб" : "Выберите департамент, чтобы увидеть подробную структуру"}</span>
       </div>
 
       {detailSheet}

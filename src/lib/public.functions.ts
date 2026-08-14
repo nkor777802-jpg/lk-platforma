@@ -117,7 +117,7 @@ export const getPublicOrgStructure = createServerFn({ method: "GET" }).handler(a
     name: u.name,
     unitType: u.unitType,
     level: u.level,
-    managerName: null,
+    managerName: u.managerName,
     planned: u.planned,
     actual: u.actual,
     vacant: u.vacant,

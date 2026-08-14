@@ -61,11 +61,18 @@ function num(v: number) {
 
 const MIN_SHEET_SCALE = 0.45;
 
-const EXPORT_BG: Record<string, { label: string; value: string | undefined }> = {
+const EXPORT_BG = {
   white: { label: "Белый (для печати)", value: "#ffffff" },
   light: { label: "Светло-серый", value: "#f4f6fa" },
-  transparent: { label: "Прозрачный", value: undefined },
-};
+  transparent: { label: "Прозрачный", value: "transparent" },
+} as const;
+
+function triggerDownload(dataUrl: string, fileName: string) {
+  const link = document.createElement("a");
+  link.href = dataUrl;
+  link.download = fileName;
+  link.click();
+}
 
 /** Ориентировочный формат листа для подсказки в диалоге экспорта (300 dpi). */
 function sheetHint(w: number, h: number) {

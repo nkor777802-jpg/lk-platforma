@@ -169,7 +169,7 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
                 className="flex flex-1 items-start gap-3 px-4 pb-3 pt-4 text-left transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
               >
                 <span
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${KIND_CLASS[kind]}`}
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${KIND_ICON_CLASS[kind]}`}
                   aria-hidden
                 >
                   <IconFor node={node} depth={1} className="h-5 w-5" />

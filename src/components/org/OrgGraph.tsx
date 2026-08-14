@@ -405,15 +405,10 @@ export function OrgGraph({
           />
         </div>
 
-        <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set(allKeys))}>
+        <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set(panelKeys))}>
           Развернуть всё
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-9"
-          onClick={() => setExpanded(new Set(roots.map((r) => r.key)))}
-        >
+        <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set())}>
           Свернуть всё
         </Button>
 

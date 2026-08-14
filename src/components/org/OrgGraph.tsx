@@ -185,7 +185,8 @@ export function OrgGraph({
       const h = inner.scrollHeight;
       if (w <= 0 || h <= 0 || cw <= 0 || ch <= 0) return;
       const raw = Math.min(1, cw / w, ch / h);
-      setSheetScale(Math.max(MIN_SHEET_SCALE, raw));
+      // Ширина вписывается всегда; по высоте допускаем прокрутку ради читаемости.
+      setSheetScale(Math.min(cw / w, Math.max(MIN_SHEET_SCALE, raw)));
       setSheetSize({ w, h });
     };
     recompute();

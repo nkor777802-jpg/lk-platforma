@@ -1,5 +1,5 @@
 import { Minus, Plus } from "lucide-react";
-import { matches, type OrgNode } from "@/lib/org-tree";
+import { headPositionOf, matches, type OrgNode } from "@/lib/org-tree";
 import { fmt, IconFor, KIND_CLASS, KIND_META, kindOf } from "./OrgPoster";
 
 interface Common {
@@ -65,6 +65,9 @@ function BranchNode({
               />
               <span className="text-xs font-semibold uppercase leading-tight break-words">{node.name}</span>
             </span>
+            {headPositionOf(node) ? (
+              <span className={`mt-1 block text-[11px] break-words ${KIND_META[kind]}`}>{headPositionOf(node)}</span>
+            ) : null}
             {node.managerName ? (
               <span className={`mt-1 block text-[11px] break-words ${KIND_META[kind]}`}>{node.managerName}</span>
             ) : null}

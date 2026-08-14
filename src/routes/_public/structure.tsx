@@ -41,7 +41,7 @@ function PublicStructurePage() {
         lead="Как устроено предприятие: подразделения, должности и численность."
       >
           {stats ? (
-            <dl className="flex flex-wrap gap-x-8 gap-y-4">
+            <dl className="flex flex-wrap gap-x-8 gap-y-3">
               {[
                 { label: "Подразделений", value: num(stats.units), accent: false },
                 { label: "Должностей", value: num(stats.positions), accent: false },
@@ -53,8 +53,8 @@ function PublicStructurePage() {
                 },
               ].map((m) => (
                 <div key={m.label} className="max-w-[16rem]">
-                  <dd className={`text-3xl font-bold ${m.accent ? "text-primary" : ""}`}>{m.value}</dd>
-                  <dt className="text-sm opacity-80">{m.label}</dt>
+                  <dd className={`text-2xl font-bold ${m.accent ? "text-primary" : ""}`}>{m.value}</dd>
+                  <dt className="text-xs opacity-80">{m.label}</dt>
                 </div>
               ))}
             </dl>

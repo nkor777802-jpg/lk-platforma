@@ -104,3 +104,35 @@ export const listPublicManagement = createServerFn({ method: "GET" }).handler(as
   );
   return members;
 });
+
+/** Публичная оргструктура: действующая версия без персональных данных. */
+export const getPublicOrgStructure = createServerFn({ method: "GET" }).handler(async () => {
+  const { loadStructure } = await import("./org-versions.server");
+  const res = await loadStructure({ versionId: null, onDate: null, canSeePersonal: false });
+  if (!res.version) return { version: null, units: [], stats: null };
+  const units = res.units.map((u) => ({
+    key: u.key,
+    parentKey: u.parentKey,
+    name: u.name,
+    unitType: u.unitType,
+    level: u.level,
+    managerName: null,
+    planned: u.planned,
+    actual: u.actual,
+    vacant: u.vacant,
+    departmentId: u.departmentId,
+    positions: u.positions,
+    people: [],
+  }));
+  const stats = {
+    units: units.length,
+    positions: units.reduce((s, u) => s + u.positions.length, 0),
+    planned: Math.round(units.reduce((s, u) => s + (u.level === 0 ? u.planned : 0), 0) || units.reduce((s, u) => s + u.planned, 0)),
+    top: units.filter((u) => u.level === 1).length,
+  };
+  return {
+    version: { title: res.version.title, effectiveFrom: res.version.effective_from },
+    units,
+    stats,
+  };
+});

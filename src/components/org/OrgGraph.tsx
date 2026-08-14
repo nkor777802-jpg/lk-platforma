@@ -824,6 +824,90 @@ export function OrgGraph({
       </div>
 
       {detailSheet}
+
+      <Dialog open={exportOpen} onOpenChange={setExportOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Экспорт схемы</DialogTitle>
+            <DialogDescription>
+              {focusNode ? `Ветка: ${focusNode.name}` : "Обзор всей структуры"} — сохраняется текущее раскрытие узлов.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 text-sm">
+            <div>
+              <p className="mb-2 font-medium text-secondary">Охват</p>
+              <div className="flex gap-2">
+                {([["view", "Текущий вид"], ["branch", "Раскрыть всю ветку"]] as const).map(([v, label]) => (
+                  <Button
+                    key={v}
+                    type="button"
+                    variant={exportScope === v ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setExportScope(v)}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-2 font-medium text-secondary">Масштаб (качество печати)</p>
+              <div className="flex gap-2">
+                {[1, 2, 3].map((s) => (
+                  <Button
+                    key={s}
+                    type="button"
+                    variant={exportScale === s ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setExportScale(s)}
+                  >
+                    {s}x
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-2 font-medium text-secondary">Фон</p>
+              <div className="flex flex-wrap gap-2">
+                {(Object.keys(EXPORT_BG) as (keyof typeof EXPORT_BG)[]).map((k) => (
+                  <Button
+                    key={k}
+                    type="button"
+                    variant={exportBg === k ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setExportBg(k)}
+                  >
+                    {EXPORT_BG[k].label}
+                  </Button>
+                ))}
+              </div>
+              {exportBg === "transparent" ? (
+                <p className="mt-1 text-xs text-muted-foreground">В PDF прозрачный фон заменяется белым.</p>
+              ) : null}
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              Ориентировочный лист PDF:{" "}
+              {innerRef.current ? sheetHint(innerRef.current.scrollWidth, innerRef.current.scrollHeight) : "A4"}
+            </p>
+          </div>
+
+          <DialogFooter className="flex-col gap-2 sm:flex-row">
+            <Button variant="outline" disabled={busy} onClick={() => void runExport("svg")}>
+              SVG
+            </Button>
+            <Button variant="outline" disabled={busy} onClick={() => void runExport("png")}>
+              PNG
+            </Button>
+            <Button disabled={busy} onClick={() => void runExport("pdf")}>
+              PDF для печати
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -289,7 +289,7 @@ export function OrgChart({ units, workCenters = [], title, subtitle, variant = "
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {ORG_MODES.map((m) => (
+              {modeOptions.map((m) => (
                 <SelectItem key={m.value} value={m.value}>
                   {m.label}
                 </SelectItem>
@@ -411,7 +411,7 @@ export function OrgChart({ units, workCenters = [], title, subtitle, variant = "
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {ORG_MODES.map((m) => (
+            {modeOptions.map((m) => (
               <SelectItem key={m.value} value={m.value}>
                 {m.label}
               </SelectItem>

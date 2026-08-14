@@ -117,7 +117,7 @@ export function IconFor({ node, depth, className }: { node: OrgNode; depth: numb
   return <Users className={cls} />;
 }
 
-/** Подсветка руководителя подразделения: значок + должность + ФИО. */
+/** Подсветка руководителя подразделения: значок + должность. */
 export function HeadBadge({
   node,
   inverted,
@@ -128,13 +128,11 @@ export function HeadBadge({
   className?: string;
 }) {
   const position = headPositionOf(node);
-  if (!position && !node.managerName) return null;
+  if (!position) return null;
   const box = inverted
     ? "border-current/30 bg-foreground/10"
     : "border-primary/30 bg-primary/10";
   const title = inverted ? "" : "text-primary";
-  const sub = inverted ? "opacity-80" : "text-muted-foreground";
-  const tipLines = [position, node.managerName].filter(Boolean) as string[];
   return (
     <span
       className={`mt-1.5 flex items-start gap-1.5 rounded-md border px-2 py-1 text-left ${box} ${className ?? ""}`}
@@ -155,19 +153,12 @@ export function HeadBadge({
           </TooltipTrigger>
           <TooltipContent side="top" className="max-w-[240px] text-left">
             <span className="block font-semibold">Руководитель подразделения</span>
-            {tipLines.length ? (
-              <span className="block text-xs opacity-90">{tipLines.join(" — ")}</span>
-            ) : null}
+            <span className="block text-xs opacity-90">{position}</span>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
       <span className="min-w-0">
-        {position ? (
-          <span className={`block text-[11px] font-semibold leading-snug break-words ${title}`}>{position}</span>
-        ) : null}
-        {node.managerName ? (
-          <span className={`block text-[11px] leading-snug break-words ${sub}`}>{node.managerName}</span>
-        ) : null}
+        <span className={`block text-[11px] font-semibold leading-snug break-words ${title}`}>{position}</span>
       </span>
     </span>
   );
@@ -264,8 +255,8 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
               <span className="block text-sm font-bold uppercase tracking-wide text-secondary">
                 Генеральный директор
               </span>
-              {head.managerName ? (
-                <span className="block text-xs text-foreground/80 break-words">{head.managerName}</span>
+              {headPositionOf(head) ? (
+                <span className="block text-xs text-foreground/80 break-words">{headPositionOf(head)}</span>
               ) : null}
               <span className="mt-0.5 block text-[11px] text-muted-foreground">
                 Общая численность — {fmt(total)} сотрудников

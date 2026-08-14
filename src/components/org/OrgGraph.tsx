@@ -19,7 +19,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import {
   ancestorsOf,
   buildTree,
-  defaultExpanded,
   findNode,
   keysMatching,
   matches,
@@ -28,11 +27,14 @@ import {
   type OrgUnitData,
   type OrgWorkCenterLink,
 } from "@/lib/org-tree";
+import { isBigBranch, OrgPoster } from "./OrgPoster";
 
 interface Props {
   units: OrgUnitData[];
   title?: string;
   subtitle?: string;
+  /** Подпись об актуальности данных штатной расстановки. */
+  note?: string;
   /** public — без ФИО и ссылок на профили; internal — полный доступ. */
   variant?: "public" | "internal";
   workCenters?: OrgWorkCenterLink[];
@@ -72,101 +74,11 @@ function styleFor(level: number) {
   return LEVEL_STYLES[Math.min(level, LEVEL_STYLES.length - 1)]!;
 }
 
-function subtreeCounts(node: OrgNode): { units: number; positions: number } {
-  return node.children.reduce(
-    (acc, c) => {
-      const s = subtreeCounts(c);
-      return { units: acc.units + 1 + s.units, positions: acc.positions + s.positions };
-    },
-    { units: 0, positions: node.positions.length },
-  );
-}
-
-function GraphNode({
-  node,
-  expanded,
-  toggle,
-  query,
-  onOpen,
-}: {
-  node: OrgNode;
-  expanded: Set<string>;
-  toggle: (key: string) => void;
-  query: string;
-  onOpen: (node: OrgNode) => void;
-}) {
-  const s = styleFor(node.level);
-  const isOpen = expanded.has(node.key);
-  const hasChildren = node.children.length > 0;
-  const highlighted = Boolean(query.trim()) && matches(node, query);
-  const counts = subtreeCounts(node);
-
-  return (
-    <li className="relative flex flex-col items-center px-3">
-      {/* линия вверх к родителю */}
-      <span className={`org-line-up absolute left-1/2 top-0 h-6 w-px -translate-x-1/2 ${s.line}`} aria-hidden />
-      <div className="relative pt-6">
-        <button
-          type="button"
-          onClick={() => onOpen(node)}
-          className={[
-            "w-56 rounded-xl border px-4 py-3 text-left transition-all duration-200",
-            "hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            s.card,
-            highlighted ? "ring-2 ring-ring ring-offset-2 ring-offset-background" : "",
-          ].join(" ")}
-        >
-          <span className="block text-sm font-semibold leading-snug break-words">{node.name}</span>
-          {node.unitType ? (
-            <span className={`mt-1 block text-[10px] uppercase tracking-wide ${s.meta}`}>{node.unitType}</span>
-          ) : null}
-          {node.managerName ? (
-            <span className={`mt-1 block text-xs break-words ${s.meta}`}>{node.managerName}</span>
-          ) : null}
-          <span className={`mt-2 block text-xs ${s.meta}`}>
-            Штат {num(node.planned)}
-            {counts.units > 0 ? ` · Подр. ${num(counts.units)}` : ""}
-            {counts.positions > 0 ? ` · Долж. ${num(counts.positions)}` : ""}
-          </span>
-        </button>
-
-        {hasChildren ? (
-          <button
-            type="button"
-            aria-label={isOpen ? "Свернуть" : "Развернуть"}
-            onClick={() => toggle(node.key)}
-            className="absolute -bottom-3 left-1/2 z-10 flex h-6 w-6 -translate-x-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-sm transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {isOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
-          </button>
-        ) : null}
-      </div>
-
-      {hasChildren && isOpen ? (
-        <>
-          <span className={`h-6 w-px ${s.line}`} aria-hidden />
-          <ul className="org-children relative flex items-start justify-center pt-0">
-            {node.children.map((child) => (
-              <GraphNode
-                key={child.key}
-                node={child}
-                expanded={expanded}
-                toggle={toggle}
-                query={query}
-                onOpen={onOpen}
-              />
-            ))}
-          </ul>
-        </>
-      ) : null}
-    </li>
-  );
-}
-
 export function OrgGraph({
   units,
   title,
   subtitle,
+  note,
   variant = "public",
   workCenters = [],
   exportRef,
@@ -200,7 +112,7 @@ export function OrgGraph({
   }, [focusKey, expanded]);
 
   useEffect(() => {
-    setExpanded(new Set(defaultExpanded(roots, 1)));
+    setExpanded(new Set());
     setPan({ x: 0, y: 0 });
   }, [roots]);
 
@@ -232,11 +144,18 @@ export function OrgGraph({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded]);
 
+  const panelKeys = useMemo(() => {
+    const top = roots.length === 1 ? roots[0]!.children : roots;
+    return top.filter(isBigBranch).map((n) => n.key);
+  }, [roots]);
+
   useEffect(() => {
     if (!query.trim()) return;
     const hits = keysMatching(roots, query);
-    if (hits.length) setExpanded(new Set(ancestorsOf(roots, hits)));
-  }, [query, roots]);
+    if (!hits.length) return;
+    const chain = new Set(ancestorsOf(roots, hits));
+    setExpanded(new Set(panelKeys.filter((k) => chain.has(k))));
+  }, [query, roots, panelKeys]);
 
   const toggle = (key: string) =>
     setExpanded((prev) => {
@@ -245,16 +164,6 @@ export function OrgGraph({
       else next.add(key);
       return next;
     });
-
-  const allKeys = useMemo(() => {
-    const out: string[] = [];
-    const walk = (n: OrgNode) => {
-      out.push(n.key);
-      n.children.forEach(walk);
-    };
-    roots.forEach(walk);
-    return out;
-  }, [roots]);
 
   const detailCenters = useMemo(() => {
     if (!detail?.departmentId) return [];
@@ -496,15 +405,10 @@ export function OrgGraph({
           />
         </div>
 
-        <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set(allKeys))}>
+        <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set(panelKeys))}>
           Развернуть всё
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-9"
-          onClick={() => setExpanded(new Set(roots.map((r) => r.key)))}
-        >
+        <Button variant="outline" size="sm" className="h-9" onClick={() => setExpanded(new Set())}>
           Свернуть всё
         </Button>
 
@@ -592,18 +496,14 @@ export function OrgGraph({
           style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
         >
           <div ref={innerRef} className="bg-background">
-            <ul className="org-children org-root flex items-start justify-center pt-8 pb-16">
-              {roots.map((root) => (
-                <GraphNode
-                  key={root.key}
-                  node={root}
-                  expanded={expanded}
-                  toggle={toggle}
-                  query={query}
-                  onOpen={(n) => setDetail(n)}
-                />
-              ))}
-            </ul>
+            <OrgPoster
+              roots={roots}
+              note={note}
+              query={query}
+              onOpen={(n) => setDetail(n)}
+              openPanels={expanded}
+              onTogglePanel={toggle}
+            />
           </div>
         </div>
         {roots.length === 0 ? (
@@ -613,13 +513,16 @@ export function OrgGraph({
 
       <div className="flex flex-wrap items-center gap-4 border-t border-border px-3 py-2 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden /> Предприятие
+          <span className="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden /> Руководство
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-secondary" aria-hidden /> Дирекции и подразделения
+          <span className="h-2.5 w-2.5 rounded-full bg-secondary" aria-hidden /> Службы, отделы и цеха
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-accent" aria-hidden /> Участки и службы
+          <span className="h-2.5 w-2.5 rounded-full bg-accent" aria-hidden /> Участки, смены, рабочие центры
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/40" aria-hidden /> Рабочие места и профессии
         </span>
         <span className="ml-auto">Перетаскивайте схему мышью, Ctrl + колесо — масштаб</span>
       </div>

@@ -71,6 +71,7 @@ function PublicStructurePage() {
                 units={data.units}
                 title="Схема предприятия"
                 {...(data.version?.title ? { subtitle: data.version.title } : {})}
+                note="Актуально по действующей штатной расстановке"
               />
               <p className="mt-4 text-xs text-muted-foreground">
                 Персональные данные работников на публичной схеме не отображаются.

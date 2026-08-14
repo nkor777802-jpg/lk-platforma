@@ -4,9 +4,8 @@ import { toast } from "sonner";
 import {
   ChevronDown,
   ChevronRight,
+  Download,
   Factory,
-  FileCode2,
-  Image as ImageIcon,
   Maximize2,
   Minus,
   Plus,
@@ -17,8 +16,17 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/hooks/useAuth";
 import {
   ancestorsOf,
   buildTree,
@@ -52,6 +60,20 @@ function num(v: number) {
 }
 
 const MIN_SHEET_SCALE = 0.45;
+
+const EXPORT_BG: Record<string, { label: string; value: string | undefined }> = {
+  white: { label: "Белый (для печати)", value: "#ffffff" },
+  light: { label: "Светло-серый", value: "#f4f6fa" },
+  transparent: { label: "Прозрачный", value: undefined },
+};
+
+/** Ориентировочный формат листа для подсказки в диалоге экспорта (300 dpi). */
+function sheetHint(w: number, h: number) {
+  const orientation = w >= h ? "альбомная" : "книжная";
+  const long = Math.max(w, h);
+  const format = long > 3508 ? "A3+" : long > 2480 ? "A3" : "A4";
+  return `${format}, ${orientation}`;
+}
 
 function fileSlug(name: string) {
   return name.trim().replace(/\s+/g, "-").replace(/[\\/:*?"<>|]/g, "").slice(0, 60);

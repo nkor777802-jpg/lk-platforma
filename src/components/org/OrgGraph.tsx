@@ -102,6 +102,9 @@ export function OrgGraph({
   const focusCrumbs = useMemo(() => (focusKey ? pathTo(allRoots, focusKey) : []), [allRoots, focusKey]);
   const [query, setQuery] = useState("");
   const [zoom, setZoom] = useState(0.9);
+  const [view, setView] = useState<"tree" | "sheet">("tree");
+  const [sheetScale, setSheetScale] = useState(1);
+  const [busy, setBusy] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [detail, setDetail] = useState<OrgNode | null>(null);
@@ -118,9 +121,22 @@ export function OrgGraph({
   });
 
   useEffect(() => {
-    onStateChange?.({ focusKey, expanded: [...expanded] });
+    onStateChange?.({ focusKey, expanded: [...expanded], view });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focusKey, expanded]);
+  }, [focusKey, expanded, view]);
+
+  // Начальный режим просмотра из URL (?view=sheet).
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("view") === "sheet") setView("sheet");
+  }, []);
+
+  // Синхронизация режима с адресной строкой.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (view === "sheet") url.searchParams.set("view", "sheet");
+    else url.searchParams.delete("view");
+    window.history.replaceState(null, "", url.toString());
+  }, [view]);
 
   useEffect(() => {
     setExpanded(new Set());

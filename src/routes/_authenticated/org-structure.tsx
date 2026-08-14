@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { OrgStructureViewer } from "@/components/org/OrgStructureViewer";
 
-export const Route = createFileRoute("/_authenticated/structure")({
+export const Route = createFileRoute("/_authenticated/org-structure")({
   head: () => ({
     meta: [
       { title: "Структура предприятия | Академия «Людиновокабель»" },

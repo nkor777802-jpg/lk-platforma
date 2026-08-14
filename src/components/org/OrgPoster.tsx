@@ -199,9 +199,9 @@ function TopCard({
 
 interface Props extends Common {
   roots: OrgNode[];
-  title?: string;
-  subtitle?: string;
-  note?: string;
+  title?: string | undefined;
+  subtitle?: string | undefined;
+  note?: string | undefined;
   openPanels: Set<string>;
   onTogglePanel: (key: string) => void;
 }

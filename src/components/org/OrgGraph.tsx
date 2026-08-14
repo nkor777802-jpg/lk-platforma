@@ -558,6 +558,9 @@ export function OrgGraph({
             {currentNode ? (
               <div className={`rounded-xl border px-4 py-3 ${styleFor(currentNode.level).card}`}>
                 <p className="text-base font-semibold break-words">{currentNode.name}</p>
+                {headPositionOf(currentNode) ? (
+                  <p className={`mt-1 text-xs ${styleFor(currentNode.level).meta}`}>{headPositionOf(currentNode)}</p>
+                ) : null}
                 {currentNode.managerName ? (
                   <p className={`mt-1 text-xs ${styleFor(currentNode.level).meta}`}>{currentNode.managerName}</p>
                 ) : null}

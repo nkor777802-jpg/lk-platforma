@@ -19,6 +19,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { headPositionOf, matches, type OrgNode } from "@/lib/org-tree";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Maximize2, Minimize2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,

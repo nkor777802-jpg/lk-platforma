@@ -12,9 +12,35 @@ export function OrgStructurePreview() {
   const { data } = useQuery(publicOrgStructureQuery);
   const units = data?.units ?? [];
   const stats = data?.stats;
+  const childrenOf = new Map<string, typeof units>();
+  for (const u of units) {
+    if (!u.parentKey) continue;
+    childrenOf.set(u.parentKey, [...(childrenOf.get(u.parentKey) ?? []), u]);
+  }
+  const subtree = (key: string): { planned: number; positions: number; units: number } => {
+    const self = units.find((u) => u.key === key);
+    const kids = childrenOf.get(key) ?? [];
+    const agg = kids.reduce(
+      (acc, k) => {
+        const s = subtree(k.key);
+        return {
+          planned: acc.planned + s.planned,
+          positions: acc.positions + s.positions,
+          units: acc.units + s.units,
+        };
+      },
+      { planned: 0, positions: 0, units: 0 },
+    );
+    return {
+      planned: Math.max(self?.planned ?? 0, agg.planned),
+      positions: (self?.positions.length ?? 0) + agg.positions,
+      units: kids.length + agg.units,
+    };
+  };
   const top = units
     .filter((u) => u.level === 1)
-    .sort((a, b) => b.planned - a.planned)
+    .map((u) => ({ unit: u, agg: subtree(u.key) }))
+    .sort((a, b) => b.agg.planned - a.agg.planned)
     .slice(0, 8);
 
   if (!stats || units.length === 0) {
@@ -45,7 +71,7 @@ export function OrgStructurePreview() {
       </dl>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {top.map((u) => (
+        {top.map(({ unit: u, agg }) => (
           <div
             key={u.key}
             className="group h-full rounded-lg border border-border bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-md"
@@ -56,7 +82,7 @@ export function OrgStructurePreview() {
               <p className="mt-1 text-[11px] uppercase tracking-wide text-muted-foreground">{u.unitType}</p>
             ) : null}
             <p className="mt-2 text-xs text-muted-foreground">
-              Штат {num(u.planned)} · Должностей {u.positions.length}
+              Штат {num(agg.planned)} · Подразделений {num(agg.units)} · Должностей {num(agg.positions)}
             </p>
           </div>
         ))}

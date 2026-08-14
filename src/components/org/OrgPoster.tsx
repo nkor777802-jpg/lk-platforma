@@ -19,6 +19,12 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { headPositionOf, matches, type OrgNode } from "@/lib/org-tree";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function fmt(v: number) {
   return new Intl.NumberFormat("ru-RU").format(Math.round(v));
@@ -126,11 +132,33 @@ export function HeadBadge({
     : "border-primary/30 bg-primary/10";
   const title = inverted ? "" : "text-primary";
   const sub = inverted ? "opacity-80" : "text-muted-foreground";
+  const tipLines = [position, node.managerName].filter(Boolean) as string[];
   return (
     <span
       className={`mt-1.5 flex items-start gap-1.5 rounded-md border px-2 py-1 text-left ${box} ${className ?? ""}`}
     >
-      <UserRoundCog className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${title}`} aria-hidden />
+      <TooltipProvider delayDuration={150}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              tabIndex={0}
+              aria-label="Руководитель подразделения"
+              className="mt-0.5 shrink-0 cursor-help rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <UserRoundCog className={`h-3.5 w-3.5 ${title}`} />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-[240px] text-left">
+            <span className="block font-semibold">Руководитель подразделения</span>
+            {tipLines.length ? (
+              <span className="block text-xs opacity-90">{tipLines.join(" — ")}</span>
+            ) : null}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <span className="min-w-0">
         {position ? (
           <span className={`block text-[11px] font-semibold leading-snug break-words ${title}`}>{position}</span>

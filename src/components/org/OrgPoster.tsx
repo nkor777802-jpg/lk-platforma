@@ -53,6 +53,18 @@ export const KIND_CLASS: Record<Kind, string> = {
   place: "border-secondary/30 bg-muted text-foreground",
 };
 
+/** Кружок иконки подразделения: фирменный оранжевый, кроме карточек с плотной заливкой. */
+export const KIND_ICON_CLASS: Record<Kind, string> = {
+  root: "border-primary bg-primary text-primary-foreground",
+  lead: "border-primary/40 bg-primary/10 text-primary",
+  unit: "border-primary/25 bg-primary/5 text-primary",
+  shop: "border-secondary bg-secondary text-secondary-foreground",
+  area: "border-primary/30 bg-primary/10 text-primary",
+  shift: "border-primary/25 bg-primary/5 text-primary",
+  center: "border-primary/35 bg-primary/15 text-primary",
+  place: "border-primary/20 bg-primary/5 text-primary",
+};
+
 export const KIND_META: Record<Kind, string> = {
   root: "text-primary-foreground/80",
   lead: "text-muted-foreground",
@@ -157,7 +169,7 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
                 className="flex flex-1 items-start gap-3 px-4 pb-3 pt-4 text-left transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
               >
                 <span
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${KIND_CLASS[kind]}`}
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${KIND_ICON_CLASS[kind]}`}
                   aria-hidden
                 >
                   <IconFor node={node} depth={1} className="h-5 w-5" />

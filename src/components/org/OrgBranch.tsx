@@ -54,7 +54,15 @@ function BranchNode({
             className={`w-full ${vertical ? "text-left" : "text-center"} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
           >
             <span className={`flex items-center gap-1.5 ${vertical ? "justify-start" : "justify-center"}`}>
-              <IconFor node={node} depth={depth} />
+              <IconFor
+                node={node}
+                depth={depth}
+                className={
+                  kind === "root" || kind === "shop"
+                    ? "h-4 w-4 shrink-0"
+                    : "h-4 w-4 shrink-0 text-primary"
+                }
+              />
               <span className="text-xs font-semibold uppercase leading-tight break-words">{node.name}</span>
             </span>
             {node.managerName ? (

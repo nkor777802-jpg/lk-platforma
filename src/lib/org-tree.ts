@@ -60,18 +60,6 @@ export function isProductionWorker(positionName: string): boolean {
   return !NON_WORKER_TITLES.some((t) => n.startsWith(t));
 }
 
-interface UnusedOrgWorkCenterLink {
-  departmentId: string | null;
-  center: {
-    id: string;
-    code: string | null;
-    name: string;
-    site: string | null;
-    area: string | null;
-    process: string | null;
-  } | null;
-}
-
 export interface OrgNode extends OrgUnitData {
   children: OrgNode[];
 }

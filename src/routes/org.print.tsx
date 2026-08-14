@@ -9,11 +9,16 @@ import { InlineLoading } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { orgStructureQuery } from "@/lib/org-queries";
+import { canPrintOrgStructure } from "@/lib/org.functions";
 import { buildTree, findNode, pathTo, type OrgNode } from "@/lib/org-tree";
 
 export const Route = createFileRoute("/org/print")({
   ssr: false,
-  validateSearch: z.object({ versionId: z.string().uuid().optional(), focus: z.string().optional() }),
+  validateSearch: z.object({
+    versionId: z.string().uuid().optional(),
+    focus: z.string().optional(),
+    open: z.string().optional(),
+  }),
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
@@ -56,25 +61,52 @@ function flatten(nodes: OrgNode[], acc: OrgNode[] = []): OrgNode[] {
   return acc;
 }
 
+/** Печатаем только те узлы, что раскрыты на экране (родитель в списке open). */
+function flattenVisible(nodes: OrgNode[], open: Set<string>, acc: OrgNode[] = []): OrgNode[] {
+  for (const n of nodes) {
+    acc.push(n);
+    if (open.has(n.key)) flattenVisible(n.children, open, acc);
+  }
+  return acc;
+}
+
 function OrgPrintPage() {
-  const { versionId, focus } = Route.useSearch();
+  const { versionId, focus, open } = Route.useSearch();
   const [orientation, setOrientation] = useState<Orientation>("landscape");
   const [margin, setMargin] = useState("12");
+  const access = useQuery({
+    queryKey: ["org", "can-print"],
+    queryFn: () => canPrintOrgStructure(),
+    staleTime: 60_000,
+  });
 
   const structure = useQuery(orgStructureQuery(versionId ?? null));
   const tree = useMemo(() => buildTree(structure.data?.units ?? []), [structure.data]);
   const branch = useMemo(() => (focus ? findNode(tree, focus) : null), [tree, focus]);
   const branchPath = useMemo(() => (focus ? pathTo(tree, focus) : []), [tree, focus]);
-  const rows = useMemo(() => flatten(branch ? [branch] : tree), [tree, branch]);
+  const openSet = useMemo(() => new Set((open ?? "").split("|").filter(Boolean)), [open]);
+  const rows = useMemo(() => {
+    const base = branch ? [branch] : tree;
+    return openSet.size ? flattenVisible(base, new Set([...openSet, ...(branch ? [branch.key] : [])])) : flatten(base);
+  }, [tree, branch, openSet]);
 
-  const ready = structure.isSuccess && rows.length > 0;
+  const allowed = access.data?.allowed === true;
+  const ready = allowed && structure.isSuccess && rows.length > 0;
   useEffect(() => {
     if (!ready) return;
     const t = setTimeout(() => window.print(), 600);
     return () => clearTimeout(t);
   }, [ready]);
 
-  if (structure.isLoading) return <InlineLoading />;
+  if (access.isLoading || structure.isLoading) return <InlineLoading />;
+
+  if (!allowed) {
+    return (
+      <div className="mx-auto max-w-3xl p-10 text-center text-muted-foreground">
+        Печать оргструктуры доступна только администраторам и службе персонала.
+      </div>
+    );
+  }
 
   if (!structure.data?.version) {
     return <div className="mx-auto max-w-3xl p-10 text-center text-muted-foreground">Структура не найдена.</div>;

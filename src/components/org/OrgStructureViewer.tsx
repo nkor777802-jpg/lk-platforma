@@ -9,8 +9,10 @@ import { InlineLoading } from "@/components/states";
 import { OrgGraph } from "@/components/org/OrgGraph";
 import { orgStructureQuery, orgVersionsQuery } from "@/lib/org-queries";
 import { exportOrgExcel } from "@/lib/org.functions";
+import { useAuth } from "@/hooks/useAuth";
 
 export function OrgStructureViewer() {
+  const { isStaff } = useAuth();
   const [versionId, setVersionId] = useState<string>("active");
   const versions = useQuery(orgVersionsQuery());
   const structure = useQuery(orgStructureQuery(versionId === "active" ? null : versionId));
@@ -69,22 +71,27 @@ export function OrgStructureViewer() {
             ))}
           </SelectContent>
         </Select>
-        <Button variant="outline" size="sm" onClick={downloadExcel} disabled={busy}>
-          <FileSpreadsheet className="mr-2 h-4 w-4" /> Excel
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            const params = new URLSearchParams();
-            if (versionId !== "active") params.set("versionId", versionId);
-            if (view.focusKey) params.set("focus", view.focusKey);
-            const qs = params.toString();
-            window.open(qs ? `/org/print?${qs}` : "/org/print", "_blank");
-          }}
-        >
-          <Printer className="mr-2 h-4 w-4" /> PDF / печать
-        </Button>
+        {isStaff ? (
+          <>
+            <Button variant="outline" size="sm" onClick={downloadExcel} disabled={busy}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" /> Excel
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const params = new URLSearchParams();
+                if (versionId !== "active") params.set("versionId", versionId);
+                if (view.focusKey) params.set("focus", view.focusKey);
+                if (view.expanded.length) params.set("open", view.expanded.join("|"));
+                const qs = params.toString();
+                window.open(qs ? `/org/print?${qs}` : "/org/print", "_blank");
+              }}
+            >
+              <Printer className="mr-2 h-4 w-4" /> PDF / печать
+            </Button>
+          </>
+        ) : null}
         {busy ? <Download className="h-4 w-4 animate-pulse text-muted-foreground" /> : null}
       </div>
 

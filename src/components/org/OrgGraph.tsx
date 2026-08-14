@@ -180,7 +180,8 @@ export function OrgGraph({
     if (!canvas || !inner) return;
     const recompute = () => {
       const cw = canvas.clientWidth - 16;
-      const ch = canvas.clientHeight - 16;
+      // Опорная высота фиксирована (не clientHeight канваса), иначе подгонка зациклится.
+      const ch = (fullscreen ? window.innerHeight - 220 : window.innerHeight * 0.7) - 16;
       const w = inner.scrollWidth;
       const h = inner.scrollHeight;
       if (w <= 0 || h <= 0 || cw <= 0 || ch <= 0) return;
@@ -601,7 +602,7 @@ export function OrgGraph({
           fullscreen ? "flex-1" : "h-[70vh]",
         ].join(" ")}
         style={
-          view === "sheet" && !fullscreen && sheetSize
+          view === "sheet" && !fullscreen && sheetSize && typeof window !== "undefined"
             ? { height: Math.min(window.innerHeight * 0.7, sheetSize.h * sheetScale + 32) }
             : undefined
         }

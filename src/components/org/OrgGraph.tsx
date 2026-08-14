@@ -1,9 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
 import {
   ChevronDown,
   ChevronRight,
   Factory,
+  FileCode2,
+  Image as ImageIcon,
   Maximize2,
   Minus,
   Plus,
@@ -41,11 +44,17 @@ interface Props {
   workCenters?: OrgWorkCenterLink[];
   /** Контейнер со схемой (без масштабирования) — для экспорта PNG/SVG. */
   exportRef?: React.RefObject<HTMLDivElement | null>;
-  onStateChange?: (state: { focusKey: string | null; expanded: string[] }) => void;
+  onStateChange?: (state: { focusKey: string | null; expanded: string[]; view?: "tree" | "sheet" }) => void;
 }
 
 function num(v: number) {
   return new Intl.NumberFormat("ru-RU").format(Math.round(v));
+}
+
+const MIN_SHEET_SCALE = 0.45;
+
+function fileSlug(name: string) {
+  return name.trim().replace(/\s+/g, "-").replace(/[\\/:*?"<>|]/g, "").slice(0, 60);
 }
 
 const LEVEL_STYLES = [

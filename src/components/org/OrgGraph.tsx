@@ -35,6 +35,7 @@ import {
   keysMatching,
   matches,
   pathTo,
+  searchUnits,
   type OrgNode,
   type OrgUnitData,
   type OrgWorkCenterLink,
@@ -132,6 +133,7 @@ export function OrgGraph({
   const roots = useMemo(() => (focusNode ? [focusNode] : allRoots), [allRoots, focusNode]);
   const focusCrumbs = useMemo(() => (focusKey ? pathTo(allRoots, focusKey) : []), [allRoots, focusKey]);
   const [query, setQuery] = useState("");
+  const [resultsOpen, setResultsOpen] = useState(false);
   const [zoom, setZoom] = useState(0.9);
   const [view, setView] = useState<"tree" | "sheet">("tree");
   const [sheetScale, setSheetScale] = useState(1);
@@ -306,6 +308,33 @@ export function OrgGraph({
     });
 
   const exportName = focusNode ? fileSlug(focusNode.name) : "обзор";
+
+  const hits = useMemo(() => searchUnits(allRoots, query), [allRoots, query]);
+
+  /** Раскрыть предков узла, прокрутить к карточке и подсветить её. */
+  const goToNode = (key: string) => {
+    const inFocus = focusKey ? Boolean(findNode(roots, key)) : true;
+    const targetBranch = inFocus ? branchId : "__all";
+    if (!inFocus) setFocusKey(null);
+    const keys = ancestorsOf(allRoots, [key]);
+    setExpandedByBranch((prev) => ({
+      ...prev,
+      [targetBranch]: [...new Set([...(prev[targetBranch] ?? []), ...keys])],
+    }));
+    setQuery("");
+    setResultsOpen(false);
+    searchSnapshot.current = null;
+    window.setTimeout(() => {
+      const el = document.querySelector<HTMLElement>(`[data-node-key="${CSS.escape(key)}"]`);
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+      el.classList.add("ring-2", "ring-primary", "ring-offset-2", "ring-offset-background");
+      window.setTimeout(
+        () => el.classList.remove("ring-2", "ring-primary", "ring-offset-2", "ring-offset-background"),
+        2200,
+      );
+    }, 320);
+  };
 
   const runExport = async (format: "png" | "svg" | "pdf") => {
     const target = innerRef.current;
@@ -497,18 +526,7 @@ export function OrgGraph({
     const currentNode = drillKey ? findNode(roots, drillKey) : null;
     const list = currentNode ? currentNode.children : roots;
     const crumbs = drillKey ? pathTo(roots, drillKey) : [];
-    const q = query.trim().toLowerCase();
-    const hits = q
-      ? units
-          .filter(
-            (u) =>
-              u.name.toLowerCase().includes(q) ||
-              (u.managerName ?? "").toLowerCase().includes(q) ||
-              u.positions.some((p) => p.name.toLowerCase().includes(q)) ||
-              u.people.some((p) => (p.fullName ?? "").toLowerCase().includes(q)),
-          )
-          .slice(0, 30)
-      : [];
+    const mobileHits = searchUnits(allRoots, query, 30);
 
     return (
       <div className="space-y-4">
@@ -517,25 +535,31 @@ export function OrgGraph({
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Поиск подразделения"
+            placeholder="Подразделение, отдел или должность"
             className="pl-9"
           />
         </div>
 
         {query.trim() ? (
           <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">Найдено: {hits.length}</p>
-            {hits.map((u) => (
+            <p className="text-xs text-muted-foreground">
+              {mobileHits.length ? `Найдено: ${mobileHits.length}` : "Ничего не найдено"}
+            </p>
+            {mobileHits.map((h) => (
               <button
-                key={u.key}
+                key={h.node.key}
                 type="button"
                 onClick={() => {
-                  setDrillKey(u.key);
+                  setDrillKey(h.node.key);
                   setQuery("");
                 }}
                 className="w-full rounded-lg border border-border bg-card px-3 py-3 text-left"
               >
-                <span className="font-medium text-secondary break-words">{u.name}</span>
+                <span className="block font-medium text-secondary break-words">{h.node.name}</span>
+                {h.reason ? <span className="block text-xs text-primary break-words">{h.reason}</span> : null}
+                {h.path.length ? (
+                  <span className="block text-[11px] text-muted-foreground break-words">{h.path.join(" › ")}</span>
+                ) : null}
               </button>
             ))}
           </div>
@@ -618,14 +642,58 @@ export function OrgGraph({
           {subtitle ? <p className="truncate text-xs text-muted-foreground">{subtitle}</p> : null}
         </div>
 
-        <div className="relative w-56">
+        <div className="relative w-72">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Поиск"
-            className="h-9 pl-9"
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setResultsOpen(true);
+            }}
+            onFocus={() => setResultsOpen(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setResultsOpen(false);
+              if (e.key === "Enter" && hits[0]) goToNode(hits[0].node.key);
+            }}
+            placeholder="Подразделение, отдел или должность"
+            className="h-9 pl-9 pr-8"
           />
+          {query ? (
+            <button
+              type="button"
+              aria-label="Очистить поиск"
+              onClick={() => {
+                setQuery("");
+                setResultsOpen(false);
+              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          ) : null}
+          {resultsOpen && query.trim() ? (
+            <div className="absolute left-0 top-full z-40 mt-1 max-h-80 w-full overflow-auto rounded-lg border border-border bg-popover p-1 shadow-lg">
+              <p className="px-2 py-1 text-[11px] text-muted-foreground">
+                {hits.length ? `Найдено: ${hits.length}` : "Ничего не найдено"}
+              </p>
+              {hits.map((h) => (
+                <button
+                  key={h.node.key}
+                  type="button"
+                  onClick={() => goToNode(h.node.key)}
+                  className="block w-full rounded-md px-2 py-1.5 text-left hover:bg-muted focus-visible:outline-none focus-visible:bg-muted"
+                >
+                  <span className="block text-sm font-medium text-secondary break-words">{h.node.name}</span>
+                  {h.reason ? (
+                    <span className="block text-xs text-primary break-words">{h.reason}</span>
+                  ) : null}
+                  {h.path.length ? (
+                    <span className="block text-[11px] text-muted-foreground break-words">{h.path.join(" › ")}</span>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         {focusNode ? (

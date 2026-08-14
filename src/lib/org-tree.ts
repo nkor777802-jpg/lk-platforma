@@ -134,9 +134,44 @@ export function matches(node: OrgNode, query: string): boolean {
   const q = query.trim().toLowerCase();
   if (!q) return false;
   if (node.name.toLowerCase().includes(q)) return true;
+  if ((node.unitType ?? "").toLowerCase().includes(q)) return true;
   if ((node.managerName ?? "").toLowerCase().includes(q)) return true;
   if (node.positions.some((p) => p.name.toLowerCase().includes(q))) return true;
   return node.people.some((p) => (p.fullName ?? "").toLowerCase().includes(q));
+}
+
+export interface OrgSearchHit {
+  node: OrgNode;
+  /** Путь к узлу без самого узла. */
+  path: string[];
+  /** Чем именно совпало: должность, ФИО или тип подразделения. */
+  reason: string | null;
+}
+
+/** Поиск подразделений по названию, должностям и руководителям. */
+export function searchUnits(roots: OrgNode[], query: string, limit = 20): OrgSearchHit[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  const out: OrgSearchHit[] = [];
+  const walk = (node: OrgNode, path: string[]) => {
+    if (matches(node, query)) {
+      let reason: string | null = null;
+      if (!node.name.toLowerCase().includes(q)) {
+        const head = headPositionOf(node);
+        const pos = node.positions.find((p) => p.name.toLowerCase().includes(q));
+        const person = node.people.find((p) => (p.fullName ?? "").toLowerCase().includes(q));
+        if (head && head.toLowerCase().includes(q)) reason = head;
+        else if (pos) reason = pos.name;
+        else if ((node.managerName ?? "").toLowerCase().includes(q)) reason = node.managerName ?? null;
+        else if (person) reason = person.fullName ?? null;
+        else if ((node.unitType ?? "").toLowerCase().includes(q)) reason = node.unitType ?? null;
+      }
+      out.push({ node, path, reason });
+    }
+    node.children.forEach((c) => walk(c, [...path, node.name]));
+  };
+  roots.forEach((r) => walk(r, []));
+  return out.slice(0, limit);
 }
 
 export function keysMatching(nodes: OrgNode[], query: string): string[] {

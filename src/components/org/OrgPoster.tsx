@@ -158,6 +158,7 @@ export function OrgPoster({ roots, note, query, onOpen, onOpenBranch }: Props) {
           return (
             <div
               key={node.key}
+              data-node-key={node.key}
               className={[
                 "flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md",
                 highlighted ? "ring-2 ring-ring ring-offset-2 ring-offset-background" : "",

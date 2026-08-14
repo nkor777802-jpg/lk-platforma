@@ -40,6 +40,7 @@ function BranchNode({
       ) : null}
       <div className={depth > 1 && !vertical ? "pt-6" : ""}>
         <div
+          data-node-key={node.key}
           className={[
             sheet
               ? `${vertical ? "w-44 text-left" : "w-44 text-center"} rounded-lg border px-2 py-1.5 shadow-sm`

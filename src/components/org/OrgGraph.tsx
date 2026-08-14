@@ -27,7 +27,8 @@ import {
   type OrgUnitData,
   type OrgWorkCenterLink,
 } from "@/lib/org-tree";
-import { isBigBranch, OrgPoster } from "./OrgPoster";
+import { OrgPoster } from "./OrgPoster";
+import { OrgBranch } from "./OrgBranch";
 
 interface Props {
   units: OrgUnitData[];
@@ -145,17 +146,25 @@ export function OrgGraph({
   }, [expanded]);
 
   const panelKeys = useMemo(() => {
-    const top = roots.length === 1 ? roots[0]!.children : roots;
-    return top.filter(isBigBranch).map((n) => n.key);
+    const acc: string[] = [];
+    const walk = (n: OrgNode) => {
+      if (n.children.length) acc.push(n.key);
+      n.children.forEach(walk);
+    };
+    roots.forEach(walk);
+    return acc;
   }, [roots]);
+
+  useEffect(() => {
+    if (focusNode) setExpanded(new Set([focusNode.key]));
+  }, [focusNode]);
 
   useEffect(() => {
     if (!query.trim()) return;
     const hits = keysMatching(roots, query);
     if (!hits.length) return;
-    const chain = new Set(ancestorsOf(roots, hits));
-    setExpanded(new Set(panelKeys.filter((k) => chain.has(k))));
-  }, [query, roots, panelKeys]);
+    setExpanded(new Set(ancestorsOf(roots, hits)));
+  }, [query, roots]);
 
   const toggle = (key: string) =>
     setExpanded((prev) => {

@@ -40,7 +40,7 @@ import {
   type OrgUnitData,
   type OrgWorkCenterLink,
 } from "@/lib/org-tree";
-import { OrgPoster } from "./OrgPoster";
+import { HeadBadge, OrgPoster } from "./OrgPoster";
 import { OrgBranch } from "./OrgBranch";
 
 interface Props {
@@ -582,14 +582,9 @@ export function OrgGraph({
             {currentNode ? (
               <div className={`rounded-xl border px-4 py-3 ${styleFor(currentNode.level).card}`}>
                 <p className="text-base font-semibold break-words">{currentNode.name}</p>
-                {headPositionOf(currentNode) ? (
-                  <p className={`mt-1 text-xs ${styleFor(currentNode.level).meta}`}>{headPositionOf(currentNode)}</p>
-                ) : null}
-                {currentNode.managerName ? (
-                  <p className={`mt-1 text-xs ${styleFor(currentNode.level).meta}`}>{currentNode.managerName}</p>
-                ) : null}
+                <HeadBadge node={currentNode} />
                 <p className={`mt-2 text-xs ${styleFor(currentNode.level).meta}`}>
-                  Штат {num(currentNode.planned)} · Должностей {num(currentNode.positions.length)}
+                  Штат {num(currentNode.planned)} ед. · Должностей {num(currentNode.positions.length)}
                 </p>
                 <Button
                   variant="outline"
@@ -612,7 +607,7 @@ export function OrgGraph({
                 >
                   <span className="min-w-0">
                     <span className="block font-medium text-secondary break-words">{n.name}</span>
-                    <span className="block text-xs text-muted-foreground">Штат {num(n.planned)}</span>
+                    <span className="block text-xs text-muted-foreground">Штат {num(n.planned)} ед.</span>
                   </span>
                   {n.children.length ? <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" /> : null}
                 </button>

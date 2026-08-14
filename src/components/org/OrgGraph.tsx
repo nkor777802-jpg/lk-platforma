@@ -117,6 +117,7 @@ export function OrgGraph({
   onStateChange,
 }: Props) {
   const isMobile = useIsMobile();
+  const { isStaff } = useAuth();
   const allRoots = useMemo(() => buildTree(units), [units]);
   const [focusKey, setFocusKey] = useState<string | null>(null);
   const focusNode = useMemo(() => (focusKey ? findNode(allRoots, focusKey) : null), [allRoots, focusKey]);
@@ -129,7 +130,11 @@ export function OrgGraph({
   const [sheetSize, setSheetSize] = useState<{ w: number; h: number } | null>(null);
   const [busy, setBusy] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [expandedByBranch, setExpandedByBranch] = useState<Record<string, string[]>>({});
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportScale, setExportScale] = useState(2);
+  const [exportBg, setExportBg] = useState<keyof typeof EXPORT_BG>("white");
+  const [exportScope, setExportScope] = useState<"view" | "branch">("view");
   const [detail, setDetail] = useState<OrgNode | null>(null);
   const [drillKey, setDrillKey] = useState<string | null>(null);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -138,6 +143,15 @@ export function OrgGraph({
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const innerRef = useRef<HTMLDivElement | null>(null);
+  const searchSnapshot = useRef<string[] | null>(null);
+
+  const branchId = focusKey ?? "__all";
+  const expanded = useMemo(
+    () => new Set(expandedByBranch[branchId] ?? (focusNode ? [focusNode.key] : [])),
+    [expandedByBranch, branchId, focusNode],
+  );
+  const setExpandedKeys = (keys: Iterable<string>) =>
+    setExpandedByBranch((prev) => ({ ...prev, [branchId]: [...new Set(keys)] }));
 
   useEffect(() => {
     if (exportRef) exportRef.current = innerRef.current;

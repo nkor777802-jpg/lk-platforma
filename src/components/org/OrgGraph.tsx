@@ -426,10 +426,10 @@ export function OrgGraph({
                 {detail.unitType ? `${detail.unitType} · ` : ""}Штатных единиц {num(detail.planned)}
               </SheetDescription>
             </SheetHeader>
-            {headPositionOf(detail) ? (
+            {headPositionOf(detail) || detail.managerName ? (
               <p className="mt-4 text-sm">
                 <span className="text-muted-foreground">Руководитель: </span>
-                {headPositionOf(detail)}
+                {[headPositionOf(detail), detail.managerName].filter(Boolean).join(" — ")}
               </p>
             ) : null}
             {detail.children.length ? (

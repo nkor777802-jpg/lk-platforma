@@ -104,6 +104,7 @@ export function OrgGraph({
   const [zoom, setZoom] = useState(0.9);
   const [view, setView] = useState<"tree" | "sheet">("tree");
   const [sheetScale, setSheetScale] = useState(1);
+  const [sheetSize, setSheetSize] = useState<{ w: number; h: number } | null>(null);
   const [busy, setBusy] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -185,6 +186,7 @@ export function OrgGraph({
       if (w <= 0 || h <= 0 || cw <= 0 || ch <= 0) return;
       const raw = Math.min(1, cw / w, ch / h);
       setSheetScale(Math.max(MIN_SHEET_SCALE, raw));
+      setSheetSize({ w, h });
     };
     recompute();
     const ro = new ResizeObserver(recompute);
@@ -232,6 +234,7 @@ export function OrgGraph({
       const mod = await import("html-to-image");
       const options = {
         backgroundColor: "#ffffff",
+        skipFonts: true,
         width: target.scrollWidth,
         height: target.scrollHeight,
         style: { transform: "none", margin: "0" },
@@ -631,10 +634,14 @@ export function OrgGraph({
       >
         <div
           ref={contentRef}
-          className={view === "sheet" ? "mx-auto w-max origin-top" : "w-max origin-top-left"}
+          className={view === "sheet" ? "mx-auto origin-top-left" : "w-max origin-top-left"}
           style={
             view === "sheet"
-              ? { transform: `scale(${sheetScale})` }
+              ? {
+                  transform: `scale(${sheetScale})`,
+                  width: sheetSize ? sheetSize.w * sheetScale : undefined,
+                  height: sheetSize ? sheetSize.h * sheetScale : undefined,
+                }
               : { transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }
           }
         >

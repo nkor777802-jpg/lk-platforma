@@ -70,7 +70,7 @@ function PublicStructurePage() {
               <OrgChart
                 units={data.units}
                 title="Схема предприятия"
-                subtitle={data.version?.title ?? undefined}
+                {...(data.version?.title ? { subtitle: data.version.title } : {})}
                 variant="public"
               />
               <p className="mt-4 text-xs text-muted-foreground">

@@ -9,6 +9,7 @@ const NAV = [
   { to: "/about", label: "О предприятии" },
   { to: "/management", label: "Руководство" },
   { to: "/training", label: "Обучение" },
+  { to: "/structure", label: "Структура" },
   { to: "/training/professions", label: "Профессии" },
   { to: "/faq", label: "Вопросы" },
   { to: "/contacts", label: "Контакты" },

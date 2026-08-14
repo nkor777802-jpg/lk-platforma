@@ -222,6 +222,35 @@ export function OrgGraph({
       return next;
     });
 
+  const exportName = focusNode ? fileSlug(focusNode.name) : "обзор";
+
+  const downloadImage = async (format: "png" | "svg") => {
+    const target = innerRef.current;
+    if (!target) return;
+    setBusy(true);
+    try {
+      const mod = await import("html-to-image");
+      const options = {
+        backgroundColor: "#ffffff",
+        width: target.scrollWidth,
+        height: target.scrollHeight,
+        style: { transform: "none", margin: "0" },
+      };
+      const dataUrl =
+        format === "png"
+          ? await mod.toPng(target, { ...options, pixelRatio: 2 })
+          : await mod.toSvg(target, options);
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `Оргструктура_${exportName}_${new Date().toISOString().slice(0, 10)}.${format}`;
+      link.click();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const detailCenters = useMemo(() => {
     if (!detail?.departmentId) return [];
     return workCenters

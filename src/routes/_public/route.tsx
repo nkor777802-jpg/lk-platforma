@@ -1,11 +1,12 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { PublicHeader } from "@/components/public/PublicHeader";
 import { PublicFooter } from "@/components/public/PublicFooter";
-import { siteContactsQuery } from "@/lib/public-queries";
+import { publicLegalDocumentsQuery, siteContactsQuery } from "@/lib/public-queries";
 
 export const Route = createFileRoute("/_public")({
-  loader: ({ context }) => {
-    void context.queryClient.ensureQueryData(siteContactsQuery);
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(siteContactsQuery);
+    void context.queryClient.prefetchQuery(publicLegalDocumentsQuery);
   },
   component: PublicLayout,
 });

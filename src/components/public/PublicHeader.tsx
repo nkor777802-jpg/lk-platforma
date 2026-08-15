@@ -1,7 +1,9 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronDown, GraduationCap, X } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { ChevronDown, GraduationCap, LogOut, X } from "lucide-react";
 import { brandLogos } from "@/lib/brand";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -46,6 +48,18 @@ function isGroup(e: NavEntry): e is NavGroup {
 
 export function PublicHeader() {
   const [open, setOpen] = useState(false);
+  const { session, loading, signOut } = useAuth();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const isAuthed = !loading && Boolean(session);
+
+  const handleSignOut = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await signOut();
+    void navigate({ to: "/", replace: true });
+  };
+
   const linkClass =
     "rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
@@ -125,11 +139,22 @@ export function PublicHeader() {
 
         <div className="ml-auto flex items-center gap-2">
           <Button asChild size="sm">
-            <Link to="/auth">
+            <Link to={isAuthed ? "/dashboard" : "/auth"}>
               <GraduationCap className="mr-1.5 h-4 w-4" />
               Моё обучение
             </Link>
           </Button>
+          {isAuthed ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Выйти"
+              className="hidden h-10 w-10 sm:inline-flex"
+              onClick={handleSignOut}
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
+          ) : null}
           <Button
             variant="ghost"
             size="icon"
@@ -161,6 +186,14 @@ export function PublicHeader() {
           className="notranslate border-t border-border bg-card lg:hidden"
         >
           <div className="mx-auto flex max-w-7xl flex-col p-2">
+            <Link
+              to={isAuthed ? "/dashboard" : "/auth"}
+              onClick={() => setOpen(false)}
+              className="mb-2 flex items-center gap-2 rounded-md bg-primary px-3 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              <GraduationCap className="h-4 w-4" />
+              Моё обучение
+            </Link>
             {NAV.map((entry) =>
               isGroup(entry) ? (
                 <Collapsible key={entry.label}>
@@ -201,6 +234,19 @@ export function PublicHeader() {
                 </Link>
               ),
             )}
+            {isAuthed ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  void handleSignOut();
+                }}
+                className="mt-1 flex w-full items-center gap-2 rounded-md px-3 py-3 text-left text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+              >
+                <LogOut className="h-4 w-4" />
+                Выйти
+              </button>
+            ) : null}
           </div>
         </nav>
       ) : null}

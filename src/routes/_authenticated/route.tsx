@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, isRedirect, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/layout/AppShell";
 import { getMyConsentStatus } from "@/lib/legal.functions";
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated")({
         const status = await getMyConsentStatus();
         if (status.required && !status.accepted) throw redirect({ to: "/legal-consent" });
       } catch (e) {
-        if (e && typeof e === "object" && "to" in e) throw e;
+        if (isRedirect(e)) throw e;
       }
     }
     return { user: data.user };

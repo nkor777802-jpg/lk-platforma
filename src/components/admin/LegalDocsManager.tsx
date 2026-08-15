@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, FileText, Upload } from "lucide-react";
+import { Download, ExternalLink, FileText, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { legalDocumentsQuery } from "@/lib/legal-queries";
 import { saveLegalDocumentVersion } from "@/lib/legal.functions";
@@ -62,6 +62,19 @@ export function DocumentRow({
     window.open(url, "_blank", "noopener");
   };
 
+  /** Принудительное скачивание доступно только админу и HR. */
+  const downloadFile = async () => {
+    const url = await signedUrl(doc.storage_path, BUCKET);
+    if (!url) {
+      toast.error("Файл документа не загружен");
+      return;
+    }
+    const link = document.createElement("a");
+    link.href = `${url}${url.includes("?") ? "&" : "?"}download=${encodeURIComponent(doc.file_name ?? "document.pdf")}`;
+    link.rel = "noopener";
+    link.click();
+  };
+
   const upload = async (file: File) => {
     setBusy(true);
     try {
@@ -101,10 +114,13 @@ export function DocumentRow({
       </div>
       <div className="flex gap-2">
         <Button size="sm" variant="outline" onClick={download} disabled={!doc.storage_path}>
-          <Download className="size-4" aria-hidden /> Скачать
+          <ExternalLink className="size-4" aria-hidden /> Открыть
         </Button>
         {canManage ? (
           <>
+            <Button size="sm" variant="outline" onClick={downloadFile} disabled={!doc.storage_path}>
+              <Download className="size-4" aria-hidden /> Скачать
+            </Button>
             <input
               ref={inputRef}
               type="file"

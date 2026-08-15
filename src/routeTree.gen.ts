@@ -19,6 +19,7 @@ import { Route as AuthenticatedCompanyRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDevelopmentRouteImport } from './routes/_authenticated/development'
 import { Route as AuthenticatedGamificationRouteImport } from './routes/_authenticated/gamification'
+import { Route as AuthenticatedLegalConsentRouteImport } from './routes/_authenticated/legal-consent'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedOrgStructureRouteImport } from './routes/_authenticated/org-structure'
@@ -114,6 +115,12 @@ const AuthenticatedGamificationRoute =
   AuthenticatedGamificationRouteImport.update({
     id: '/gamification',
     path: '/gamification',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLegalConsentRoute =
+  AuthenticatedLegalConsentRouteImport.update({
+    id: '/legal-consent',
+    path: '/legal-consent',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
@@ -375,6 +382,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/development': typeof AuthenticatedDevelopmentRoute
   '/gamification': typeof AuthenticatedGamificationRoute
+  '/legal-consent': typeof AuthenticatedLegalConsentRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/org-structure': typeof AuthenticatedOrgStructureRoute
@@ -429,6 +437,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/development': typeof AuthenticatedDevelopmentRoute
   '/gamification': typeof AuthenticatedGamificationRoute
+  '/legal-consent': typeof AuthenticatedLegalConsentRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/org-structure': typeof AuthenticatedOrgStructureRoute
@@ -486,6 +495,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/development': typeof AuthenticatedDevelopmentRoute
   '/_authenticated/gamification': typeof AuthenticatedGamificationRoute
+  '/_authenticated/legal-consent': typeof AuthenticatedLegalConsentRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/org-structure': typeof AuthenticatedOrgStructureRoute
@@ -544,6 +554,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/development'
     | '/gamification'
+    | '/legal-consent'
     | '/library'
     | '/onboarding'
     | '/org-structure'
@@ -598,6 +609,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/development'
     | '/gamification'
+    | '/legal-consent'
     | '/library'
     | '/onboarding'
     | '/org-structure'
@@ -654,6 +666,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/development'
     | '/_authenticated/gamification'
+    | '/_authenticated/legal-consent'
     | '/_authenticated/library'
     | '/_authenticated/onboarding'
     | '/_authenticated/org-structure'
@@ -780,6 +793,13 @@ declare module '@tanstack/react-router' {
       path: '/gamification'
       fullPath: '/gamification'
       preLoaderRoute: typeof AuthenticatedGamificationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/legal-consent': {
+      id: '/_authenticated/legal-consent'
+      path: '/legal-consent'
+      fullPath: '/legal-consent'
+      preLoaderRoute: typeof AuthenticatedLegalConsentRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/library': {
@@ -1157,6 +1177,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDevelopmentRoute: typeof AuthenticatedDevelopmentRoute
   AuthenticatedGamificationRoute: typeof AuthenticatedGamificationRoute
+  AuthenticatedLegalConsentRoute: typeof AuthenticatedLegalConsentRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedOrgStructureRoute: typeof AuthenticatedOrgStructureRoute
@@ -1180,6 +1201,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDevelopmentRoute: AuthenticatedDevelopmentRoute,
   AuthenticatedGamificationRoute: AuthenticatedGamificationRoute,
+  AuthenticatedLegalConsentRoute: AuthenticatedLegalConsentRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedOrgStructureRoute: AuthenticatedOrgStructureRoute,

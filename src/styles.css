@@ -256,6 +256,96 @@
   }
 }
 
+/* --- Навигация: плавное раскрытие выпадающих меню --- */
+@keyframes nav-dropdown-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes nav-dropdown-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+
+@keyframes nav-item-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility nav-dropdown {
+  transform-origin: top center;
+  &[data-state="open"] {
+    animation: nav-dropdown-in 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  &[data-state="closed"] {
+    animation: nav-dropdown-out 0.12s ease-in both;
+  }
+}
+
+@utility nav-dropdown-item {
+  position: relative;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    padding-left 0.18s ease;
+  animation: nav-item-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0.25rem;
+    top: 50%;
+    height: 0;
+    width: 2px;
+    border-radius: 9999px;
+    background: var(--primary);
+    transform: translateY(-50%);
+    transition:
+      height 0.18s ease,
+      opacity 0.18s ease;
+    opacity: 0;
+  }
+
+  &:hover,
+  &:focus-visible,
+  &[data-highlighted] {
+    padding-left: 1.25rem;
+  }
+
+  &:hover::before,
+  &:focus-visible::before,
+  &[data-highlighted]::before {
+    height: 60%;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-dropdown,
+  .nav-dropdown-item {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 /* --- Оргсхема: соединительные линии --- */
 .org-link {
   background: color-mix(in oklab, var(--secondary) 45%, transparent);

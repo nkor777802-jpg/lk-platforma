@@ -135,9 +135,19 @@ export const listAdminUsers = createServerFn({ method: "GET" })
 
     const { data: profiles } = await query;
     const { data: roles } = await supabaseAdmin.from("user_roles").select("user_id, role");
+    const { data: consents } = await supabaseAdmin
+      .from("legal_consents")
+      .select("user_id, accepted_at");
+    /** Последняя дата согласия на обработку ПД по каждому работнику. */
+    const consentAt = new Map<string, string>();
+    for (const c of consents ?? []) {
+      const prev = consentAt.get(c.user_id);
+      if (!prev || (c.accepted_at && c.accepted_at > prev)) consentAt.set(c.user_id, c.accepted_at);
+    }
     return (profiles ?? []).map((p) => ({
       ...p,
       roles: (roles ?? []).filter((r) => r.user_id === p.id).map((r) => r.role),
+      consent_accepted_at: consentAt.get(p.id) ?? null,
     }));
   });
 

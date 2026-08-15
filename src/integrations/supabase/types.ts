@@ -1337,6 +1337,41 @@ export type Database = {
           },
         ]
       }
+      legal_consents: {
+        Row: {
+          accepted_at: string
+          created_at: string
+          document_id: string
+          document_version: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          created_at?: string
+          document_id: string
+          document_version?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          created_at?: string
+          document_id?: string
+          document_version?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_consents_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "legal_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_document_versions: {
         Row: {
           created_at: string

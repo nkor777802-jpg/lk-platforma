@@ -237,6 +237,18 @@ function AdminUsersPage() {
       ),
     },
     {
+      key: "consent_accepted_at",
+      label: "Согласие на ПД",
+      render: (r) => {
+        const at = r["consent_accepted_at"] as string | null;
+        return at ? (
+          <Badge variant="secondary">{new Date(at).toLocaleDateString("ru-RU")}</Badge>
+        ) : (
+          <Badge variant="outline">Не дано</Badge>
+        );
+      },
+    },
+    {
       key: "__actions",
       label: "Действия",
       className: "text-right",

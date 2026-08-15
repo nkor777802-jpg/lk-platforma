@@ -10,12 +10,13 @@ import { simulatorHistoryQuery } from "@/lib/simulator-queries";
 import { ProductionSimulator } from "@/components/gamification/ProductionSimulator";
 import { QualityLab } from "@/components/gamification/QualityLab";
 import { EmptyState, InlineLoading } from "@/components/states";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export const Route = createFileRoute("/_authenticated/gamification")({
+export const Route = createFileRoute("/_authenticated/gamification/")({
   head: () => ({
     meta: [
       { title: "Производственный тренажёр — Академия «Людиновокабель»" },
@@ -68,6 +69,20 @@ function GamificationPage() {
           .
         </p>
       </div>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg text-secondary">КабельТрис</CardTitle>
+          <CardDescription>
+            Мини-игра на знание марок продукции: собирайте одинаковые карточки и категории.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button asChild>
+            <Link to="/gamification/cabletris">Играть</Link>
+          </Button>
+        </CardContent>
+      </Card>
 
       {xp ? (
         <Card>

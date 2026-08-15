@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import {
   getPublicOrgStructure,
   getSiteContacts,
+  listPublicLegalDocuments,
   listPublicManagement,
   listPublicProfessions,
 } from "./public.functions";
@@ -28,4 +29,10 @@ export const publicOrgStructureQuery = queryOptions({
   queryKey: ["public", "org-structure"],
   queryFn: () => getPublicOrgStructure(),
   staleTime: 10 * 60 * 1000,
+});
+
+export const publicLegalDocumentsQuery = queryOptions({
+  queryKey: ["public", "legal-documents"],
+  queryFn: () => listPublicLegalDocuments(),
+  staleTime: 5 * 60 * 1000,
 });

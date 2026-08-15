@@ -156,6 +156,9 @@ export function OrgGraph({
   const searchSnapshot = useRef<string[] | null>(null);
 
   const branchId = focusKey ?? "__all";
+  // Режим просмотра запоминается отдельно для каждой выбранной ветки.
+  const view = viewByBranch[branchId] ?? "tree";
+  const setView = (v: "tree" | "sheet") => setViewByBranch((prev) => ({ ...prev, [branchId]: v }));
   const expanded = useMemo(
     () => new Set(expandedByBranch[branchId] ?? (focusNode ? [focusNode.key] : [])),
     [expandedByBranch, branchId, focusNode],
@@ -175,9 +178,9 @@ export function OrgGraph({
   // Начальное состояние из URL (?view=sheet&focus=...&open=a|b).
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search);
-    if (sp.get("view") === "sheet") setView("sheet");
     const f = sp.get("focus");
     if (f) setFocusKey(f);
+    if (sp.get("view") === "sheet") setViewByBranch({ [f ?? "__all"]: "sheet" });
     const open = sp.get("open");
     if (open) {
       const keys = open.split("|").filter(Boolean);

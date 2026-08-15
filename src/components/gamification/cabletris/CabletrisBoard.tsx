@@ -22,6 +22,7 @@ export function CabletrisBoard({
   onMove: (dCol: number) => void;
   onDrop: () => void;
 }) {
+  const rows = grid.length;
   const cols = grid[0]?.length ?? 0;
   const rootRef = useRef<HTMLDivElement>(null);
   const origin = useRef<{ x: number; y: number } | null>(null);

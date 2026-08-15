@@ -135,7 +135,7 @@ export function OrgGraph({
   const [query, setQuery] = useState("");
   const [resultsOpen, setResultsOpen] = useState(false);
   const [zoom, setZoom] = useState(0.9);
-  const [view, setView] = useState<"tree" | "sheet">("tree");
+  const [viewByBranch, setViewByBranch] = useState<Record<string, "tree" | "sheet">>({});
   const [sheetScale, setSheetScale] = useState(1);
   const [sheetSize, setSheetSize] = useState<{ w: number; h: number } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -156,6 +156,9 @@ export function OrgGraph({
   const searchSnapshot = useRef<string[] | null>(null);
 
   const branchId = focusKey ?? "__all";
+  // Режим просмотра запоминается отдельно для каждой выбранной ветки.
+  const view = viewByBranch[branchId] ?? "tree";
+  const setView = (v: "tree" | "sheet") => setViewByBranch((prev) => ({ ...prev, [branchId]: v }));
   const expanded = useMemo(
     () => new Set(expandedByBranch[branchId] ?? (focusNode ? [focusNode.key] : [])),
     [expandedByBranch, branchId, focusNode],
@@ -175,9 +178,9 @@ export function OrgGraph({
   // Начальное состояние из URL (?view=sheet&focus=...&open=a|b).
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search);
-    if (sp.get("view") === "sheet") setView("sheet");
     const f = sp.get("focus");
     if (f) setFocusKey(f);
+    if (sp.get("view") === "sheet") setViewByBranch({ [f ?? "__all"]: "sheet" });
     const open = sp.get("open");
     if (open) {
       const keys = open.split("|").filter(Boolean);
@@ -441,7 +444,7 @@ export function OrgGraph({
                   setDetail(null);
                 }}
               >
-                Открыть ветку подразделения
+                Показать структуру подразделения
               </Button>
             ) : null}
             {detail.positions.length ? (
@@ -779,6 +782,23 @@ export function OrgGraph({
         ))}
       </nav>
 
+      {focusNode && focusNode.children.length ? (
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-border px-3 py-2">
+          <span className="mr-1 text-xs text-muted-foreground">Структура подразделения:</span>
+          {focusNode.children.map((c) => (
+            <button
+              key={c.key}
+              type="button"
+              onClick={() => setFocusKey(c.key)}
+              className="rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-secondary transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              title={`Показать структуру: ${c.name}`}
+            >
+              {c.name}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       {focusNode ? (
       <div
         ref={canvasRef}
@@ -845,6 +865,7 @@ export function OrgGraph({
               root={focusNode}
               query={query}
               onOpen={(n) => setDetail(n)}
+              onFocus={(n) => setFocusKey(n.key)}
               expanded={expanded}
               onToggle={toggle}
               sheet={view === "sheet"}

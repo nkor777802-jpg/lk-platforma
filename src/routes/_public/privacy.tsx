@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { company } from "@/content/site";
 import { useCompany } from "@/hooks/useCompany";
 import { Section } from "@/components/public/sections";
+import { LegalDocsDownload } from "@/components/public/LegalDocsDownload";
 
 const TITLE = "Политика конфиденциальности — Людиновокабель";
 const DESCRIPTION =
@@ -28,6 +29,7 @@ function PrivacyPage() {
   return (
     <Section title="Политика конфиденциальности">
       <div className="max-w-3xl space-y-6 text-muted-foreground">
+        <LegalDocsDownload slugs={["site-privacy-policy"]} />
         <p className="text-foreground">
           Настоящая политика описывает порядок обработки персональных данных в корпоративной
           платформе обучения {company.legalName}.

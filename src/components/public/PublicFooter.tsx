@@ -47,6 +47,7 @@ export function PublicFooter() {
           <ul className="mt-4 space-y-2 text-sm">
             <li><Link className="underline underline-offset-4 opacity-90 hover:opacity-100" to="/privacy">Политика конфиденциальности</Link></li>
             <li><Link className="underline underline-offset-4 opacity-90 hover:opacity-100" to="/consent">Согласие на обработку персональных данных</Link></li>
+            <li><Link className="underline underline-offset-4 opacity-90 hover:opacity-100" to="/privacy" hash="documents">Скачать документы</Link></li>
           </ul>
         </div>
       </div>

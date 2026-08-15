@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { company } from "@/content/site";
 import { useCompany } from "@/hooks/useCompany";
 import { Section } from "@/components/public/sections";
+import { LegalDocsDownload } from "@/components/public/LegalDocsDownload";
 
 const TITLE = "Согласие на обработку персональных данных — Людиновокабель";
 const DESCRIPTION =
@@ -28,6 +29,7 @@ function ConsentPage() {
   return (
     <Section title="Согласие на обработку персональных данных">
       <div className="max-w-3xl space-y-6 text-muted-foreground">
+        <LegalDocsDownload slugs={["site-consent-processing", "site-consent-distribution"]} />
         <p className="text-foreground">
           Отправляя форму на сайте или регистрируясь в системе обучения, пользователь даёт{" "}
           {company.legalName} согласие на обработку своих персональных данных на условиях ниже.

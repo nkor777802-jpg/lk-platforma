@@ -149,3 +149,38 @@ export const getPublicOrgStructure = createServerFn({ method: "GET" }).handler(a
     stats,
   };
 });
+
+/** Актуальные документы по персональным данным для публичного сайта. */
+export const listPublicLegalDocuments = createServerFn({ method: "GET" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("legal_documents")
+    .select("slug, title, kind, sort_order, storage_path, file_name, file_size, uploaded_at")
+    .eq("kind", "site")
+    .order("sort_order");
+  if (error) throw new Error(error.message);
+
+  const rows = (data ?? []).filter((r) => Boolean(r.storage_path));
+  const out: {
+    slug: string;
+    title: string;
+    fileName: string | null;
+    fileSize: number | null;
+    updatedAt: string | null;
+    url: string | null;
+  }[] = [];
+  for (const row of rows) {
+    const { data: signed } = await supabaseAdmin.storage
+      .from("legal-docs")
+      .createSignedUrl(row.storage_path as string, 60 * 60);
+    out.push({
+      slug: row.slug,
+      title: row.title,
+      fileName: row.file_name,
+      fileSize: row.file_size,
+      updatedAt: row.uploaded_at,
+      url: signed?.signedUrl ?? null,
+    });
+  }
+  return out.filter((d) => d.url);
+});

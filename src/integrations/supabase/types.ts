@@ -1337,6 +1337,95 @@ export type Database = {
           },
         ]
       }
+      legal_document_versions: {
+        Row: {
+          created_at: string
+          document_id: string
+          file_name: string | null
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          storage_path: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          file_name?: string | null
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          storage_path: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          file_name?: string | null
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          storage_path?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_document_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "legal_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      legal_documents: {
+        Row: {
+          created_at: string
+          file_name: string | null
+          file_size: number | null
+          id: string
+          kind: string
+          mime_type: string | null
+          slug: string
+          sort_order: number
+          storage_path: string | null
+          title: string
+          updated_at: string
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          id?: string
+          kind: string
+          mime_type?: string | null
+          slug: string
+          sort_order?: number
+          storage_path?: string | null
+          title: string
+          updated_at?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          id?: string
+          kind?: string
+          mime_type?: string | null
+          slug?: string
+          sort_order?: number
+          storage_path?: string | null
+          title?: string
+          updated_at?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       management: {
         Row: {
           bio: string | null

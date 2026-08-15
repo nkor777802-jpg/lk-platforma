@@ -1,19 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { about, advantages, company, faq, platform, stages } from "@/content/site";
-import { useCompany } from "@/hooks/useCompany";
-import { publicProfessionsQuery } from "@/lib/public-queries";
-import { Section, InfoCard } from "@/components/public/sections";
-import { AnimatedStageList } from "@/components/public/animated-stage-list";
-import { ProfessionGrid } from "@/components/public/ProfessionGrid";
-import { OrgStructurePreview } from "@/components/public/OrgStructurePreview";
+import { company } from "@/content/site";
 import { Button } from "@/components/ui/button";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import heroImage from "@/assets/hero-plant.jpg";
 
 const TITLE = "Людиновокабель — обучение и аттестация работников кабельного производства";
@@ -21,9 +8,6 @@ const DESCRIPTION =
   "Корпоративная платформа обучения «Людиновокабель»: программы по профессиям, учебные материалы, тестирование и аттестация работников кабельного завода.";
 
 export const Route = createFileRoute("/_public/")({
-  loader: ({ context }) => {
-    void context.queryClient.ensureQueryData(publicProfessionsQuery);
-  },
   head: () => ({
     meta: [
       { title: TITLE },

@@ -1,10 +1,12 @@
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, Network } from "lucide-react";
 import { matches, type OrgNode } from "@/lib/org-tree";
 import { fmt, HeadBadge, IconFor, KIND_CLASS, KIND_META, kindOf } from "./OrgPoster";
 
 interface Common {
   query: string;
   onOpen: (node: OrgNode) => void;
+  /** Построить отдельную схему по этому подразделению. */
+  onFocus?: (node: OrgNode) => void;
   expanded: Set<string>;
   onToggle: (key: string) => void;
   /** Листовой режим: всё раскрыто, компактные карточки, без кнопок свёртки. */
@@ -16,6 +18,7 @@ function BranchNode({
   depth,
   query,
   onOpen,
+  onFocus,
   expanded,
   onToggle,
   sheet,
@@ -71,14 +74,27 @@ function BranchNode({
           </button>
 
           {node.children.length && !sheet ? (
-            <button
-              type="button"
-              onClick={() => onToggle(node.key)}
-              className={`mt-2 flex w-full items-center justify-center gap-1 rounded-md border border-current/20 px-2 py-1 text-[11px] font-medium ${KIND_META[kind]} hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
-            >
-              {open ? <Minus className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
-              {open ? "Свернуть" : `Показать ${fmt(node.children.length)}`}
-            </button>
+            <div className="mt-2 flex items-stretch gap-1">
+              <button
+                type="button"
+                onClick={() => onToggle(node.key)}
+                className={`flex flex-1 items-center justify-center gap-1 rounded-md border border-current/20 px-2 py-1 text-[11px] font-medium ${KIND_META[kind]} hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
+              >
+                {open ? <Minus className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
+                {open ? "Свернуть" : `Показать ${fmt(node.children.length)}`}
+              </button>
+              {onFocus && depth > 1 ? (
+                <button
+                  type="button"
+                  onClick={() => onFocus(node)}
+                  aria-label="Открыть как отдельную схему"
+                  title="Открыть как отдельную схему"
+                  className={`flex items-center justify-center rounded-md border border-current/20 px-2 py-1 ${KIND_META[kind]} hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
+                >
+                  <Network className="h-3 w-3" />
+                </button>
+              ) : null}
+            </div>
           ) : null}
         </div>
       </div>
@@ -100,6 +116,7 @@ function BranchNode({
                 depth={depth + 1}
                 query={query}
                 onOpen={onOpen}
+                {...(onFocus ? { onFocus } : {})}
                 expanded={expanded}
                 onToggle={onToggle}
                 sheet={sheet ?? false}
@@ -114,7 +131,7 @@ function BranchNode({
 }
 
 /** Подробная структура одного департамента. */
-export function OrgBranch({ root, query, onOpen, expanded, onToggle, sheet }: Common & { root: OrgNode }) {
+export function OrgBranch({ root, query, onOpen, onFocus, expanded, onToggle, sheet }: Common & { root: OrgNode }) {
   return (
     <div className={sheet ? "min-w-max px-6 pb-6 pt-4" : "min-w-max px-8 pb-10 pt-6"}>
       <ul className="org-children org-root flex items-start justify-center">
@@ -123,6 +140,7 @@ export function OrgBranch({ root, query, onOpen, expanded, onToggle, sheet }: Co
           depth={1}
           query={query}
           onOpen={onOpen}
+          {...(onFocus ? { onFocus } : {})}
           expanded={expanded}
           onToggle={onToggle}
           sheet={sheet ?? false}

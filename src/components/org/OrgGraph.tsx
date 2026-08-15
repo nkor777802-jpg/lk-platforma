@@ -135,7 +135,7 @@ export function OrgGraph({
   const [query, setQuery] = useState("");
   const [resultsOpen, setResultsOpen] = useState(false);
   const [zoom, setZoom] = useState(0.9);
-  const [view, setView] = useState<"tree" | "sheet">("tree");
+  const [viewByBranch, setViewByBranch] = useState<Record<string, "tree" | "sheet">>({});
   const [sheetScale, setSheetScale] = useState(1);
   const [sheetSize, setSheetSize] = useState<{ w: number; h: number } | null>(null);
   const [busy, setBusy] = useState(false);

@@ -159,12 +159,14 @@ export function useCabletris() {
   }, []);
 
   const drop = useCallback(() => {
-    setState((prev) => {
-      if (prev.phase !== "playing") return prev;
-      const stepped = softDrop(prev, config, products);
-      if (stepped.locked && stepped.meta) return afterLock(stepped.state, stepped.meta);
-      return stepped.state;
-    });
+    const prev = stateRef.current;
+    if (prev.phase !== "playing") return;
+    const stepped = softDrop(prev, config, products);
+    if (stepped.locked && stepped.meta) {
+      setState(afterLock(stepped.state, stepped.meta));
+      return;
+    }
+    setState(stepped.state);
   }, [afterLock, config, products]);
 
   useEffect(() => {

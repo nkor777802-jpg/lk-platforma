@@ -78,14 +78,26 @@ export function PublicHeader() {
             isGroup(entry) ? (
               <DropdownMenu key={entry.label}>
                 <DropdownMenuTrigger
-                  className={`${linkClass} inline-flex items-center gap-1 data-[state=open]:bg-secondary/10 data-[state=open]:text-secondary`}
+                  className={`${linkClass} group inline-flex items-center gap-1 data-[state=open]:bg-secondary/10 data-[state=open]:text-secondary`}
                 >
                   {entry.label}
-                  <ChevronDown className="h-4 w-4" aria-hidden />
+                  <ChevronDown
+                    className="h-4 w-4 transition-transform duration-200 ease-out group-data-[state=open]:rotate-180"
+                    aria-hidden
+                  />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="notranslate min-w-56">
-                  {entry.items.map((item) => (
-                    <DropdownMenuItem key={item.to} asChild>
+                <DropdownMenuContent
+                  align="start"
+                  sideOffset={8}
+                  className="notranslate nav-dropdown min-w-56 overflow-hidden"
+                >
+                  {entry.items.map((item, i) => (
+                    <DropdownMenuItem
+                      key={item.to}
+                      asChild
+                      className="nav-dropdown-item"
+                      style={{ animationDelay: `${60 + i * 40}ms` }}
+                    >
                       <Link
                         to={item.to}
                         className="cursor-pointer"
@@ -149,22 +161,28 @@ export function PublicHeader() {
             {NAV.map((entry) =>
               isGroup(entry) ? (
                 <Collapsible key={entry.label}>
-                  <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+                  <CollapsibleTrigger className="group flex w-full items-center justify-between rounded-md px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground data-[state=open]:text-secondary">
                     {entry.label}
-                    <ChevronDown className="h-4 w-4 transition-transform" aria-hidden />
+                    <ChevronDown
+                      className="h-4 w-4 transition-transform duration-200 ease-out group-data-[state=open]:rotate-180"
+                      aria-hidden
+                    />
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="flex flex-col pl-3">
-                    {entry.items.map((item) => (
+                  <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                    <div className="flex flex-col pl-3">
+                    {entry.items.map((item, i) => (
                       <Link
                         key={item.to}
                         to={item.to}
                         onClick={() => setOpen(false)}
-                        className="rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+                        style={{ animationDelay: `${60 + i * 40}ms` }}
+                        className="nav-dropdown-item rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
                         activeProps={{ className: "bg-secondary/10 text-secondary" }}
                       >
                         {item.label}
                       </Link>
                     ))}
+                    </div>
                   </CollapsibleContent>
                 </Collapsible>
               ) : (

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Download, FileText } from "lucide-react";
+import { ExternalLink, FileText } from "lucide-react";
 import { publicLegalDocumentsQuery } from "@/lib/public-queries";
 import { Button } from "@/components/ui/button";
 
@@ -46,7 +46,7 @@ export function LegalDocsDownload({
               </div>
               <Button asChild size="sm" variant="outline">
                 <a href={doc.url ?? "#"} target="_blank" rel="noopener noreferrer">
-                  <Download className="size-4" aria-hidden /> Скачать
+                  <ExternalLink className="size-4" aria-hidden /> Открыть
                 </a>
               </Button>
             </li>

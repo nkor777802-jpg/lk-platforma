@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { updateMyProfile } from "@/lib/account.functions";
 import { myPassportQuery } from "@/lib/onboarding-queries";
 import { competencyStatusLabel } from "@/lib/training-types";
+import { LegalDocsManager } from "@/components/admin/LegalDocsManager";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
@@ -217,6 +218,16 @@ function ProfilePage() {
             ))}
           </div>
         )}
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <h2 className="text-xl font-semibold text-secondary">Персональные данные: документы</h2>
+          <p className="text-sm text-muted-foreground">
+            Актуальные политики и бланки согласий для печати и подписи.
+          </p>
+        </div>
+        <LegalDocsManager canManage={false} />
       </div>
     </div>
   );

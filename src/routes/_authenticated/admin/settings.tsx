@@ -8,6 +8,7 @@ import { savePlatformSetting, saveSiteContacts } from "@/lib/admin.functions";
 import { siteContactsQuery } from "@/lib/public-queries";
 import { company as contactDefaults } from "@/content/site";
 import { ErrorState, InlineLoading } from "@/components/states";
+import { LegalDocsManager } from "@/components/admin/LegalDocsManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -208,12 +209,16 @@ function SettingsPage() {
         <TabsList className="flex-wrap">
           <TabsTrigger value="contacts">Контакты</TabsTrigger>
           <TabsTrigger value="platform">Параметры платформы</TabsTrigger>
+          <TabsTrigger value="legal">Документы по ПД</TabsTrigger>
         </TabsList>
         <TabsContent value="contacts" className="pt-6">
           <ContactsTab />
         </TabsContent>
         <TabsContent value="platform" className="pt-6">
           <PlatformSettingsTab />
+        </TabsContent>
+        <TabsContent value="legal" className="pt-6">
+          <LegalDocsManager />
         </TabsContent>
       </Tabs>
     </div>

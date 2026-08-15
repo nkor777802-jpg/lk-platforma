@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown, GraduationCap, X } from "lucide-react";
 import { brandLogos } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
 import {
@@ -125,7 +125,10 @@ export function PublicHeader() {
 
         <div className="ml-auto flex items-center gap-2">
           <Button asChild size="sm">
-            <Link to="/auth">Войти</Link>
+            <Link to="/auth">
+              <GraduationCap className="mr-1.5 h-4 w-4" />
+              Моё обучение
+            </Link>
           </Button>
           <Button
             variant="ghost"

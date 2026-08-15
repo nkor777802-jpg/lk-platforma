@@ -444,7 +444,7 @@ export function OrgGraph({
                   setDetail(null);
                 }}
               >
-                Открыть ветку подразделения
+                Показать структуру подразделения
               </Button>
             ) : null}
             {detail.positions.length ? (

@@ -257,6 +257,36 @@
 }
 
 /* --- Навигация: плавное раскрытие выпадающих меню --- */
+@keyframes accordion-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height, auto);
+    opacity: 1;
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-collapsible-content-height, auto);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+@utility animate-accordion-down {
+  animation: accordion-down 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@utility animate-accordion-up {
+  animation: accordion-up 0.18s ease-in;
+}
+
 @keyframes nav-dropdown-in {
   0% {
     opacity: 0;

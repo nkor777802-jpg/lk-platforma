@@ -87,3 +87,57 @@ export const saveLegalDocumentVersion = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+/** Статус согласий текущего пользователя по обязательным документам. */
+export const getMyConsentStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: docs, error } = await context.supabase
+      .from("legal_documents")
+      .select("id, slug, title, kind, sort_order, storage_path, uploaded_at")
+      .eq("kind", "site")
+      .order("sort_order");
+    if (error) throw new Error(error.message);
+
+    const { data: consents, error: cErr } = await context.supabase
+      .from("legal_consents")
+      .select("document_id, accepted_at")
+      .eq("user_id", context.userId);
+    if (cErr) throw new Error(cErr.message);
+
+    const accepted = new Map((consents ?? []).map((c) => [c.document_id, c.accepted_at]));
+    const items = (docs ?? []).map((d) => ({
+      id: d.id,
+      slug: d.slug,
+      title: d.title,
+      hasFile: Boolean(d.storage_path),
+      acceptedAt: accepted.get(d.id) ?? null,
+    }));
+    return {
+      items,
+      required: items.length > 0,
+      accepted: items.length > 0 && items.every((i) => i.acceptedAt),
+    };
+  });
+
+/** Фиксация согласия работника по всем обязательным документам. */
+export const acceptLegalConsents = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: docs, error } = await context.supabase
+      .from("legal_documents")
+      .select("id, uploaded_at")
+      .eq("kind", "site");
+    if (error) throw new Error(error.message);
+    const rows = (docs ?? []).map((d) => ({
+      user_id: context.userId,
+      document_id: d.id,
+      document_version: d.uploaded_at,
+    }));
+    if (rows.length === 0) return { ok: true };
+    const { error: insErr } = await context.supabase
+      .from("legal_consents")
+      .upsert(rows, { onConflict: "user_id,document_id", ignoreDuplicates: true });
+    if (insErr) throw new Error(insErr.message);
+    return { ok: true };
+  });

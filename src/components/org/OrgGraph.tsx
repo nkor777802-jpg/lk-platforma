@@ -865,6 +865,7 @@ export function OrgGraph({
               root={focusNode}
               query={query}
               onOpen={(n) => setDetail(n)}
+              onFocus={(n) => setFocusKey(n.key)}
               expanded={expanded}
               onToggle={toggle}
               sheet={view === "sheet"}

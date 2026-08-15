@@ -782,6 +782,23 @@ export function OrgGraph({
         ))}
       </nav>
 
+      {focusNode && focusNode.children.length ? (
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-border px-3 py-2">
+          <span className="mr-1 text-xs text-muted-foreground">Структура подразделения:</span>
+          {focusNode.children.map((c) => (
+            <button
+              key={c.key}
+              type="button"
+              onClick={() => setFocusKey(c.key)}
+              className="rounded-full border border-border bg-card px-2.5 py-1 text-xs font-medium text-secondary transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              title={`Показать структуру: ${c.name}`}
+            >
+              {c.name}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       {focusNode ? (
       <div
         ref={canvasRef}

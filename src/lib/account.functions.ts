@@ -14,15 +14,12 @@ export const updateMyProfile = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    // Белый список полей: кадровые данные сотрудник менять не может
-    const patch: { phone?: string | null; email?: string | null; avatar_url?: string | null } = {};
-    if (data.phone !== undefined) patch.phone = data.phone;
-    if (data.email !== undefined) patch.email = data.email;
-    if (data.avatar_url !== undefined) patch.avatar_url = data.avatar_url;
-    const { error } = await context.supabase
-      .from("profiles")
-      .update(patch as never)
-      .eq("id", context.userId);
+    // Кадровые поля защищены на уровне БД: работник меняет только контакты и аватар.
+    const { error } = await context.supabase.rpc("update_own_contacts", {
+      p_phone: data.phone ?? null,
+      p_email: data.email ?? null,
+      p_avatar_url: data.avatar_url ?? null,
+    } as never);
     if (error) throw new Error(error.message);
     return { success: true };
   });

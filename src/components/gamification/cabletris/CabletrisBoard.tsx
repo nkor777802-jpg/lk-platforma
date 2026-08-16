@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { categoryLabel, productById } from "@/lib/cabletris/adapter";
+import { centerColumns } from "@/lib/cabletris/engine";
 import type { CabletrisProduct, FallingPiece, GridCell, MergeFx } from "@/lib/cabletris/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ export function CabletrisBoard({
 }) {
   const rows = grid.length;
   const cols = grid[0]?.length ?? 0;
+  const danger = centerColumns(cols);
   const rootRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const origin = useRef<{ x: number; y: number } | null>(null);
@@ -118,7 +120,7 @@ export function CabletrisBoard({
       className="mx-auto w-full touch-none select-none overscroll-contain"
       style={{
         touchAction: "none",
-        maxWidth: `min(100%, calc((100dvh - 15rem) * ${cols} / ${rows}))`,
+        maxWidth: `min(100%, calc((100dvh - 16rem) * ${cols} / ${rows}))`,
         minWidth: 0,
       }}
       role="application"
@@ -131,7 +133,7 @@ export function CabletrisBoard({
     >
       <div
         ref={gridRef}
-        className="grid gap-0.5 rounded-2xl border-2 border-secondary/20 bg-secondary/5 p-1.5 shadow-[var(--shadow-brand)] backdrop-blur-[2px] sm:gap-1 sm:p-2"
+        className="grid gap-1 rounded-2xl border-2 border-secondary/40 bg-[linear-gradient(160deg,var(--secondary),color-mix(in_oklab,var(--secondary)_78%,black))] p-2 shadow-[var(--shadow-brand)] sm:gap-1.5 sm:p-2.5"
         style={{
           gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
           gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
@@ -145,20 +147,22 @@ export function CabletrisBoard({
             const isGhost = falling !== null && ghostRow === r && inColumn && !isFalling;
             const shown: GridCell = isFalling ? { kind: "brand", productId: falling.productId } : cell;
             const float = fx.find((item) => item.row === r && item.col === c);
+            const isDanger = danger.includes(c);
             return (
               <div
                 key={`${r}-${c}`}
                 className={cn(
-                  "relative min-h-0 min-w-0 overflow-hidden rounded-md bg-background/90",
-                  inColumn && !isFalling && "bg-primary/5",
-                  isGhost && "ring-2 ring-dashed ring-primary/40",
+                  "relative min-h-0 min-w-0 overflow-hidden rounded-lg bg-[color-mix(in_oklab,var(--secondary)_62%,white)] shadow-[inset_0_1px_2px_color-mix(in_oklab,black_25%,transparent)]",
+                  isDanger && "bg-[color-mix(in_oklab,var(--primary)_22%,color-mix(in_oklab,var(--secondary)_62%,white))]",
+                  inColumn && !isFalling && "bg-[color-mix(in_oklab,var(--primary)_35%,var(--secondary))]",
+                  isGhost && "ring-2 ring-dashed ring-primary",
                   isFalling &&
-                    "z-[1] ring-2 ring-primary shadow-[0_0_0_3px_color-mix(in_oklab,var(--brand-orange)_25%,transparent)]",
+                    "z-[1] ring-2 ring-primary shadow-[0_0_0_4px_color-mix(in_oklab,var(--brand-orange)_45%,transparent),0_0_18px_color-mix(in_oklab,var(--brand-orange)_55%,transparent)]",
                 )}
               >
                 <CellView cell={shown} products={products} />
                 {float ? (
-                  <span className="pointer-events-none absolute inset-x-0 top-0 animate-pulse text-center text-[11px] font-bold text-primary motion-reduce:animate-none">
+                  <span className="pointer-events-none absolute inset-x-0 top-0 z-[2] animate-pulse text-center text-[13px] font-extrabold text-primary drop-shadow-[0_1px_6px_color-mix(in_oklab,var(--brand-orange)_70%,transparent)] motion-reduce:animate-none">
                     {float.text}
                   </span>
                 ) : null}
@@ -203,5 +207,12 @@ function CellView({ cell, products }: { cell: GridCell; products: CabletrisProdu
   }
   const product = productById(products, cell.productId);
   if (!product) return null;
-  return <ProductCard brand={product.brand} image={product.image} thumb />;
+  return (
+    <ProductCard
+      brand={product.brand}
+      image={product.image}
+      categoryId={product.category_id}
+      thumb
+    />
+  );
 }

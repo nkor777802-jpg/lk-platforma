@@ -120,7 +120,7 @@ export function CabletrisBoard({
       className="mx-auto w-full touch-none select-none overscroll-contain"
       style={{
         touchAction: "none",
-        maxWidth: `min(100%, calc((100dvh - 16rem) * ${cols} / ${rows}))`,
+        maxWidth: `min(100%, 32rem, calc((100dvh - 16rem) * ${cols} / ${rows}))`,
         minWidth: 0,
       }}
       role="application"
@@ -153,7 +153,7 @@ export function CabletrisBoard({
                 key={`${r}-${c}`}
                 className={cn(
                   "relative min-h-0 min-w-0 overflow-hidden rounded-lg bg-[color-mix(in_oklab,var(--secondary)_62%,white)] shadow-[inset_0_1px_2px_color-mix(in_oklab,black_25%,transparent)]",
-                  isDanger && "bg-[color-mix(in_oklab,var(--primary)_22%,color-mix(in_oklab,var(--secondary)_62%,white))]",
+                  isDanger && "bg-[color-mix(in_oklab,var(--primary)_10%,color-mix(in_oklab,var(--secondary)_62%,white))]",
                   inColumn && !isFalling && "bg-[color-mix(in_oklab,var(--primary)_35%,var(--secondary))]",
                   isGhost && "ring-2 ring-dashed ring-primary",
                   isFalling &&

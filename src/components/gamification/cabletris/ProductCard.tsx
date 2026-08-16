@@ -15,11 +15,11 @@ export function ProductCard({
   return (
     <div
       className={cn(
-        "flex h-full min-h-0 w-full flex-col overflow-hidden rounded-md border border-border bg-card",
+        "flex h-full min-h-0 w-full flex-col overflow-hidden rounded-md border border-border/70 bg-card shadow-sm",
         compact && "rounded-sm",
       )}
     >
-      <div className="flex min-h-0 flex-1 items-center justify-center bg-muted/40 p-0.5">
+      <div className="flex min-h-0 flex-[3] items-center justify-center bg-muted/30 p-0.5">
         <img
           src={thumb ? thumbUrl(image) : image}
           alt=""
@@ -33,8 +33,8 @@ export function ProductCard({
       </div>
       <p
         className={cn(
-          "shrink-0 truncate px-0.5 py-0.5 text-center font-medium leading-tight text-secondary",
-          compact ? "text-[8px] sm:text-[10px]" : "text-[9px] sm:text-xs",
+          "flex shrink-0 items-center justify-center px-0.5 pb-0.5 text-center font-semibold leading-[1.05] tracking-tight text-secondary [overflow-wrap:anywhere]",
+          compact ? "text-[9px] sm:text-[11px]" : "text-[9px] sm:text-[11px]",
         )}
       >
         {brand}

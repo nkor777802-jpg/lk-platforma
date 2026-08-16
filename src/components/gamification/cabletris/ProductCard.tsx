@@ -14,12 +14,14 @@ export function ProductCard({
   categoryId,
   compact = false,
   thumb = false,
+  showLabel = true,
 }: {
   brand: string;
   image: string;
   categoryId?: string;
   compact?: boolean;
   thumb?: boolean;
+  showLabel?: boolean;
 }) {
   const accent = (categoryId && CATEGORY_ACCENT[categoryId]) || "bg-primary";
 
@@ -33,11 +35,11 @@ export function ProductCard({
       aria-label={brand}
     >
       <span className={cn("h-1 w-full shrink-0", accent)} aria-hidden />
-      <div className="flex min-h-0 flex-1 items-center justify-center bg-gradient-to-b from-background to-muted/50 px-1 py-0.5">
+      <div className="flex min-h-0 flex-1 items-center justify-center bg-gradient-to-b from-background to-muted/50 p-0.5">
         <img
           src={thumb ? thumbUrl(image) : image}
           alt=""
-          className="max-h-full w-full object-contain drop-shadow-sm"
+          className="h-full w-full object-contain drop-shadow-sm"
           draggable={false}
           decoding="async"
           loading="eager"
@@ -45,7 +47,8 @@ export function ProductCard({
           height={96}
         />
       </div>
-      <p
+      {showLabel ? (
+        <p
         className={cn(
           "line-clamp-2 shrink-0 bg-secondary px-1 py-0.5 text-center font-bold leading-[1.1] tracking-tight text-secondary-foreground [overflow-wrap:anywhere]",
           compact ? "text-[9px]" : "text-[10px] sm:text-[12px]",
@@ -53,6 +56,7 @@ export function ProductCard({
       >
         {brand}
       </p>
+      ) : null}
     </div>
   );
 }

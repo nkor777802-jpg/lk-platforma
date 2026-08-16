@@ -15,6 +15,12 @@ export function CabletrisResults({
   onRestart: () => void;
 }) {
   const orderName = orderProduct?.brand ?? "";
+  const reason =
+    state.endReason === "center"
+      ? "Центральные колонки заполнены"
+      : state.endReason === "spawn"
+        ? "Нет места для новой карточки"
+        : null;
 
   return (
     <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
@@ -23,6 +29,11 @@ export function CabletrisResults({
           <CardTitle className="text-secondary">Игра окончена</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
+          {reason ? (
+            <p className="rounded-lg border border-primary/40 bg-primary/10 px-3 py-2 text-primary">
+              {reason}
+            </p>
+          ) : null}
           <ResultRow label="Счёт" value={String(state.score)} />
           <ResultRow label="Слияния марок" value={String(state.brandMerges)} />
           <ResultRow label="Слияния категорий" value={String(state.categoryMerges)} />

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Boxes, Layers, MoveHorizontal, Play, Sparkles } from "lucide-react";
+import { AlertTriangle, Boxes, Layers, MoveHorizontal, Play, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductCard } from "./ProductCard";
@@ -36,12 +36,21 @@ export function CabletrisIntro({
           <Rule icon={<Layers className="h-4 w-4" aria-hidden />}>
             Три одинаковые категории дают бонус и дополнительные очки.
           </Rule>
+          <Rule icon={<AlertTriangle className="h-4 w-4" aria-hidden />}>
+            Игра заканчивается, если две центральные колонки заполнены до верха.
+          </Rule>
         </ul>
 
         <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-2.5">
           {orderProduct ? (
             <div className="h-14 w-14 shrink-0">
-              <ProductCard brand={orderProduct.brand} image={orderProduct.image} compact thumb />
+              <ProductCard
+                brand={orderProduct.brand}
+                image={orderProduct.image}
+                categoryId={orderProduct.category_id}
+                compact
+                thumb
+              />
             </div>
           ) : (
             <Sparkles className="h-5 w-5 text-primary" aria-hidden />

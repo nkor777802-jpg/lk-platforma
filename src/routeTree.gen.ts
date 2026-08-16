@@ -57,6 +57,7 @@ import { Route as AuthenticatedAdminTestsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedGamificationIndexRouteImport } from './routes/_authenticated/gamification.index'
 import { Route as AuthenticatedGamificationCabletrisRouteImport } from './routes/_authenticated/gamification.cabletris'
+import { Route as AuthenticatedGamificationSimulatorRouteImport } from './routes/_authenticated/gamification.simulator'
 import { Route as AuthenticatedLearningIndexRouteImport } from './routes/_authenticated/learning.index'
 import { Route as AuthenticatedLearningCourseIdRouteImport } from './routes/_authenticated/learning.$courseId'
 import { Route as AuthenticatedProfessionsIndexRouteImport } from './routes/_authenticated/professions.index'
@@ -325,6 +326,12 @@ const AuthenticatedGamificationCabletrisRoute =
     path: '/gamification/cabletris',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedGamificationSimulatorRoute =
+  AuthenticatedGamificationSimulatorRouteImport.update({
+    id: '/gamification/simulator',
+    path: '/gamification/simulator',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLearningIndexRoute =
   AuthenticatedLearningIndexRouteImport.update({
     id: '/learning/',
@@ -424,6 +431,7 @@ export interface FileRoutesByFullPath {
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/gamification/cabletris': typeof AuthenticatedGamificationCabletrisRoute
+  '/gamification/simulator': typeof AuthenticatedGamificationSimulatorRoute
   '/learning/$courseId': typeof AuthenticatedLearningCourseIdRoute
   '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
@@ -480,6 +488,7 @@ export interface FileRoutesByTo {
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/gamification/cabletris': typeof AuthenticatedGamificationCabletrisRoute
+  '/gamification/simulator': typeof AuthenticatedGamificationSimulatorRoute
   '/learning/$courseId': typeof AuthenticatedLearningCourseIdRoute
   '/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
@@ -540,6 +549,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/gamification/cabletris': typeof AuthenticatedGamificationCabletrisRoute
+  '/_authenticated/gamification/simulator': typeof AuthenticatedGamificationSimulatorRoute
   '/_authenticated/learning/$courseId': typeof AuthenticatedLearningCourseIdRoute
   '/_authenticated/professions/$slug': typeof AuthenticatedProfessionsSlugRoute
   '/_authenticated/results/$attemptId': typeof AuthenticatedResultsAttemptIdRoute
@@ -599,6 +609,7 @@ export interface FileRouteTypes {
     | '/admin/tests'
     | '/admin/users'
     | '/gamification/cabletris'
+    | '/gamification/simulator'
     | '/learning/$courseId'
     | '/professions/$slug'
     | '/results/$attemptId'
@@ -655,6 +666,7 @@ export interface FileRouteTypes {
     | '/admin/tests'
     | '/admin/users'
     | '/gamification/cabletris'
+    | '/gamification/simulator'
     | '/learning/$courseId'
     | '/professions/$slug'
     | '/results/$attemptId'
@@ -714,6 +726,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/tests'
     | '/_authenticated/admin/users'
     | '/_authenticated/gamification/cabletris'
+    | '/_authenticated/gamification/simulator'
     | '/_authenticated/learning/$courseId'
     | '/_authenticated/professions/$slug'
     | '/_authenticated/results/$attemptId'
@@ -1074,6 +1087,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedGamificationCabletrisRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/gamification/simulator': {
+      id: '/_authenticated/gamification/simulator'
+      path: '/gamification/simulator'
+      fullPath: '/gamification/simulator'
+      preLoaderRoute: typeof AuthenticatedGamificationSimulatorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/learning/': {
       id: '/_authenticated/learning/'
       path: '/learning'
@@ -1205,6 +1225,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTestsRoute: typeof AuthenticatedTestsRoute
   AuthenticatedVideosRoute: typeof AuthenticatedVideosRoute
   AuthenticatedGamificationCabletrisRoute: typeof AuthenticatedGamificationCabletrisRoute
+  AuthenticatedGamificationSimulatorRoute: typeof AuthenticatedGamificationSimulatorRoute
   AuthenticatedLearningCourseIdRoute: typeof AuthenticatedLearningCourseIdRoute
   AuthenticatedProfessionsSlugRoute: typeof AuthenticatedProfessionsSlugRoute
   AuthenticatedResultsAttemptIdRoute: typeof AuthenticatedResultsAttemptIdRoute
@@ -1231,6 +1252,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVideosRoute: AuthenticatedVideosRoute,
   AuthenticatedGamificationCabletrisRoute:
     AuthenticatedGamificationCabletrisRoute,
+  AuthenticatedGamificationSimulatorRoute:
+    AuthenticatedGamificationSimulatorRoute,
   AuthenticatedLearningCourseIdRoute: AuthenticatedLearningCourseIdRoute,
   AuthenticatedProfessionsSlugRoute: AuthenticatedProfessionsSlugRoute,
   AuthenticatedResultsAttemptIdRoute: AuthenticatedResultsAttemptIdRoute,

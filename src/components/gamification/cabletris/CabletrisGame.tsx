@@ -19,7 +19,7 @@ export function CabletrisGame() {
         <div>
           <p className="text-sm text-muted-foreground">
             <Link to="/gamification" className="text-primary hover:underline">
-              Навыки
+              Игры и тренажёры
             </Link>
             {" · "}
             {game.config.title}

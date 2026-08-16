@@ -16,7 +16,7 @@ const NAV = [
   { to: "/tests", label: "Тесты" },
   { to: "/results", label: "Результаты" },
   { to: "/development", label: "Развитие" },
-  { to: "/gamification", label: "Навыки" },
+  { to: "/gamification", label: "Игры и тренажёры" },
   { to: "/certificates", label: "Сертификаты" },
   { to: "/profile", label: "Профиль" },
 ] as const;

@@ -11,6 +11,7 @@ import {
 } from "@/lib/lms-queries";
 import { myAssignmentsQuery, myNotificationsQuery } from "@/lib/account-queries";
 import { TodayTasks } from "@/components/account/TodayTasks";
+import { GamesSummary } from "@/components/account/GamesSummary";
 import { trainingTypeLabel } from "@/lib/training-types";
 import { EmptyState, InlineLoading } from "@/components/states";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -68,6 +69,8 @@ function DashboardPage() {
       </div>
 
       <TodayTasks />
+
+      <GamesSummary />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard icon={BookOpen} label="Изучено материалов" value={String(completed)} />

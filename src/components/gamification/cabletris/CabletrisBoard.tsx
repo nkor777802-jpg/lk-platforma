@@ -38,6 +38,17 @@ export function CabletrisBoard({
   const fallingColRef = useRef<number | null>(falling?.col ?? null);
   fallingColRef.current = falling?.col ?? null;
 
+  // Посадочная клетка «призрака»: нижняя свободная строка в колонке падения.
+  let ghostRow: number | null = null;
+  if (falling) {
+    for (let r = rows - 1; r >= 0; r -= 1) {
+      if (grid[r]?.[falling.col]?.kind === "empty") {
+        ghostRow = r;
+        break;
+      }
+    }
+  }
+
   /** Перемещает падающую карточку в колонку под точкой касания. */
   const moveToPoint = useCallback(
     (clientX: number) => {
@@ -107,7 +118,8 @@ export function CabletrisBoard({
       className="mx-auto w-full touch-none select-none overscroll-contain"
       style={{
         touchAction: "none",
-        maxWidth: `min(100%, 28rem, calc((100dvh - 23rem) * ${cols} / ${rows}))`,
+        maxWidth: `min(100%, calc((100dvh - 15rem) * ${cols} / ${rows}))`,
+        minWidth: 0,
       }}
       role="application"
       aria-label="Игровое поле КабельТрис"
@@ -119,7 +131,7 @@ export function CabletrisBoard({
     >
       <div
         ref={gridRef}
-        className="grid gap-0.5 rounded-xl border border-border bg-muted/50 p-1 sm:gap-1 sm:p-1.5"
+        className="grid gap-0.5 rounded-2xl border-2 border-secondary/20 bg-secondary/5 p-1.5 shadow-[var(--shadow-brand)] backdrop-blur-[2px] sm:gap-1 sm:p-2"
         style={{
           gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
           gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
@@ -129,19 +141,24 @@ export function CabletrisBoard({
         {grid.map((row, r) =>
           row.map((cell, c) => {
             const isFalling = falling && falling.row === r && falling.col === c;
+            const inColumn = falling ? falling.col === c : false;
+            const isGhost = falling !== null && ghostRow === r && inColumn && !isFalling;
             const shown: GridCell = isFalling ? { kind: "brand", productId: falling.productId } : cell;
             const float = fx.find((item) => item.row === r && item.col === c);
             return (
               <div
                 key={`${r}-${c}`}
                 className={cn(
-                  "relative min-h-0 min-w-0 overflow-hidden rounded-sm bg-background",
-                  isFalling && "ring-2 ring-primary",
+                  "relative min-h-0 min-w-0 overflow-hidden rounded-md bg-background/90",
+                  inColumn && !isFalling && "bg-primary/5",
+                  isGhost && "ring-2 ring-dashed ring-primary/40",
+                  isFalling &&
+                    "z-[1] ring-2 ring-primary shadow-[0_0_0_3px_color-mix(in_oklab,var(--brand-orange)_25%,transparent)]",
                 )}
               >
                 <CellView cell={shown} products={products} />
                 {float ? (
-                  <span className="pointer-events-none absolute inset-x-0 top-0 animate-pulse text-center text-[10px] font-bold text-primary motion-reduce:animate-none">
+                  <span className="pointer-events-none absolute inset-x-0 top-0 animate-pulse text-center text-[11px] font-bold text-primary motion-reduce:animate-none">
                     {float.text}
                   </span>
                 ) : null}

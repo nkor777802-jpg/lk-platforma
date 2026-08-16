@@ -22,6 +22,8 @@ export function GameCard({
             src={game.previewSrc}
             alt={game.previewAlt ?? ""}
             className="h-full w-full object-contain p-3"
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <Factory className="h-12 w-12 text-primary" aria-hidden />

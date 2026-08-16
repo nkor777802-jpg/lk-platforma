@@ -1,44 +1,43 @@
-# Диагностика ошибки «Uncaught undefined» на /gamification/cabletris
+# Диагностика: пустой экран на /gamification/cabletris
 
-## Что проверено (без изменений кода)
+## Фактическая цепочка рендера (проверено в браузере)
 
-- Маршрут `/gamification/cabletris` зарегистрирован корректно; типы проекта проходят `tsgo --noEmit` без ошибок.
-- Данные `data_products.json` и `game_config.json` загружаются в браузере штатно (3 товара, валидный конфиг), картинки `/cabletris/products/*.png` существуют.
-- Движок отработал 400 тиков (`tickFall` / `spawnFalling` / `resolveBoard`) без исключений.
-- `CabletrisBoard`, `ProductCard`, `CategoryTile`, `CabletrisHud`, `CabletrisResults` не читают `grid`/state без защиты; ошибки `rows is not defined` больше нет.
+1. `__root` → `AuthProvider` → `Outlet` — отрабатывает.
+2. `src/routes/_authenticated/route.tsx` — `beforeLoad` **срабатывает**.
+3. Сессия существует: `supabase.auth.getUser()` возвращает `admin@lk.com`, редиректа на `/auth` нет.
+4. Дальше выполняется `getMyConsentStatus()` и на строках 22-24 бросается
+   `throw redirect({ to: "/legal-consent" })`.
+5. **До компонента страницы `CabletrisPage` выполнение не доходит**, `CabletrisGame`
+   и `CabletrisBoard` не монтируются вообще.
+6. Новых runtime-ошибок и rejected promise нет: в headless-браузере с вашей сессией
+   `/gamification/cabletris`, `/gamification`, `/dashboard` — все три уходят на `/legal-consent`
+   и отрисовывают экран согласия (693 символа текста). Без сессии — уходят на `/auth`.
+7. Пустоту даёт сам layout, а не игра:
+   - `src/routes/_authenticated/route.tsx:9` — `pendingComponent: () => null`;
+   - `src/routes/_authenticated/route.tsx:37` — `if (!mounted) return null`.
+   Пока асинхронный `beforeLoad` (два сетевых вызова: `auth.getUser()` + серверная функция
+   `getMyConsentStatus`) не завершится и пока не отработает `useEffect`, экран пустой.
 
-## Первопричина
+## Общесистемность
 
-Ошибка **не в коде игры**. В журнале ошибок предпросмотра «Uncaught undefined» идёт сразу за
-`Hydration failed because the server rendered HTML didn't match the client` на уровне `__root__`
-(`<OutletImpl>` → `<Suspense fallback={null}>`).
+Причина общесистемная, не связана с игрой: **все** authenticated-маршруты сейчас ведут
+на `/legal-consent`. В таблице `legal_consents` **0 записей** для всех 7 пользователей,
+при этом обязательных документов `kind = 'site'` — три, поэтому
+`getMyConsentStatus()` всегда возвращает `required: true, accepted: false`.
 
-- Файл: `src/routes/_authenticated/route.tsx`
-- Строки: 7 (`ssr: false`) и 17 (`throw redirect({ to: "/legal-consent" })`)
-- Выражение, дающее `undefined`: отклонённый промис `beforeLoad`, значение которого — объект
-  redirect'а TanStack Router. Он выбрасывается во время гидратации ветки, отрисованной на сервере
-  как пустой `Suspense`-fallback (`ssr: false`), поэтому браузер печатает `Uncaught undefined`
-  (без стека — выброшен не `Error`).
-- Почему срабатывает именно сейчас: в таблице `legal_consents` нет ни одной записи, поэтому
-  `getMyConsentStatus()` возвращает `required && !accepted` для любого пользователя, и каждый вход
-  на `/gamification/cabletris` уходит в редирект на `/legal-consent` ещё до отрисовки игры.
+Сейчас ваш предпросмотр открыт именно на `/legal-consent` и отрисован корректно.
 
-## Минимальное исправление
+## Точный вывод
 
-1. Вынести проверку согласия из `beforeLoad` в `loader` (или выполнять её только когда
-   `router.state.isLoading`, т.е. не во время гидратации), чтобы редирект не выбрасывался
-   во время hydration ветки с `ssr: false`.
-2. Убрать `try/catch` вокруг проверки: сейчас редирект бросается внутри `try` и повторно
-   пробрасывается через `isRedirect(e)`, что маскирует настоящие ошибки `getMyConsentStatus()`.
+- Последний успешно выполняемый маршрут: `_authenticated` (`beforeLoad`), затем экран
+  `/legal-consent`.
+- Первый компонент, который не выполняется: `CabletrisPage`
+  (`src/routes/_authenticated/gamification.cabletris.tsx:25`).
+- Файл и строка причины: `src/routes/_authenticated/route.tsx:22-24`.
+- Причина пустого экрана: гейт согласия на обработку ПД + `null` вместо индикатора загрузки
+  на время `beforeLoad` (строки 9 и 37 того же файла).
+- Минимальное исправление: нажать «Подтвердить» на `/legal-consent` — после записи согласия
+  маршрут игры откроется. Чтобы убрать сам пустой кадр, заменить `pendingComponent: () => null`
+  и `return null` на видимый скелет/спиннер.
 
-## Сопутствующий дефект в игре (найден, не связан с «Uncaught undefined»)
-
-`src/hooks/useCabletris.ts:161-168` — `drop()` вызывает `afterLock()` внутри updater-функции
-`setState`, а та через `pushFx` (:54) вызывает `setFx` и `emitCabletrisEvent`. Это побочный эффект
-во время рендера (React пишет предупреждение «Can't perform a React state update on a component
-that hasn't mounted yet»). Минимальная правка — считать новое состояние вне updater'а и вызывать
-`pushFx` / события после `setState`, как это уже сделано в игровом цикле (:144).
-
-## Дальше
-
-Правки не применяю — жду подтверждения, какой из двух пунктов делать.
+Правки не вносил.

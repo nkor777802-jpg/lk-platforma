@@ -3988,6 +3988,10 @@ export type Database = {
         Args: { _manager: string; _target: string }
         Returns: boolean
       }
+      update_own_contacts: {
+        Args: { p_avatar_url?: string; p_email?: string; p_phone?: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "employee" | "manager" | "hr" | "admin" | "teacher"

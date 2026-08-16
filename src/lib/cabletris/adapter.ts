@@ -64,3 +64,8 @@ export function categoryLabel(products: CabletrisProduct[], categoryId: string):
   const hit = products.find((p) => p.category_id === categoryId);
   return hit?.display_category ?? hit?.category ?? categoryId;
 }
+
+/** Облегчённая версия фото для мелких игровых плиток. */
+export function thumbUrl(image: string): string {
+  return image.replace(/\.png$/i, "_sm.webp");
+}

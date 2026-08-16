@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CabletrisBoard } from "./CabletrisBoard";
 import { CabletrisHud } from "./CabletrisHud";
 import { CabletrisResults } from "./CabletrisResults";
-import { ProductCard } from "./ProductCard";
 
 export function CabletrisGame() {
   const game = useCabletris();
@@ -23,28 +22,23 @@ export function CabletrisGame() {
 
   return (
     <div className="relative space-y-3 overscroll-contain sm:space-y-4">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
-        <div className="min-w-0">
-          <p className="truncate text-xs text-muted-foreground sm:text-sm">
-            <Link to="/gamification" className="text-primary hover:underline">
-              Игры и тренажёры
-            </Link>
-            {" · "}
-            {game.config.title}
-          </p>
-          <h1 className="truncate text-xl font-bold text-secondary sm:text-3xl">
-            {game.config.title}
-          </h1>
-        </div>
-        <div className="w-14 shrink-0 sm:w-20">
-          <p className="mb-1 text-center text-[10px] uppercase text-muted-foreground">Следующая</p>
-          {next ? <ProductCard brand={next.brand} image={next.image} compact thumb /> : null}
-        </div>
+      <div className="min-w-0">
+        <p className="truncate text-xs text-muted-foreground sm:text-sm">
+          <Link to="/gamification" className="text-primary hover:underline">
+            Игры и тренажёры
+          </Link>
+          {" · "}
+          {game.config.title}
+        </p>
+        <h1 className="truncate text-xl font-bold text-secondary sm:text-3xl">
+          {game.config.title}
+        </h1>
       </div>
 
       <CabletrisHud
         config={game.config}
         orderProduct={game.orderProduct}
+        nextProduct={next}
         state={game.state}
         soundOn={game.soundOn}
         onToggleSound={() => game.setSoundOn((v) => !v)}

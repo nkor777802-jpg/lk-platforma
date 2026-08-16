@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Boxes, Layers, MoveHorizontal, Play, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,7 +71,7 @@ export function CabletrisIntro({
   );
 }
 
-function Rule({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+function Rule({ icon, children }: { icon: ReactNode; children: ReactNode }) {
   return (
     <li className="flex items-start gap-2.5 text-sm text-foreground">
       <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-accent">

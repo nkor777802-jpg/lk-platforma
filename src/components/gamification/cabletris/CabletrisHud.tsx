@@ -47,7 +47,14 @@ export function CabletrisHud({
           <div className="flex items-start gap-2.5">
             {orderProduct ? (
               <div className="h-14 w-14 shrink-0">
-                <ProductCard brand={orderProduct.brand} image={orderProduct.image} compact thumb />
+                <ProductCard
+                  brand={orderProduct.brand}
+                  image={orderProduct.image}
+                  categoryId={orderProduct.category_id}
+                  compact
+                  thumb
+                  showLabel={false}
+                />
               </div>
             ) : null}
             <div className="min-w-0 flex-1">
@@ -69,7 +76,13 @@ export function CabletrisHud({
               </p>
               <div className="h-14">
                 {nextProduct ? (
-                  <ProductCard brand={nextProduct.brand} image={nextProduct.image} compact thumb />
+                  <ProductCard
+                    brand={nextProduct.brand}
+                    image={nextProduct.image}
+                    categoryId={nextProduct.category_id}
+                    compact
+                    thumb
+                  />
                 ) : null}
               </div>
             </div>

@@ -120,7 +120,7 @@ export function CabletrisBoard({
       className="mx-auto w-full touch-none select-none overscroll-contain"
       style={{
         touchAction: "none",
-        maxWidth: `min(100%, 32rem, calc((100dvh - 21rem) * ${cols} / ${rows}))`,
+        maxWidth: `min(100%, ${cols * 5}rem)`,
         minWidth: 0,
       }}
       role="application"
@@ -213,6 +213,7 @@ function CellView({ cell, products }: { cell: GridCell; products: CabletrisProdu
       image={product.image}
       categoryId={product.category_id}
       thumb
+      showLabel={false}
     />
   );
 }

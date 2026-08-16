@@ -27,8 +27,8 @@ export function CabletrisHud({
   const orderName = orderProduct?.brand ?? config.mvpOrder.productId;
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div className="grid min-w-0 flex-1 grid-cols-3 gap-2">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+      <div className="grid min-w-0 flex-1 grid-cols-3 gap-1.5 sm:gap-2">
         <HudStat label="Счёт" value={String(state.score)} />
         <HudStat label="Комбо" value={`x${Math.max(1, state.lastWaveCombo)}`} />
         <div className="rounded-lg border border-border bg-card px-2 py-1.5">
@@ -45,7 +45,7 @@ export function CabletrisHud({
         {state.phase === "paused" ? (
           <Button type="button" size="sm" onClick={onResume}>
             <Play className="h-4 w-4" />
-            Продолжить
+            <span className="hidden sm:inline">Продолжить</span>
           </Button>
         ) : (
           <Button
@@ -56,7 +56,7 @@ export function CabletrisHud({
             disabled={state.phase !== "playing"}
           >
             <Pause className="h-4 w-4" />
-            Пауза
+            <span className="hidden sm:inline">Пауза</span>
           </Button>
         )}
         <Button

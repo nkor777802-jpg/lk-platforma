@@ -33,8 +33,8 @@ export function CabletrisHud({
   const combo = Math.max(1, state.lastWaveCombo);
 
   return (
-    <div className="rounded-2xl border border-secondary/15 bg-secondary p-3 text-secondary-foreground shadow-[var(--shadow-brand)]">
-      <div className="grid gap-3 lg:grid-cols-[repeat(2,minmax(0,1fr))_minmax(0,1.4fr)_auto] lg:items-stretch">
+    <div className="rounded-2xl border border-secondary/15 bg-secondary p-2 text-secondary-foreground shadow-[var(--shadow-brand)] sm:p-3">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-[repeat(2,minmax(0,1fr))_minmax(0,1.4fr)_auto] lg:items-stretch">
         <HudStat label="Счёт" value={state.score.toLocaleString("ru-RU")} />
         <HudStat
           label="Комбо"
@@ -43,10 +43,10 @@ export function CabletrisHud({
           icon={combo > 1 ? <Flame className="h-4 w-4" aria-hidden /> : null}
         />
 
-        <div className="rounded-xl bg-background/10 p-2.5">
-          <div className="flex items-start gap-2.5">
+        <div className="col-span-2 rounded-xl bg-background/10 p-2 sm:p-2.5 lg:col-span-1">
+          <div className="flex items-center gap-2.5">
             {orderProduct ? (
-              <div className="h-14 w-14 shrink-0">
+              <div className="h-10 w-10 shrink-0 sm:h-14 sm:w-14">
                 <ProductCard
                   brand={orderProduct.brand}
                   image={orderProduct.image}
@@ -58,34 +58,40 @@ export function CabletrisHud({
               </div>
             ) : null}
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] uppercase tracking-[0.14em] opacity-70">Заказ смены</p>
-              <p className="truncate text-sm font-bold">{orderName}</p>
-              <Progress value={progress} className="mt-1.5 h-2 bg-background/20" />
-              <p className="mt-1 text-[11px] opacity-80">
-                {state.orderProgress} / {target}
-              </p>
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="truncate text-[13px] font-bold sm:text-sm">
+                  <span className="mr-1 text-[10px] font-medium uppercase tracking-[0.14em] opacity-70">
+                    Заказ
+                  </span>
+                  {orderName}
+                </p>
+                <p className="shrink-0 text-[11px] tabular-nums opacity-80">
+                  {state.orderProgress} / {target}
+                </p>
+              </div>
+              <Progress value={progress} className="mt-1 h-1.5 bg-background/20 sm:h-2" />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-3 lg:flex-col lg:items-end lg:justify-start">
+        <div className="col-span-2 flex items-center justify-between gap-3 lg:col-span-1 lg:flex-col lg:items-end lg:justify-start">
           <div className="flex items-center gap-2">
-            <div className="w-14 shrink-0">
-              <p className="mb-1 text-center text-[9px] uppercase tracking-[0.12em] opacity-70">
-                Далее
-              </p>
-              <div className="h-14">
-                {nextProduct ? (
-                  <ProductCard
-                    brand={nextProduct.brand}
-                    image={nextProduct.image}
-                    categoryId={nextProduct.category_id}
-                    compact
-                    thumb
-                  />
-                ) : null}
-              </div>
+            <p className="text-[9px] uppercase tracking-[0.12em] opacity-70">Далее</p>
+            <div className="h-10 w-10 shrink-0 sm:h-14 sm:w-14">
+              {nextProduct ? (
+                <ProductCard
+                  brand={nextProduct.brand}
+                  image={nextProduct.image}
+                  categoryId={nextProduct.category_id}
+                  compact
+                  thumb
+                  showLabel={false}
+                />
+              ) : null}
             </div>
+            <p className="min-w-0 truncate text-[11px] font-semibold sm:text-xs">
+              {nextProduct?.brand ?? ""}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             {state.phase === "paused" ? (
@@ -120,7 +126,7 @@ export function CabletrisHud({
       </div>
 
       {state.orderCompleted ? (
-        <Badge className="mt-3 gap-1">
+        <Badge className="mt-2 gap-1">
           <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
           Заказ выполнен
         </Badge>
@@ -143,14 +149,14 @@ function HudStat({
   return (
     <div
       className={cn(
-        "rounded-xl bg-background/10 px-3 py-2 transition-colors",
+        "rounded-xl bg-background/10 px-2.5 py-1.5 transition-colors sm:px-3 sm:py-2",
         highlight && "bg-primary text-primary-foreground",
       )}
     >
-      <p className="text-[10px] uppercase tracking-[0.14em] opacity-70">{label}</p>
+      <p className="text-[9px] uppercase tracking-[0.14em] opacity-70 sm:text-[10px]">{label}</p>
       <p
         className={cn(
-          "flex items-center gap-1.5 text-2xl font-bold tabular-nums sm:text-3xl",
+          "flex items-center gap-1.5 text-lg font-bold tabular-nums sm:text-3xl",
           highlight && "animate-pulse motion-reduce:animate-none",
         )}
       >

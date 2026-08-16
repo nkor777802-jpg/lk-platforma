@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { CheckCircle2, Flame, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -124,7 +125,7 @@ function HudStat({
   label: string;
   value: string;
   highlight?: boolean;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
 }) {
   return (
     <div

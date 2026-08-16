@@ -22,16 +22,16 @@ export function CabletrisGame() {
   }, [game.products]);
 
   return (
-    <div className="relative space-y-3 overscroll-contain sm:space-y-4">
+    <div className="relative space-y-2 overscroll-contain sm:space-y-4">
       <div className="min-w-0">
-        <p className="truncate text-xs text-muted-foreground sm:text-sm">
+        <p className="hidden truncate text-xs text-muted-foreground sm:block sm:text-sm">
           <Link to="/gamification" className="text-primary hover:underline">
             Игры и тренажёры
           </Link>
           {" · "}
           {game.config.title}
         </p>
-        <h1 className="truncate text-xl font-bold text-secondary sm:text-3xl">
+        <h1 className="truncate text-base font-bold text-secondary sm:text-3xl">
           {game.config.title}
         </h1>
       </div>
@@ -98,9 +98,12 @@ export function CabletrisGame() {
         ) : null}
       </div>
 
-      <p className="text-center text-xs text-muted-foreground">
+      <p className="hidden text-center text-xs text-muted-foreground sm:block">
         Клавиатура: ← → и ↓. На телефоне: касание по колонке — переставить, двойное касание или
         свайп вниз — сбросить, кнопки под полем — тоже работают.
+      </p>
+      <p className="text-center text-[11px] text-muted-foreground sm:hidden">
+        Касание по колонке — переставить, двойное — сбросить.
       </p>
     </div>
   );

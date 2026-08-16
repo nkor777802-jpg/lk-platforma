@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { categoryLabel, productById } from "@/lib/cabletris/adapter";
 import { centerColumns } from "@/lib/cabletris/engine";
@@ -10,6 +10,8 @@ import { ProductCard } from "./ProductCard";
 
 const SWIPE_MIN = 24;
 const TAP_MAX = 12;
+/** Минимальный размер клетки, ниже которого фото кабеля перестаёт читаться. */
+const MIN_CELL = 52;
 
 export function CabletrisBoard({
   grid,
@@ -31,6 +33,8 @@ export function CabletrisBoard({
   const danger = centerColumns(cols);
   const rootRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
+  const [maxBoardWidth, setMaxBoardWidth] = useState<number | null>(null);
   const origin = useRef<{ x: number; y: number } | null>(null);
   const lastTap = useRef(0);
   const onMoveRef = useRef(onMove);
@@ -113,6 +117,29 @@ export function CabletrisBoard({
     };
   }, [moveToPoint]);
 
+  // Вписываем поле в свободную высоту экрана, но не мельче MIN_CELL на клетку.
+  useEffect(() => {
+    if (rows === 0 || cols === 0) return;
+    const recalc = () => {
+      const el = rootRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top;
+      const controls = controlsRef.current?.getBoundingClientRect().height ?? 0;
+      const available = window.innerHeight - top - controls - 24;
+      const byHeight = (available * cols) / rows;
+      setMaxBoardWidth(Math.max(cols * MIN_CELL, byHeight));
+    };
+    recalc();
+    window.addEventListener("resize", recalc);
+    const ro = new ResizeObserver(recalc);
+    if (controlsRef.current) ro.observe(controlsRef.current);
+    ro.observe(document.body);
+    return () => {
+      window.removeEventListener("resize", recalc);
+      ro.disconnect();
+    };
+  }, [cols, rows]);
+
   return (
     <div className="flex flex-col items-center gap-3">
     <div
@@ -120,7 +147,10 @@ export function CabletrisBoard({
       className="mx-auto w-full touch-none select-none overscroll-contain"
       style={{
         touchAction: "none",
-        maxWidth: `min(100%, ${cols * 5}rem)`,
+        maxWidth:
+          maxBoardWidth === null
+            ? `min(100%, ${cols * 5}rem)`
+            : `min(100%, ${cols * 5}rem, ${Math.round(maxBoardWidth)}px)`,
         minWidth: 0,
       }}
       role="application"
@@ -173,7 +203,7 @@ export function CabletrisBoard({
       </div>
     </div>
 
-      <div className="flex w-full max-w-xs items-center justify-center gap-2 sm:hidden">
+      <div ref={controlsRef} className="flex w-full max-w-xs items-center justify-center gap-2 sm:hidden">
         <Button
           type="button"
           variant="outline"

@@ -1,11 +1,14 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { categoryLabel, productById } from "@/lib/cabletris/adapter";
 import type { CabletrisProduct, FallingPiece, GridCell, MergeFx } from "@/lib/cabletris/types";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { CategoryTile } from "./CategoryTile";
 import { ProductCard } from "./ProductCard";
 
-const SWIPE_MIN = 28;
+const SWIPE_MIN = 24;
+const TAP_MAX = 12;
 
 export function CabletrisBoard({
   grid,
@@ -25,11 +28,29 @@ export function CabletrisBoard({
   const rows = grid.length;
   const cols = grid[0]?.length ?? 0;
   const rootRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
   const origin = useRef<{ x: number; y: number } | null>(null);
+  const lastTap = useRef(0);
   const onMoveRef = useRef(onMove);
   const onDropRef = useRef(onDrop);
   onMoveRef.current = onMove;
   onDropRef.current = onDrop;
+  const fallingColRef = useRef<number | null>(falling?.col ?? null);
+  fallingColRef.current = falling?.col ?? null;
+
+  /** Перемещает падающую карточку в колонку под точкой касания. */
+  const moveToPoint = useCallback(
+    (clientX: number) => {
+      const box = gridRef.current?.getBoundingClientRect();
+      const from = fallingColRef.current;
+      if (!box || from === null || cols === 0) return;
+      const ratio = (clientX - box.left) / box.width;
+      const target = Math.min(cols - 1, Math.max(0, Math.floor(ratio * cols)));
+      const step = target > from ? 1 : -1;
+      for (let i = 0; i < Math.abs(target - from); i += 1) onMoveRef.current(step);
+    },
+    [cols],
+  );
 
   useEffect(() => {
     const el = rootRef.current;
@@ -51,6 +72,17 @@ export function CabletrisBoard({
       if (!from || !t) return;
       const dx = t.clientX - from.x;
       const dy = t.clientY - from.y;
+      if (Math.abs(dx) <= TAP_MAX && Math.abs(dy) <= TAP_MAX) {
+        const now = Date.now();
+        if (now - lastTap.current < 300) {
+          lastTap.current = 0;
+          onDropRef.current();
+        } else {
+          lastTap.current = now;
+          moveToPoint(t.clientX);
+        }
+        return;
+      }
       if (Math.abs(dx) < SWIPE_MIN && Math.abs(dy) < SWIPE_MIN) return;
       if (Math.abs(dx) > Math.abs(dy)) onMoveRef.current(dx < 0 ? -1 : 1);
       else if (dy > 0) onDropRef.current();
@@ -66,17 +98,27 @@ export function CabletrisBoard({
       el.removeEventListener("touchend", end);
       el.removeEventListener("touchcancel", end);
     };
-  }, []);
+  }, [moveToPoint]);
 
   return (
+    <div className="flex flex-col items-center gap-3">
     <div
       ref={rootRef}
-      className="mx-auto w-full max-w-[min(100%,28rem)] touch-none select-none overscroll-contain"
-      style={{ touchAction: "none" }}
+      className="mx-auto w-full touch-none select-none overscroll-contain"
+      style={{
+        touchAction: "none",
+        maxWidth: `min(100%, 28rem, calc((100dvh - 20rem) * ${cols} / ${rows}))`,
+      }}
       role="application"
       aria-label="Игровое поле КабельТрис"
+      onClick={(e) => {
+        if (e.detail === 0) return;
+        moveToPoint(e.clientX);
+      }}
+      onDoubleClick={onDrop}
     >
       <div
+        ref={gridRef}
         className="grid gap-0.5 rounded-xl border border-border bg-muted/50 p-1 sm:gap-1 sm:p-1.5"
         style={{
           gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
@@ -109,6 +151,31 @@ export function CabletrisBoard({
         )}
       </div>
     </div>
+
+      <div className="flex w-full max-w-xs items-center justify-center gap-2 sm:hidden">
+        <Button
+          type="button"
+          variant="outline"
+          className="h-12 flex-1"
+          aria-label="Влево"
+          onClick={() => onMove(-1)}
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </Button>
+        <Button type="button" className="h-12 flex-1" aria-label="Вниз" onClick={onDrop}>
+          <ChevronDown className="h-5 w-5" />
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="h-12 flex-1"
+          aria-label="Вправо"
+          onClick={() => onMove(1)}
+        >
+          <ChevronRight className="h-5 w-5" />
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -119,5 +186,5 @@ function CellView({ cell, products }: { cell: GridCell; products: CabletrisProdu
   }
   const product = productById(products, cell.productId);
   if (!product) return null;
-  return <ProductCard brand={product.brand} image={product.image} />;
+  return <ProductCard brand={product.brand} image={product.image} thumb />;
 }

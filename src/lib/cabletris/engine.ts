@@ -15,6 +15,7 @@ export type EngineState = GameStats & {
   phase: GamePhase;
   elapsedMs: number;
   lastWaveCombo: number;
+  endReason: "center" | "spawn" | null;
 };
 
 const DIRS: ReadonlyArray<readonly [number, number]> = [
@@ -78,11 +79,28 @@ function pickProductId(
   return pick;
 }
 
-const SPAWN_COL_ORDER = [2, 3, 1, 4, 0, 5];
+/** Две центральные колонки поля — «зона риска». */
+export function centerColumns(cols: number): number[] {
+  if (cols <= 0) return [];
+  if (cols === 1) return [0];
+  const mid = Math.floor((cols - 1) / 2);
+  return [mid, Math.min(cols - 1, mid + 1)];
+}
+
+/** Игра окончена, когда обе центральные колонки заполнены до верха. */
+export function isCenterBlocked(grid: GridCell[][]): boolean {
+  const cols = grid[0]?.length ?? 0;
+  const center = centerColumns(cols);
+  if (center.length === 0) return false;
+  return center.every((c) => !isEmpty(grid, 0, c));
+}
 
 function spawnCol(grid: GridCell[][], rng: () => number): number | null {
   const cols = grid[0]?.length ?? 0;
-  const free = SPAWN_COL_ORDER.filter((c) => c < cols && isEmpty(grid, 0, c));
+  const order = Array.from({ length: cols }, (_, i) => i).sort(
+    (a, b) => Math.abs(a - (cols - 1) / 2) - Math.abs(b - (cols - 1) / 2),
+  );
+  const free = order.filter((c) => isEmpty(grid, 0, c));
   if (free.length === 0) return null;
   const shuffled = [...free].sort(() => rng() - 0.5);
   return shuffled[0] ?? null;
@@ -103,6 +121,7 @@ export function createInitialState(
     phase: "idle",
     elapsedMs: 0,
     lastWaveCombo: 1,
+    endReason: null,
     score: 0,
     combo: 1,
     bestCombo: 1,
@@ -120,11 +139,14 @@ export function spawnFalling(
 ): EngineState {
   const productId = state.nextProductId;
   if (!productId) {
-    return { ...state, phase: "gameover", falling: null };
+    return { ...state, phase: "gameover", falling: null, endReason: "spawn" };
+  }
+  if (isCenterBlocked(state.grid)) {
+    return { ...state, phase: "gameover", falling: null, endReason: "center" };
   }
   const col = spawnCol(state.grid, rng);
   if (col === null) {
-    return { ...state, phase: "gameover", falling: null };
+    return { ...state, phase: "gameover", falling: null, endReason: "spawn" };
   }
   const recent = [...state.recentSpawns, productId];
   const next = pickProductId(products, recent, rng);

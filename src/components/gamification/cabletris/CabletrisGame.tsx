@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useCabletris } from "@/hooks/useCabletris";
-import { productById } from "@/lib/cabletris/adapter";
+import { productById, thumbUrl } from "@/lib/cabletris/adapter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CabletrisBoard } from "./CabletrisBoard";
@@ -13,22 +13,32 @@ export function CabletrisGame() {
   const game = useCabletris();
   const next = productById(game.products, game.state.nextProductId);
 
+  // Предзагрузка облегчённых фото, чтобы плитки не «мигали» пустотой.
+  useEffect(() => {
+    for (const product of game.products) {
+      const img = new Image();
+      img.src = thumbUrl(product.image);
+    }
+  }, [game.products]);
+
   return (
-    <div className="relative space-y-4">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-sm text-muted-foreground">
+    <div className="relative space-y-3 overscroll-contain sm:space-y-4">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-xs text-muted-foreground sm:text-sm">
             <Link to="/gamification" className="text-primary hover:underline">
               Игры и тренажёры
             </Link>
             {" · "}
             {game.config.title}
           </p>
-          <h1 className="text-2xl font-bold text-secondary sm:text-3xl">{game.config.title}</h1>
+          <h1 className="truncate text-xl font-bold text-secondary sm:text-3xl">
+            {game.config.title}
+          </h1>
         </div>
-        <div className="w-20 shrink-0">
+        <div className="w-14 shrink-0 sm:w-20">
           <p className="mb-1 text-center text-[10px] uppercase text-muted-foreground">Следующая</p>
-          {next ? <ProductCard brand={next.brand} image={next.image} compact /> : null}
+          {next ? <ProductCard brand={next.brand} image={next.image} compact thumb /> : null}
         </div>
       </div>
 
@@ -103,7 +113,8 @@ export function CabletrisGame() {
       </div>
 
       <p className="text-center text-xs text-muted-foreground">
-        Клавиатура: ← → и ↓. На телефоне: свайп влево, вправо и вниз.
+        Клавиатура: ← → и ↓. На телефоне: касание по колонке — переставить, двойное касание или
+        свайп вниз — сбросить, кнопки под полем — тоже работают.
       </p>
     </div>
   );

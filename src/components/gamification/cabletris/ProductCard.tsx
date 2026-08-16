@@ -1,13 +1,16 @@
 import { cn } from "@/lib/utils";
+import { thumbUrl } from "@/lib/cabletris/adapter";
 
 export function ProductCard({
   brand,
   image,
   compact = false,
+  thumb = false,
 }: {
   brand: string;
   image: string;
   compact?: boolean;
+  thumb?: boolean;
 }) {
   return (
     <div
@@ -17,7 +20,16 @@ export function ProductCard({
       )}
     >
       <div className="flex min-h-0 flex-1 items-center justify-center bg-muted/40 p-0.5">
-        <img src={image} alt="" className="h-full w-full object-contain" draggable={false} />
+        <img
+          src={thumb ? thumbUrl(image) : image}
+          alt=""
+          className="h-full w-full object-contain"
+          draggable={false}
+          decoding="async"
+          loading="eager"
+          width={192}
+          height={192}
+        />
       </div>
       <p
         className={cn(

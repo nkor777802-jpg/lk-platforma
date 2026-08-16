@@ -107,7 +107,7 @@ export function CabletrisBoard({
       className="mx-auto w-full touch-none select-none overscroll-contain"
       style={{
         touchAction: "none",
-        maxWidth: `min(100%, 28rem, calc((100dvh - 20rem) * ${cols} / ${rows}))`,
+        maxWidth: `min(100%, 28rem, calc((100dvh - 23rem) * ${cols} / ${rows}))`,
       }}
       role="application"
       aria-label="Игровое поле КабельТрис"

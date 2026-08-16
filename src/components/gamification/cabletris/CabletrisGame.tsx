@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CabletrisBoard } from "./CabletrisBoard";
 import { CabletrisHud } from "./CabletrisHud";
+import { CabletrisIntro } from "./CabletrisIntro";
 import { CabletrisResults } from "./CabletrisResults";
 
 export function CabletrisGame() {
@@ -58,20 +59,11 @@ export function CabletrisGame() {
 
         {game.state.phase === "idle" ? (
           <Overlay>
-            <Card className="max-w-sm">
-              <CardHeader>
-                <CardTitle className="text-secondary">{game.config.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>
-                  Собирайте три одинаковые марки, чтобы получить плитку категории. Три одинаковые
-                  категории дают бонус. Заказ и очки берутся из настроек игры.
-                </p>
-                <Button type="button" className="w-full" onClick={game.start}>
-                  Начать
-                </Button>
-              </CardContent>
-            </Card>
+            <CabletrisIntro
+              config={game.config}
+              orderProduct={game.orderProduct}
+              onStart={game.start}
+            />
           </Overlay>
         ) : null}
 

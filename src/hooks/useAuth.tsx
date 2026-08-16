@@ -23,28 +23,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
-      setSession(next);
-      if (!next) setRoles([]);
-    });
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
+    /** Сбой подключения к бэкенду не должен ронять публичные страницы: отдаём состояние «гость». */
+    try {
+      const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
+        setSession(next);
+        if (!next) setRoles([]);
+      });
+      void supabase.auth
+        .getSession()
+        .then(({ data }) => setSession(data.session))
+        .catch(() => setSession(null))
+        .finally(() => setLoading(false));
+      return () => sub.subscription.unsubscribe();
+    } catch (e) {
+      console.error("[auth] backend unavailable", e);
+      setSession(null);
+      setRoles([]);
       setLoading(false);
-    });
-    return () => sub.subscription.unsubscribe();
+      return;
+    }
   }, []);
 
   useEffect(() => {
     const uid = session?.user?.id;
     if (!uid) return;
     let cancelled = false;
-    void supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", uid)
-      .then(({ data }) => {
-        if (!cancelled) setRoles(((data ?? []) as { role: AppRole }[]).map((r) => r.role));
-      });
+    try {
+      void supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", uid)
+        .then(({ data }) => {
+          if (!cancelled) setRoles(((data ?? []) as { role: AppRole }[]).map((r) => r.role));
+        });
+    } catch (e) {
+      console.error("[auth] roles unavailable", e);
+    }
     return () => {
       cancelled = true;
     };

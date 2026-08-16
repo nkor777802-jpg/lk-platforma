@@ -80,7 +80,7 @@ export function CabletrisBoard({
         className="grid gap-0.5 rounded-xl border border-border bg-muted/50 p-1 sm:gap-1 sm:p-1.5"
         style={{
           gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-          gridTemplateRows: `repeat(${grid.length}, minmax(0, 1fr))`,
+          gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
           aspectRatio: `${cols} / ${rows}`,
         }}
       >

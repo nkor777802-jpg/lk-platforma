@@ -213,6 +213,7 @@ function CellView({ cell, products }: { cell: GridCell; products: CabletrisProdu
       image={product.image}
       categoryId={product.category_id}
       thumb
+      showLabel={false}
     />
   );
 }

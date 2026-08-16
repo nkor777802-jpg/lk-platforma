@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export const Route = createFileRoute("/_authenticated/gamification")({
+export const Route = createFileRoute("/_authenticated/gamification/simulator")({
   head: () => ({
     meta: [
       { title: "Производственный тренажёр — Академия «Людиновокабель»" },
@@ -33,10 +33,10 @@ export const Route = createFileRoute("/_authenticated/gamification")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: GamificationPage,
+  component: SimulatorPage,
 });
 
-function GamificationPage() {
+function SimulatorPage() {
   const settings = useQuery(gamificationSettingsQuery);
   const data = useQuery(myGamificationQuery);
   const boards = useQuery(leaderboardsQuery);
@@ -58,6 +58,13 @@ function GamificationPage() {
   return (
     <div className="space-y-6">
       <div>
+        <p className="text-sm text-muted-foreground">
+          <Link to="/gamification" className="text-primary hover:underline">
+            Игры и тренажёры
+          </Link>
+          {" · "}
+          Производственный тренажёр
+        </p>
         <h1 className="text-2xl font-bold text-secondary sm:text-3xl">Производственный тренажёр</h1>
         <p className="mt-2 text-muted-foreground">
           Сборка кабеля по реальным маршрутам производственного паспорта. Тренажёр повышает

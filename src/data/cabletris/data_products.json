@@ -1,0 +1,35 @@
+[
+  {
+    "product_id": "01-029",
+    "brand": "АВБШвнг(А)-ХЛ",
+    "category_id": "01",
+    "category": "Кабель силовой",
+    "display_category": "Силовые кабели",
+    "image": "assets/products/01-029_PHOTO_01_АВБШвнг(А)-ХЛ.png",
+    "difficulty": 1,
+    "rarity": "common",
+    "is_active": true
+  },
+  {
+    "product_id": "02-003",
+    "brand": "КВВГнг(А)-LS",
+    "category_id": "02",
+    "category": "Кабель контрольный",
+    "display_category": "Контрольные кабели",
+    "image": "assets/products/02-003_PHOTO_01_КВВГнг(А)-LS.png",
+    "difficulty": 1,
+    "rarity": "common",
+    "is_active": true
+  },
+  {
+    "product_id": "03-005",
+    "brand": "СИП-3",
+    "category_id": "03",
+    "category": "Провод самонесущий изолированный",
+    "display_category": "Провода СИП",
+    "image": "assets/products/03-005_PHOTO_01_СИП-3.png",
+    "difficulty": 1,
+    "rarity": "common",
+    "is_active": true
+  }
+]
